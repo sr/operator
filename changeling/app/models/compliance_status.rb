@@ -92,7 +92,7 @@ class ComplianceStatus
     when RepositoryCommitStatus::FAILURE
       body << "<li>The automated tests have failed</li>"
     else
-      body << "<li>The status of automated tests is unknown</li>"
+      body << "<li>The status of the automated tests is unknown</li>"
     end
 
     ticket = @multipass.referenced_ticket

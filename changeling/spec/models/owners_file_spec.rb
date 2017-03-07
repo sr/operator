@@ -11,8 +11,13 @@ garbage
 srozet@salesforce.com
 @simon-rozet
 @pardot/app-sec *.php
+@pardot/dba my.cnf
 EOS
 
     expect(owners.teams).to eq(["Pardot/bread"])
+    expect(owners.globs).to eq(
+      "*.php" => "pardot/app-sec",
+      "my.cnf" => "pardot/dba"
+    )
   end
 end

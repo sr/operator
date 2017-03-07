@@ -5,7 +5,7 @@ class OwnersFile
     @teams, @globs = parse(string)
   end
 
-  attr_reader :teams
+  attr_reader :teams, :globs
 
   private
 
@@ -24,8 +24,9 @@ class OwnersFile
         name = nil
       when :GLOB
         name ||= names.pop
-        globs[value] ||= []
-        globs[value] << name
+        if name
+          globs[value] = name
+        end
       when :TEAMNAME
         names << value[1, value.length]
       when :END

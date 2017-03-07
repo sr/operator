@@ -68,17 +68,16 @@ RSpec.describe RepositoryPullRequest, "ownership" do
     )
     @pull_request.reload
 
-    expect(@pull_request.ownership_users).to eq([[
-      user("alindeman"),
-      user("sr"),
-      user("ys")
-    ]])
+    expect(@pull_request.ownership_users).to eq([
+      [user("alindeman"), user("sr")],
+      [user("ys")]
+    ])
   end
 
-  it "returns the list of teams that owns components changed by this pull request" do
+  it "returns the list of teams that owns the file and directories being changed in this pull request" do
     expect(@pull_request.ownership_teams).to eq([])
 
-    @repository.repository_owners_files.create!(
+    ownersfile = @repository.repository_owners_files.create!(
       path_name: "/#{Repository::OWNERS_FILENAME}",
       content: "@heroku/ops"
     )
@@ -90,6 +89,23 @@ RSpec.describe RepositoryPullRequest, "ownership" do
     team_1 = @pull_request.ownership_teams[0]
     expect(team_1.slug).to eq("heroku/ops")
     expect(team_1.url).to eq("#{Changeling.config.github_url}/orgs/heroku/teams/ops")
+
+    content = [
+      "@heroku/ops",
+      "@heroku/security dangerzone",
+      "@heroku/bread build-*"
+    ]
+    ownersfile.update!(content: content.join("\n"))
+    expect(@pull_request.ownership_teams.size).to eq(1)
+    @multipass.pull_request_files.create!(
+      filename: "/dangerzone",
+      state: "added",
+      patch: "+ LANAAAAA",
+    )
+    @pull_request.reload
+    expect(@pull_request.ownership_teams.size).to eq(2)
+    team_2 = @pull_request.ownership_teams[1]
+    expect(team_2.slug).to eq("heroku/security")
   end
 
   it "returns the OWNERS files relevant for the pull request" do
