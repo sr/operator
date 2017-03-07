@@ -94,3 +94,7 @@ $ gvt fetch github.com/user/repo/package
 ```
 
 Please read `gvt -help` for more details.
+
+## Protocol Buffers
+
+All generated protocol buffers files are defined under the [`breadpb`](/pb#readme) package. Checkout the [`/proto` directory](/proto#readme) for details.
