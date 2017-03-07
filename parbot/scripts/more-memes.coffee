@@ -43,7 +43,7 @@ module.exports = (robot) ->
   robot.respond /DUDE YOU'?RE? GETTING A (.*)/i, id: 'meme.dell-guy', (msg) ->
     memeGenerator msg, 'iXkgvA', 'Dude, you\'re getting a', msg.match[1]
     
-  robot.respond /BRIMLEY (.*)/i, id: 'meme.brimley', (msg) ->
+  robot.respond /(?:BEETUS|BRIMLEY) (.*)/i, id: 'meme.brimley', (msg) ->
     memeGenerator msg, 'bz8GJg', '', msg.match[1]
 
   robot.respond /THIS IS (.+)$/i, id: 'meme.spardotify', (msg) ->
