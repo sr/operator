@@ -6,17 +6,17 @@ import com.atlassian.bamboo.repository.RepositoryDefinitionManager;
 import com.atlassian.bamboo.security.EncryptionService;
 import com.atlassian.bamboo.user.BambooAuthenticationContext;
 import com.atlassian.bamboo.utils.ConfigUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pardot.bread.bambooplugin.repository.GithubEnterpriseRepository;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-@Path("/linkedrepos/{name}")
+@Path("/linkedrepos")
 @Component
 public class LinkedRepositoryResource {
     private static final Logger log = Logger.getLogger(LinkedRepositoryResource.class);
@@ -48,66 +48,49 @@ public class LinkedRepositoryResource {
     }
 
     static class RepositoryConfiguration {
-        private String username;
-        private String password;
-        private String branch;
-        private String repository;
+        public String name;
+        public String username;
+        public String password;
+        public String branch;
+        public String repository;
+    }
 
-        public String getUsername() {
-            return username;
-        }
-
-        public void setUsername(String username) {
-            this.username = username;
-        }
-
-        public String getPassword() {
-            return password;
-        }
-
-        public void setPassword(String password) {
-            this.password = password;
-        }
-
-        public String getBranch() {
-            return branch;
-        }
-
-        public void setBranch(String branch) {
-            this.branch = branch;
-        }
-
-        public String getRepository() {
-            return repository;
-        }
-
-        public void setRepository(String repository) {
-            this.repository = repository;
-        }
+    static class RepositoryInformation {
+        public String name;
+        public long id;
     }
 
     @GET
+    @Path("/{name}")
+    @Produces(MediaType.APPLICATION_JSON)
     public Response get(@PathParam("name") final String name) {
-        if (findGlobalRepositoryWithName(name) != null) {
-            return Response.status(Response.Status.OK).build();
+        RepositoryData data = findGlobalRepositoryWithName(name);
+        if (data == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
         }
-        return Response.status(Response.Status.NOT_FOUND).build();
+
+        RepositoryInformation information = new RepositoryInformation();
+        information.name = name;
+        information.id = data.getId();
+        return Response.ok(information).build();
     }
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response create(@PathParam("name") final String name,
-                           @RequestBody final RepositoryConfiguration body) {
-        if (findGlobalRepositoryWithName(name) != null) {
+    public Response create(final Object body) {
+        final RepositoryConfiguration repositoryConfiguration = new ObjectMapper()
+                .convertValue(body, RepositoryConfiguration.class);
+
+        if (findGlobalRepositoryWithName(repositoryConfiguration.name) != null) {
             return Response.status(Response.Status.CONFLICT).build();
         }
 
         HierarchicalConfiguration configuration = ConfigUtils.newConfiguration();
         configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_HOSTNAME, GithubEnterpriseRepository.getDefaultHostname());
-        configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_USERNAME, body.getUsername());
-        configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_PASSWORD, encryptionService.encrypt(body.getPassword()));
-        configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_REPOSITORY, body.getRepository());
-        configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_BRANCH, body.getBranch());
+        configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_USERNAME, repositoryConfiguration.username);
+        configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_PASSWORD, encryptionService.encrypt(repositoryConfiguration.password));
+        configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_REPOSITORY, repositoryConfiguration.repository);
+        configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_BRANCH, repositoryConfiguration.branch);
         configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_USE_SHALLOW_CLONES, true);
         configuration.setProperty("repository.github.useShallowClones", true);
         configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_USE_REMOTE_AGENT_CACHE, false);
@@ -118,7 +101,7 @@ public class LinkedRepositoryResource {
         configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_COMMAND_TIMEOUT, String.valueOf(GithubEnterpriseRepository.DEFAULT_COMMAND_TIMEOUT_IN_MINUTES));
 
         repositoryConfigurationService.createGlobalRepository(
-                name,
+                repositoryConfiguration.name,
                 githubEnterpriseRepositoryKey,
                 noWebRepositoryKey,
                 configuration,

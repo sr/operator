@@ -15,7 +15,7 @@ import java.util.Map;
 public class GithubWebhookTriggerConfigurator implements TriggerConfigurator {
     private static final Logger log = Logger.getLogger(GithubWebhookTriggerConfigurator.class);
 
-    private static final String PLUGIN_KEY = "com.pardot.bread.bambooplugin.pardot-bamboo-plugin:github-webhook-trigger";
+    public static final String PLUGIN_KEY = "com.pardot.bread.bambooplugin.pardot-bamboo-plugin:github-webhook-trigger";
 
     public static final Predicate<TriggerDefinition> IS_ACTIVE_GITHUB_WEBHOOK_TRIGGER = new Predicate<TriggerDefinition>()  {
         @Override
