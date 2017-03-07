@@ -40,6 +40,7 @@
     <description key="pardot-bamboo-rest.description">The Pardot Bamboo REST API</description>
   </rest>
 
+  <component-import key="authenticationContext" interface="com.atlassian.bamboo.user.BambooAuthenticationContext" />
   <component-import key="branchDetectionService" interface="com.atlassian.bamboo.plan.branch.BranchDetectionService" />
   <component-import key="branchIntegrationHelper" interface="com.atlassian.bamboo.plan.branch.BranchIntegrationHelper" />
   <component-import key="buildDirectoryManager" interface="com.atlassian.bamboo.build.fileserver.BuildDirectoryManager" />
@@ -51,6 +52,7 @@
   <component-import key="eventPublisher" interface="com.atlassian.event.api.EventPublisher" />
   <component-import key="i18nResolver" interface="com.atlassian.sal.api.message.I18nResolver" />
   <component-import key="planManager" interface="com.atlassian.bamboo.plan.PlanManager" />
+  <component-import key="repositoryConfigurationService" interface="com.atlassian.bamboo.repository.RepositoryConfigurationService" />
   <component-import key="repositoryDefinitionManager" interface="com.atlassian.bamboo.repository.RepositoryDefinitionManager" />
   <component-import key="sshProxyService" interface="com.atlassian.bamboo.ssh.SshProxyService" />
   <component-import key="templateRenderer" interface="com.atlassian.bamboo.template.TemplateRenderer" />

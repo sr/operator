@@ -24,19 +24,19 @@ import java.net.URL;
 public class GithubEnterpriseRepository extends GitHubRepository {
     private static final Logger log = Logger.getLogger(GithubEnterpriseRepository.class);
 
-    private static final int DEFAULT_COMMAND_TIMEOUT_IN_MINUTES = 180;
+    public static final int DEFAULT_COMMAND_TIMEOUT_IN_MINUTES = 180;
 
-    private static final String REPOSITORY_GITHUBENTERPRISE_HOSTNAME = "repository.githubenterprise.hostname";
-    private static final String REPOSITORY_GITHUBENTERPRISE_USERNAME = "repository.githubenterprise.username";
-    private static final String REPOSITORY_GITHUBENTERPRISE_PASSWORD = "repository.githubenterprise.password";
-    private static final String REPOSITORY_GITHUBENTERPRISE_REPOSITORY = "repository.githubenterprise.repository";
-    private static final String REPOSITORY_GITHUBENTERPRISE_BRANCH = "repository.githubenterprise.branch";
-    private static final String REPOSITORY_GITHUBENTERPRISE_USE_SHALLOW_CLONES = "repository.githubenterprise.useShallowClones";
-    private static final String REPOSITORY_GITHUBENTERPRISE_USE_SUBMODULES = "repository.githubenterprise.useSubmodules";
-    private static final String REPOSITORY_GITHUBENTERPRISE_USE_REMOTE_AGENT_CACHE = "repository.githubenterprise.useRemoteAgentCache";
-    private static final String REPOSITORY_GITHUBENTERPRISE_COMMAND_TIMEOUT = "repository.githubenterprise.commandTimeout";
-    private static final String REPOSITORY_GITHUBENTERPRISE_VERBOSE_LOGS = "repository.githubenterprise.verbose.logs";
-    private static final String REPOSITORY_GITHUBENTERPRISE_FETCH_WHOLE_REPOSITORY = "repository.githubenterprise.fetch.whole.repository";
+    public static final String REPOSITORY_GITHUBENTERPRISE_HOSTNAME = "repository.githubenterprise.hostname";
+    public static final String REPOSITORY_GITHUBENTERPRISE_USERNAME = "repository.githubenterprise.username";
+    public static final String REPOSITORY_GITHUBENTERPRISE_PASSWORD = "repository.githubenterprise.password";
+    public static final String REPOSITORY_GITHUBENTERPRISE_REPOSITORY = "repository.githubenterprise.repository";
+    public static final String REPOSITORY_GITHUBENTERPRISE_BRANCH = "repository.githubenterprise.branch";
+    public static final String REPOSITORY_GITHUBENTERPRISE_USE_SHALLOW_CLONES = "repository.githubenterprise.useShallowClones";
+    public static final String REPOSITORY_GITHUBENTERPRISE_USE_SUBMODULES = "repository.githubenterprise.useSubmodules";
+    public static final String REPOSITORY_GITHUBENTERPRISE_USE_REMOTE_AGENT_CACHE = "repository.githubenterprise.useRemoteAgentCache";
+    public static final String REPOSITORY_GITHUBENTERPRISE_COMMAND_TIMEOUT = "repository.githubenterprise.commandTimeout";
+    public static final String REPOSITORY_GITHUBENTERPRISE_VERBOSE_LOGS = "repository.githubenterprise.verbose.logs";
+    public static final String REPOSITORY_GITHUBENTERPRISE_FETCH_WHOLE_REPOSITORY = "repository.githubenterprise.fetch.whole.repository";
 
     private static final String REPOSITORY_GITHUBENTERPRISE_TEMPORARY_PASSWORD = "repository.githubenterprise.temporary.password";
     private static final String TEMPORARY_GITHUBENTERPRISE_PASSWORD_CHANGE = "temporary.githubenterprise.password.change";
@@ -92,7 +92,7 @@ public class GithubEnterpriseRepository extends GitHubRepository {
         return hostname;
     }
 
-    private static String getDefaultHostname() {
+    public static String getDefaultHostname() {
         try {
             URL apiBaseUrl = new URL(GITHUB_API_BASE_URL);
             return apiBaseUrl.getHost();
