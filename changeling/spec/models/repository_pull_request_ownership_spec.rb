@@ -97,15 +97,25 @@ RSpec.describe RepositoryPullRequest, "ownership" do
     ]
     ownersfile.update!(content: content.join("\n"))
     expect(@pull_request.ownership_teams.size).to eq(1)
+    expect(@pull_request.ownership_teams[0].slug).to eq("heroku/ops")
+
     @multipass.pull_request_files.create!(
       filename: "/dangerzone",
       state: "added",
       patch: "+ LANAAAAA",
     )
     @pull_request.reload
+    expect(@pull_request.ownership_teams.size).to eq(1)
+    expect(@pull_request.ownership_teams[0].slug).to eq("heroku/security")
+
+    @multipass.pull_request_files.create!(
+      filename: "/build-everything",
+      state: "added",
+      patch: "+ exec true",
+    )
+    @pull_request.reload
     expect(@pull_request.ownership_teams.size).to eq(2)
-    team_2 = @pull_request.ownership_teams[1]
-    expect(team_2.slug).to eq("heroku/security")
+    expect(@pull_request.ownership_teams.map(&:slug)).to match_array(["heroku/security", "heroku/bread"])
   end
 
   it "returns the OWNERS files relevant for the pull request" do
