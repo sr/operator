@@ -3,7 +3,9 @@
 This [Bamboo plugin] contains customizations to the Bamboo CI server for Salesforce Pardot.
 
 Currently, it adds:
+* GitHub Enterprise repository support
 * Webhook-based triggers for GitHub Enterprise repositories
+* HTTP API for creating linked repositories and build plans
 
 ## Building
 
