@@ -109,9 +109,11 @@ class PullRequestOwnership
           owners_file = by_directory.fetch(dirname)
           owners_file.parse
 
-          files.add(owners_file)
-          slugs.merge(owners_file.parsed.teams)
-          break
+          if !owners_file.parsed.teams.empty?
+            files.add(owners_file)
+            slugs.merge(owners_file.parsed.teams)
+            break
+          end
         end
       end
     end
