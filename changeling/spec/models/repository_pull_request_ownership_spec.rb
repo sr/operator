@@ -123,21 +123,21 @@ RSpec.describe RepositoryPullRequest, "ownership" do
 
     mysql = @repository.repository_owners_files.create!(
       path_name: "/cookbooks/pardot_mysql/#{Repository::OWNERS_FILENAME}",
-      content: ""
+      content: "@heroku/dba"
     )
     expect(@pull_request.reload.ownership_owners_files).to eq([])
 
     root = @repository.repository_owners_files.create!(
       path_name: "/#{Repository::OWNERS_FILENAME}",
-      content: ""
+      content: "@heroku/ops"
     )
     scripts = @repository.repository_owners_files.create!(
       path_name: "/scripts/#{Repository::OWNERS_FILENAME}",
-      content: ""
+      content: "@heroku/bread"
     )
     lib = @repository.repository_owners_files.create!(
       path_name: "/lib/#{Repository::OWNERS_FILENAME}",
-      content: ""
+      content: "@heroku/bread"
     )
 
     expect(@pull_request.reload.ownership_owners_files).to eq([root])
