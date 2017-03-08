@@ -42,6 +42,8 @@ import java.util.HashSet;
 
 @Path("/buildplans")
 @Component
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
 public class BuildPlanResource {
     private static final Logger log = Logger.getLogger(BuildPlanResource.class);
 
@@ -125,8 +127,6 @@ public class BuildPlanResource {
     }
 
     @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     public Response create(final Object body) {
         final PlanConfiguration planConfiguration = new ObjectMapper()
                 .convertValue(body, PlanConfiguration.class);

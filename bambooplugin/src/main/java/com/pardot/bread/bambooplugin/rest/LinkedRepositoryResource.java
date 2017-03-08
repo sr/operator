@@ -18,6 +18,8 @@ import javax.ws.rs.core.Response;
 
 @Path("/linkedrepos")
 @Component
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
 public class LinkedRepositoryResource {
     private static final Logger log = Logger.getLogger(LinkedRepositoryResource.class);
 
@@ -62,7 +64,6 @@ public class LinkedRepositoryResource {
 
     @GET
     @Path("/{name}")
-    @Produces(MediaType.APPLICATION_JSON)
     public Response get(@PathParam("name") final String name) {
         RepositoryData data = findGlobalRepositoryWithName(name);
         if (data == null) {
@@ -70,13 +71,12 @@ public class LinkedRepositoryResource {
         }
 
         RepositoryInformation information = new RepositoryInformation();
-        information.name = name;
+        information.name = data.getName();
         information.id = data.getId();
         return Response.ok(information).build();
     }
 
     @POST
-    @Consumes(MediaType.APPLICATION_JSON)
     public Response create(final Object body) {
         final RepositoryConfiguration repositoryConfiguration = new ObjectMapper()
                 .convertValue(body, RepositoryConfiguration.class);
@@ -100,7 +100,7 @@ public class LinkedRepositoryResource {
         configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_FETCH_WHOLE_REPOSITORY, false);
         configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_COMMAND_TIMEOUT, String.valueOf(GithubEnterpriseRepository.DEFAULT_COMMAND_TIMEOUT_IN_MINUTES));
 
-        repositoryConfigurationService.createGlobalRepository(
+        RepositoryData data = repositoryConfigurationService.createGlobalRepository(
                 repositoryConfiguration.name,
                 githubEnterpriseRepositoryKey,
                 noWebRepositoryKey,
@@ -109,17 +109,21 @@ public class LinkedRepositoryResource {
                 authenticationContext.getUser()
         );
 
-        return Response.status(Response.Status.CREATED).build();
+        RepositoryInformation information = new RepositoryInformation();
+        information.name = data.getName();
+        information.id = data.getId();
+
+        return Response.ok(information)
+                .status(Response.Status.CREATED)
+                .build();
     }
 
    private RepositoryData findGlobalRepositoryWithName(String name) {
        for (RepositoryData repositoryData : repositoryDefinitionManager.getGlobalRepositoryDefinitionsForAdministration()) {
-           log.info("Looking at " + repositoryData.getName());
-           if (repositoryData.getName().equals(name)) {
+           if (name.equals(repositoryData.getName())) {
                return repositoryData;
            }
        }
        return null;
    }
-
 }
