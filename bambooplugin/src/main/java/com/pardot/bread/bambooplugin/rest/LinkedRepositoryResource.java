@@ -6,7 +6,6 @@ import com.atlassian.bamboo.repository.RepositoryDefinitionManager;
 import com.atlassian.bamboo.security.EncryptionService;
 import com.atlassian.bamboo.user.BambooAuthenticationContext;
 import com.atlassian.bamboo.utils.ConfigUtils;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pardot.bread.bambooplugin.repository.GithubEnterpriseRepository;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.log4j.Logger;
@@ -49,18 +48,33 @@ public class LinkedRepositoryResource {
         this.encryptionService = encryptionService;
     }
 
-    static class RepositoryConfiguration {
+    static class RepositoryRequest {
         public String name;
         public String username;
         public String password;
         public String branch;
         public String repository;
+        public boolean shallowClones;
     }
 
-    static class RepositoryInformation {
-        public String name;
+    static class RepositoryResponse {
         public long id;
+        public String name;
+        public String branch;
+        public String repository;
+        public boolean shallowClones;
+
+        public static RepositoryResponse newFromRepositoryData(final RepositoryData data) {
+            RepositoryResponse information = new RepositoryResponse();
+            information.id = data.getId();
+            information.name = data.getName();
+            information.branch = data.getConfiguration().getString(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_BRANCH, null);
+            information.repository = data.getConfiguration().getString(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_REPOSITORY, null);
+            information.shallowClones = data.getConfiguration().getBoolean(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_USE_SHALLOW_CLONES, false);
+            return information;
+        }
     }
+
 
     @GET
     @Path("/{name}")
@@ -70,51 +84,61 @@ public class LinkedRepositoryResource {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
 
-        RepositoryInformation information = new RepositoryInformation();
-        information.name = data.getName();
-        information.id = data.getId();
+        RepositoryResponse information = RepositoryResponse.newFromRepositoryData(data);
         return Response.ok(information).build();
     }
 
-    @POST
-    public Response create(final Object body) {
-        final RepositoryConfiguration repositoryConfiguration = new ObjectMapper()
-                .convertValue(body, RepositoryConfiguration.class);
+    @DELETE
+    @Path("/{name}")
+    public Response delete(@PathParam("name") final String name) {
+        RepositoryData data = findGlobalRepositoryWithName(name);
+        if (data == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
 
-        if (findGlobalRepositoryWithName(repositoryConfiguration.name) != null) {
+        repositoryConfigurationService.deleteGlobalRepository(data.getId());
+        return Response.noContent().build();
+    }
+
+    @POST
+    public Response create(final RepositoryRequest repositoryRequest) {
+        if (findGlobalRepositoryWithName(repositoryRequest.name) != null) {
             return Response.status(Response.Status.CONFLICT).build();
         }
 
-        HierarchicalConfiguration configuration = ConfigUtils.newConfiguration();
-        configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_HOSTNAME, GithubEnterpriseRepository.getDefaultHostname());
-        configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_USERNAME, repositoryConfiguration.username);
-        configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_PASSWORD, encryptionService.encrypt(repositoryConfiguration.password));
-        configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_REPOSITORY, repositoryConfiguration.repository);
-        configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_BRANCH, repositoryConfiguration.branch);
-        configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_USE_SHALLOW_CLONES, true);
-        configuration.setProperty("repository.github.useShallowClones", true);
-        configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_USE_REMOTE_AGENT_CACHE, false);
-        configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_USE_SUBMODULES, false);
-        configuration.setProperty("repository.github.useSubmodules", false);
-        configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_VERBOSE_LOGS, false);
-        configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_FETCH_WHOLE_REPOSITORY, false);
-        configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_COMMAND_TIMEOUT, String.valueOf(GithubEnterpriseRepository.DEFAULT_COMMAND_TIMEOUT_IN_MINUTES));
-
         RepositoryData data = repositoryConfigurationService.createGlobalRepository(
-                repositoryConfiguration.name,
+                repositoryRequest.name,
                 githubEnterpriseRepositoryKey,
                 noWebRepositoryKey,
-                configuration,
+                buildConfiguration(repositoryRequest),
                 true,
                 authenticationContext.getUser()
         );
 
-        RepositoryInformation information = new RepositoryInformation();
-        information.name = data.getName();
-        information.id = data.getId();
-
+        RepositoryResponse information = RepositoryResponse.newFromRepositoryData(data);
         return Response.ok(information)
                 .status(Response.Status.CREATED)
+                .build();
+    }
+
+    @PUT
+    @Path("/{name}")
+    public Response update(@PathParam("name") final String name, final RepositoryRequest repositoryRequest) {
+        RepositoryData data = findGlobalRepositoryWithName(name);
+        if (data == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+        data = repositoryConfigurationService.editGlobalRepository(
+                name,
+                githubEnterpriseRepositoryKey,
+                noWebRepositoryKey,
+                data,
+                buildConfiguration(repositoryRequest)
+        );
+
+        RepositoryResponse information = RepositoryResponse.newFromRepositoryData(data);
+        return Response.ok(information)
                 .build();
     }
 
@@ -125,5 +149,24 @@ public class LinkedRepositoryResource {
            }
        }
        return null;
+   }
+
+   private HierarchicalConfiguration buildConfiguration(final RepositoryRequest request) {
+       final HierarchicalConfiguration configuration = ConfigUtils.newConfiguration();
+       configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_HOSTNAME, GithubEnterpriseRepository.getDefaultHostname());
+       configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_USERNAME, request.username);
+       configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_PASSWORD, encryptionService.encrypt(request.password));
+       configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_REPOSITORY, request.repository);
+       configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_BRANCH, request.branch);
+       configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_USE_SHALLOW_CLONES, request.shallowClones);
+       configuration.setProperty("repository.github.useShallowClones", request.shallowClones);
+       configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_USE_REMOTE_AGENT_CACHE, false);
+       configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_USE_SUBMODULES, true);
+       configuration.setProperty("repository.github.useSubmodules", true);
+       configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_VERBOSE_LOGS, false);
+       configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_FETCH_WHOLE_REPOSITORY, false);
+       configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_COMMAND_TIMEOUT, String.valueOf(GithubEnterpriseRepository.DEFAULT_COMMAND_TIMEOUT_IN_MINUTES));
+
+       return configuration;
    }
 }

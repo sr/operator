@@ -7,15 +7,18 @@ import com.atlassian.bamboo.build.PlanCreationException;
 import com.atlassian.bamboo.build.creation.*;
 import com.atlassian.bamboo.caching.DashboardCachingManager;
 import com.atlassian.bamboo.collections.ActionParametersMap;
+import com.atlassian.bamboo.deletion.DeletionService;
 import com.atlassian.bamboo.event.BuildConfigurationUpdatedEvent;
 import com.atlassian.bamboo.fieldvalue.BuildDefinitionConverter;
 import com.atlassian.bamboo.plan.Plan;
+import com.atlassian.bamboo.plan.PlanIdentifier;
 import com.atlassian.bamboo.plan.PlanKeys;
 import com.atlassian.bamboo.plan.PlanManager;
 import com.atlassian.bamboo.plan.branch.BranchIntegrationConfigurationImpl;
 import com.atlassian.bamboo.plan.branch.BranchMonitoringConfiguration;
 import com.atlassian.bamboo.plan.cache.CachedPlanManager;
 import com.atlassian.bamboo.plan.cache.ImmutableJob;
+import com.atlassian.bamboo.plan.cache.ImmutablePlan;
 import com.atlassian.bamboo.spring.ComponentAccessor;
 import com.atlassian.bamboo.task.*;
 import com.atlassian.bamboo.trigger.TriggerConfigurationService;
@@ -26,8 +29,6 @@ import com.atlassian.bamboo.trigger.polling.PollingTriggerConfigurationConstants
 import com.atlassian.bamboo.webwork.util.ActionParametersMapImpl;
 import com.atlassian.bamboo.ww2.actions.build.admin.create.BuildConfiguration;
 import com.atlassian.event.api.EventPublisher;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pardot.bread.bambooplugin.trigger.GithubWebhookTriggerConfigurator;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.lang.StringUtils;
@@ -62,6 +63,7 @@ public class BuildPlanResource {
     private TriggerConfigurationService triggerConfigurationService;
     private TriggerTypeManager triggerTypeManager;
     private EventPublisher eventPublisher;
+    private DeletionService deletionService;
 
     public void setChainCreationService(ChainCreationService chainCreationService) {
         this.chainCreationService = chainCreationService;
@@ -107,33 +109,52 @@ public class BuildPlanResource {
         this.eventPublisher = eventPublisher;
     }
 
+    public void setDeletionService(DeletionService deletionService) {
+        this.deletionService = deletionService;
+    }
+
+
     public BuildPlanResource() {
         // NOTE(alindeman): It's not clear why this doesn't work as a regular <component-import> but I could not get it to work
         setTaskManager(ComponentAccessor.TASK_MANAGER.get());
     }
 
-    static class PlanConfiguration {
-        @JsonProperty("project_key")
-        public String projectKey;
-        public String name;
+    static class PlanRequest {
         public String key;
+        public String name;
         public String description;
-        @JsonProperty("repository_id")
         public long repositoryId;
     }
 
     static class PlanInformation {
         public String key;
+        public String name;
+
+        public static PlanInformation newFromPlan(PlanIdentifier plan) {
+            PlanInformation information = new PlanInformation();
+            information.key = plan.getPlanKey().toString();
+            information.name = plan.getName();
+            return information;
+        }
+    }
+
+    @GET
+    @Path("/{key}")
+    public Response get(@PathParam("key") final String key) {
+        final ImmutablePlan plan = cachedPlanManager.getPlanByKey(PlanKeys.getPlanKey(key));
+        if (plan == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+        PlanInformation information = PlanInformation.newFromPlan(plan);
+        return Response.ok(information).build();
     }
 
     @POST
-    public Response create(final Object body) {
-        final PlanConfiguration planConfiguration = new ObjectMapper()
-                .convertValue(body, PlanConfiguration.class);
-
+    public Response create(final PlanRequest planRequest) {
         String planKey;
         try {
-            planKey = createPlan(planConfiguration);
+            planKey = createPlan(planRequest);
         } catch (PlanCreationDeniedException e) {
             log.error("permission denied while creating plan", e);
             return Response.status(Response.Status.FORBIDDEN).build();
@@ -155,29 +176,40 @@ public class BuildPlanResource {
 
         createDefaultTask(planKey, jobKey);
         setupWebhookTrigger(planKey);
-        setupDailyPoll(planKey, planConfiguration.repositoryId);
+        setupDailyPoll(planKey, planRequest.repositoryId);
         configureBranchManagement(planKey);
         dashboardCachingManager.updatePlanCache(PlanKeys.getPlanKey(planKey));
 
-        PlanInformation information = new PlanInformation();
-        information.key = planKey;
-
+        Plan plan = planManager.getPlanByKey(PlanKeys.getPlanKey(planKey));
+        PlanInformation information = PlanInformation.newFromPlan(plan);
         return Response.ok(information)
                 .status(Response.Status.CREATED)
                 .build();
     }
 
-    private String createPlan(final PlanConfiguration planConfiguration) throws PlanCreationDeniedException {
+    @DELETE
+    @Path("/{key}")
+    public Response delete(@PathParam("key") final String key) {
+        final Plan plan = planManager.getPlanByKey(PlanKeys.getPlanKey(key));
+        if (plan == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+        deletionService.deletePlan(plan);
+        return Response.noContent().build();
+    }
+
+    private String createPlan(final PlanRequest planRequest) throws PlanCreationDeniedException {
         HashMap<String,String> configuration = new HashMap<>();
-        configuration.put("existingProjectKey", planConfiguration.projectKey);
-        configuration.put("chainName", planConfiguration.name);
-        configuration.put("chainKey", planConfiguration.key);
-        configuration.put("chainDescription", planConfiguration.description);
-        configuration.put("selectedRepository", Long.toString(planConfiguration.repositoryId));
+        configuration.put("existingProjectKey", PlanKeys.getProjectKeyPart(PlanKeys.getPlanKey(planRequest.key)));
+        configuration.put("chainName", planRequest.name);
+        configuration.put("chainKey", PlanKeys.getPlanKeyPart(PlanKeys.getPlanKey(planRequest.key)));
+        configuration.put("chainDescription", planRequest.description);
+        configuration.put("selectedRepository", Long.toString(planRequest.repositoryId));
         configuration.put("repositoryTypeOption", "LINKED");
 
         BuildConfiguration buildConfiguration = new BuildConfiguration();
-        buildConfiguration.setProperty("selectedRepository", Long.toString(planConfiguration.repositoryId));
+        buildConfiguration.setProperty("selectedRepository", Long.toString(planRequest.repositoryId));
 
         return chainCreationService.createPlan(
                 buildConfiguration,

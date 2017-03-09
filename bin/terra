@@ -52,8 +52,6 @@ TERRAFORM_PLAN="${TERRAFORM_DIR}/plan.out"
 TERRAFORM_VAR_FILE="${TERRAFORM_BASEDIR}/terraform.tfvars"
 export TERRAFORM_DIR TERRAFORM_PLAN TERRAFORM_PROJECT TERRAFORM_VAR_FILE
 
-GOPATH="${TERRAFORM_VENDORDIR}" GOBIN="${TERRAFORM_VENDORDIR}/bin" go install -v github.com/hashicorp/terraform
-
 if test -z "${GOPATH:-""}" || test "$BREAD" != "${GOPATH}/src/git.dev.pardot.com/Pardot/bread"; then
     echo "Deploying Terraform changes requires a working Go environment:"
     echo
@@ -73,6 +71,9 @@ if test -z "${GOPATH:-""}" || test "$BREAD" != "${GOPATH}/src/git.dev.pardot.com
     echo
     exit 1
 fi
+
+GOBIN="${TERRAFORM_VENDORDIR}/bin" go install -v ./cmd/terraform-provider-*
+GOPATH="${TERRAFORM_VENDORDIR}" GOBIN="${TERRAFORM_VENDORDIR}/bin" go install -v github.com/hashicorp/terraform
 
 case "$action" in
   apply|unlock|plan)

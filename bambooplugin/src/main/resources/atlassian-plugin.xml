@@ -51,6 +51,7 @@
   <component-import key="chainCreationService" interface="com.atlassian.bamboo.build.creation.ChainCreationService" />
   <component-import key="customVariableContext" interface="com.atlassian.bamboo.variable.CustomVariableContext"/>
   <component-import key="dashboardCachingManager" interface="com.atlassian.bamboo.caching.DashboardCachingManager" />
+  <component-import key="deletionService" interface="com.atlassian.bamboo.deletion.DeletionService" />
   <component-import key="encryptionService" interface="com.atlassian.bamboo.security.EncryptionService" />
   <component-import key="eventPublisher" interface="com.atlassian.event.api.EventPublisher" />
   <component-import key="i18nResolver" interface="com.atlassian.sal.api.message.I18nResolver" />
