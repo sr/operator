@@ -82,24 +82,37 @@ class PullRequestOwnership
       end
 
     changed_files.each do |file|
+      # An OWNERS file with glob patterns may only match files in the same
+      # directory.
+      dirname = file.dirname.to_s
+      if by_directory.key?(dirname)
+        owners_file = by_directory.fetch(dirname)
+        owners_file.parse
+
+        matched_glob = false
+        owners_file.parsed.globs.each do |glob, team|
+          next unless File.fnmatch?(glob, file.basename)
+
+          matched_glob = true
+          files.add(owners_file)
+          slugs.add(team)
+        end
+
+        # If the file matched at least one glob its own directory, we don't need
+        # to look at anything else.
+        next if matched_glob
+      end
+
       file.ascend do |path|
         dirname = path.dirname.to_s
-
         if by_directory.key?(dirname)
           owners_file = by_directory.fetch(dirname)
           owners_file.parse
 
-          files.add(owners_file)
-
-          # Add naked team mentions, such as "@Pardot/bread"
-          slugs.merge(owners_file.parsed.teams)
-
-          # Add team mentions that have a glob modifier attached to them,
-          # such as "@Pardot/bread build-*".
-          owners_file.parsed.globs.each do |glob, team|
-            if File.fnmatch?(glob, file.basename)
-              slugs.add(team)
-            end
+          if !owners_file.parsed.teams.empty?
+            files.add(owners_file)
+            slugs.merge(owners_file.parsed.teams)
+            break
           end
         end
       end

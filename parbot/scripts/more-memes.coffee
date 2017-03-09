@@ -18,6 +18,7 @@
 #   ! OMG <text> - Meme: Ermahgerd terxt
 #   ! ELF <text_top>...<text_bottom> - Buddy the Elf
 #   ! MAKE <text> GREAT AGAIN - Meme: Trump
+#   ! BRIMLEY <text> - Meme: Wilford Brimley
 #
 # Author:
 #   brianhays
@@ -41,6 +42,9 @@ module.exports = (robot) ->
 
   robot.respond /DUDE YOU'?RE? GETTING A (.*)/i, id: 'meme.dell-guy', (msg) ->
     memeGenerator msg, 'iXkgvA', 'Dude, you\'re getting a', msg.match[1]
+    
+  robot.respond /(?:BEETUS|BRIMLEY) (.*)/i, id: 'meme.brimley', (msg) ->
+    memeGenerator msg, 'bz8GJg', '', msg.match[1]
 
   robot.respond /THIS IS (.+)$/i, id: 'meme.spardotify', (msg) ->
     # characters we can duplicate to make it Spartaaaaaaa

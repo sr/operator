@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 set -euo pipefail
-PATH="$(dirname "$0")/../src/build:$PATH"
+PATH="$(dirname "$0")/../tools/build:$PATH"
 export PATH
 exec build "$@"
