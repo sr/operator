@@ -200,14 +200,12 @@ namespace :canoe do
 
     case Rails.env
     when "production"
-      # Until we coordinate with the Security team to make more granular groups,
-      # require 'releasebox' for all production deployments in all projects
-      production_targets = DeployTarget.where(name: %w[production production_dfw production_phx])
+      production_targets = DeployTarget.where(production: true)
       Project.find_each do |project|
         production_targets.each do |target|
           DeployACLEntry.find_or_initialize_by(project_id: project.id, deploy_target_id: target.id).tap { |entry|
             entry.acl_type = "ldap_group"
-            entry.value = ["releasebox"]
+            entry.value = ["prod_promotion_#{project.name}"]
           }.tap(&:save!)
         end
       end
