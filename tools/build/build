@@ -358,7 +358,7 @@ case "$project" in
         ;;
     teampass)
         docker build $pullopts \
-            -f src/teampass/Dockerfile -t teampass_app src/teampass
+            -f teampass/Dockerfile -t teampass_app teampass
 
         if [ -n "$CI" ]; then
             docker_push "$project"
