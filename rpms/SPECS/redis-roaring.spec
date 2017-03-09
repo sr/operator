@@ -1,6 +1,6 @@
 %define destination_directory /opt/pardot/redis-roaring
 Name: redis-roaring
-Version: master
+Version: 1.0.0
 Release: 1%{?dist}
 Summary: Redis Roaring Bitmaps
 Group: Applications/Internet
