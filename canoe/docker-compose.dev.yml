@@ -1,0 +1,5 @@
+version: "2"
+services:
+  app:
+    environment:
+      RACK_TIMEOUT_SERVICE_TIMEOUT: 120
