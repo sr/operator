@@ -11,6 +11,7 @@ import com.atlassian.bamboo.deletion.DeletionService;
 import com.atlassian.bamboo.event.BuildConfigurationUpdatedEvent;
 import com.atlassian.bamboo.fieldvalue.BuildDefinitionConverter;
 import com.atlassian.bamboo.plan.Plan;
+import com.atlassian.bamboo.plan.PlanIdentifier;
 import com.atlassian.bamboo.plan.PlanKeys;
 import com.atlassian.bamboo.plan.PlanManager;
 import com.atlassian.bamboo.plan.branch.BranchIntegrationConfigurationImpl;
@@ -129,7 +130,7 @@ public class BuildPlanResource {
         public String key;
         public String name;
 
-        public static PlanInformation newFromPlan(ImmutablePlan plan) {
+        public static PlanInformation newFromPlan(PlanIdentifier plan) {
             PlanInformation information = new PlanInformation();
             information.key = plan.getPlanKey().toString();
             information.name = plan.getName();
@@ -179,9 +180,8 @@ public class BuildPlanResource {
         configureBranchManagement(planKey);
         dashboardCachingManager.updatePlanCache(PlanKeys.getPlanKey(planKey));
 
-        PlanInformation information = new PlanInformation();
-        information.key = planKey;
-
+        Plan plan = planManager.getPlanByKey(PlanKeys.getPlanKey(planKey));
+        PlanInformation information = PlanInformation.newFromPlan(plan);
         return Response.ok(information)
                 .status(Response.Status.CREATED)
                 .build();
