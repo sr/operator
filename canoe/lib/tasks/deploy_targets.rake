@@ -99,6 +99,7 @@ namespace :canoe do
       "aws/pardot-sandbox",
       "aws/pardotops",
       "aws/pardotpublic",
+      "bamboo",
       "github_enterprise",
       "letsencrypt"
     ].each do |name|
