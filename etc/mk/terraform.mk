@@ -54,7 +54,7 @@ validate: $(TERRAFORM)
 		xargs -0 -n1 echo
 
 $(TERRAFORM):
-	GOPATH="$(BREAD)/src/terraform/_vendor" GOBIN="$(GOBIN)" $(GO) install -v github.com/hashicorp/terraform
+	GOPATH="$(BREAD)/terraform/_vendor" GOBIN="$(GOBIN)" $(GO) install -v github.com/hashicorp/terraform
 
 .PHONY: \
 	apply \
