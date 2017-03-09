@@ -190,7 +190,7 @@ case "$project" in
     canoe)
         build-ruby "$project" "canoe"
 
-        file="${BREAD}/src/terraform/_vendor/src/github.com/hashicorp/terraform/terraform/version.go"
+        file="${BREAD}/terraform/_vendor/src/github.com/hashicorp/terraform/terraform/version.go"
         vendored="$(
           grep "const Version " "$file" |
           sed -e 's/^.*"\(.*\)".*$/\1/'
@@ -375,7 +375,7 @@ case "$project" in
         tarball="$(mktemp -t "bread-terraformXXXXX").tar"
         trap 'rm $tarball' EXIT
         docker run --rm -v "$BREAD:/data" -w "/data" build/build \
-          git archive "$(git rev-parse HEAD)" src/terraform > "$tarball"
+          git archive "$(git rev-parse HEAD)" terraform > "$tarball"
 
         if [ -n "$CI" ]; then
           tarball_upload "$tarball" "true"
