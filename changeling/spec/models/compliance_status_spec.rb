@@ -19,6 +19,7 @@ describe ComplianceStatus, "pardot" do
       owner: "heroku",
       name: "changeling",
     )
+    GithubTeamMembership.delete_all
     GithubInstallation.current.team_memberships.create!(
       github_team_id: 1,
       github_user_id: 1,

@@ -13,6 +13,7 @@ class GithubInstallation < ApplicationRecord
   def team_members(team_slugs)
     team_memberships
       .where(team_slug: team_slugs)
+      .order(:team_slug)
       .pluck(:user_login)
       .map { |login| GithubUser.new(login) }
   end

@@ -58,181 +58,168 @@ RSpec.describe RepositoryPullRequest, "ownership" do
     GithubUser.new(login)
   end
 
-  it "returns the repository owners if the pull request has no changes" do
-    create_team_memberships(bread: %w[alindeman sr], tools: %w[ys])
-    expect(@pull_request.ownership_users).to eq([])
-
-    @repository.repository_owners_files.create!(
-      path_name: "/#{Repository::OWNERS_FILENAME}",
-      content: "@pardot/boomtown\n@heroku/bread\n@heroku/tools\n",
-    )
-    @pull_request.reload
-
-    expect(@pull_request.ownership_users).to eq([
-      [user("alindeman"), user("sr")],
-      [user("ys")]
-    ])
+  def create_pull_request_file(path)
+    @multipass.pull_request_files.create!(filename: path, state: "modified", patch: "+ hi")
   end
 
-  it "returns the list of teams that owns the file and directories being changed in this pull request" do
-    expect(@pull_request.ownership_teams).to eq([])
-
-    ownersfile = @repository.repository_owners_files.create!(
-      path_name: "/#{Repository::OWNERS_FILENAME}",
-      content: "@heroku/ops"
+  def create_owners_file(directory, lines = [])
+    @repository.repository_owners_files.create!(
+      path_name: File.join(directory, Repository::OWNERS_FILENAME),
+      content: lines.map { |line| "@#{line}" }.join("\n")
     )
-    create_team_memberships(ops: %w[alindeman sr])
-
-    @pull_request.reload
-
-    expect(@pull_request.ownership_teams.size).to eq(1)
-    team_1 = @pull_request.ownership_teams[0]
-    expect(team_1.slug).to eq("heroku/ops")
-    expect(team_1.url).to eq("#{Changeling.config.github_url}/orgs/heroku/teams/ops")
-
-    content = [
-      "@heroku/ops",
-      "@heroku/security dangerzone",
-      "@heroku/bread build-*"
-    ]
-    ownersfile.update!(content: content.join("\n"))
-    expect(@pull_request.ownership_teams.size).to eq(1)
-    expect(@pull_request.ownership_teams[0].slug).to eq("heroku/ops")
-
-    @multipass.pull_request_files.create!(
-      filename: "/dangerzone",
-      state: "added",
-      patch: "+ LANAAAAA",
-    )
-    @pull_request.reload
-    expect(@pull_request.ownership_teams.size).to eq(1)
-    expect(@pull_request.ownership_teams[0].slug).to eq("heroku/security")
-
-    @multipass.pull_request_files.create!(
-      filename: "/build-everything",
-      state: "added",
-      patch: "+ exec true",
-    )
-    @pull_request.reload
-    expect(@pull_request.ownership_teams.size).to eq(2)
-    expect(@pull_request.ownership_teams.map(&:slug)).to match_array(["heroku/security", "heroku/bread"])
   end
 
   it "returns the OWNERS files relevant for the pull request" do
     expect(@pull_request.ownership_owners_files).to eq([])
-
-    mysql = @repository.repository_owners_files.create!(
-      path_name: "/cookbooks/pardot_mysql/#{Repository::OWNERS_FILENAME}",
-      content: "@heroku/dba"
-    )
     expect(@pull_request.reload.ownership_owners_files).to eq([])
 
-    root = @repository.repository_owners_files.create!(
-      path_name: "/#{Repository::OWNERS_FILENAME}",
-      content: "@heroku/ops"
-    )
-    scripts = @repository.repository_owners_files.create!(
-      path_name: "/scripts/#{Repository::OWNERS_FILENAME}",
-      content: "@heroku/bread"
-    )
-    lib = @repository.repository_owners_files.create!(
-      path_name: "/lib/#{Repository::OWNERS_FILENAME}",
-      content: "@heroku/bread"
-    )
+    root = create_owners_file("/", ["heroku/ops"])
+    scripts = create_owners_file("/scripts", ["heroku/bread"])
+    lib = create_owners_file("/lib", ["heroku/bread"])
+    mysql = create_owners_file("/cookbooks/pardot_mysql", ["heroku/dba"])
 
     expect(@pull_request.reload.ownership_owners_files).to eq([root])
 
-    @multipass.pull_request_files.create!(
-      filename: "/README",
-      state: "added",
-      patch: "+ Hello World"
-    )
+    create_pull_request_file("/README")
     expect(@pull_request.reload.ownership_owners_files).to eq([root])
 
-    @multipass.pull_request_files.create!(
-      filename: "/nodes/dfw/pardot0-app1.json",
-      state: "added",
-      patch: "+ {}"
-    )
+    create_pull_request_file("/nodes/dfw/pardot0-app1.json")
     expect(@pull_request.reload.ownership_owners_files).to eq([root])
 
-    @multipass.pull_request_files.create!(
-      filename: "/scripts/build",
-      state: "modified",
-      patch: "+ exit 1"
-    )
+    create_pull_request_file("/scripts/build")
     expect(@pull_request.reload.ownership_owners_files).to eq([root, scripts])
 
-    @multipass.pull_request_files.create!(
-      filename: "/lib/foo.rb",
-      state: "changed",
-      patch: ""
-    )
+    create_pull_request_file("/lib/foo.rb")
     expect(@pull_request.reload.ownership_owners_files).to eq([root, scripts, lib])
 
-    @multipass.pull_request_files.create!(
-      filename: "/cookbooks/pardot_mysql/files/default/mysqld.conf",
-      state: "removed",
-      patch: ""
-    )
-    @multipass.pull_request_files.create!(
-      filename: "/cookbooks/pardot_mysql/attributes/pardot.rb",
-      state: "removed",
-      patch: ""
-    )
+    create_pull_request_file("/cookbooks/pardot_mysql/files/default/mysqld.conf")
+    create_pull_request_file("/cookbooks/pardot_mysql/attributes/pardot.rb")
     expect(@pull_request.reload.ownership_owners_files).to eq([root, scripts, lib, mysql])
   end
 
-  it "returns the owners of every component being changed" do
-    team_bread = %w[alindeman sr].map { |u| user(u) }
-    team_dba = %w[glen].map { |u| user(u) }
-    team_ops = %w[alindeman glen sr].map { |u| user(u) }
+  describe "ownership_teams" do
+    before(:all) do
+      @team_bread = %w[alindeman sr].map { |u| user(u) }
+      @team_dba = %w[glen].map { |u| user(u) }
+      @team_ops = %w[alindeman glen sr].map { |u| user(u) }
 
-    create_team_memberships(
-      "bread": team_bread.map(&:login),
-      "dba": team_dba.map(&:login),
-      "ops": team_ops.map(&:login)
-    )
+      GithubTeamMembership.delete_all
 
-    @multipass.pull_request_files.create!(
-      filename: "/README",
-      state: "added",
-      patch: "+ Hello World"
-    )
-    @multipass.pull_request_files.create!(
-      filename: "/nodes/dfw/pardot0-app1.json",
-      state: "added",
-      patch: "+ {}"
-    )
-    @multipass.pull_request_files.create!(
-      filename: "/cookbooks/pardot_mysql/files/default/mysqld.conf",
-      state: "removed",
-      patch: ""
-    )
-    @multipass.pull_request_files.create!(
-      filename: "/scripts/build",
-      state: "modified",
-      patch: "+ exit 1"
-    )
+      create_team_memberships(
+        "bread": @team_bread.map(&:login),
+        "dba": @team_dba.map(&:login),
+        "ops": @team_ops.map(&:login)
+      )
+    end
 
-    expect(@pull_request.ownership_users).to eq([])
+    it "returns an empty array if there is no OWNERS file" do
+      expect(@pull_request.repository_owners_files.size).to eq(0)
+      expect(@pull_request.ownership_teams).to eq([])
+    end
 
-    @repository.repository_owners_files.create!(
-      path_name: "/#{Repository::OWNERS_FILENAME}",
-      content: "@heroku/ops"
-    )
-    expect(@pull_request.reload.ownership_users).to eq([team_ops])
+    it "returns the repository owners when there are no change" do
+      teams = ["heroku/bread", "heroku/ops"]
+      create_owners_file("/", teams)
+      expect(@multipass.changed_files.size).to eq(0)
+      expect(@pull_request.ownership_teams.map(&:slug)).to match_array(teams)
+    end
 
-    @repository.repository_owners_files.create!(
-      path_name: "/cookbooks/pardot_mysql/#{Repository::OWNERS_FILENAME}",
-      content: "@heroku/dba"
-    )
-    expect(@pull_request.reload.ownership_users).to eq([team_ops, team_dba])
+    it "returns subtree owners" do
+      teams = ["heroku/dba"]
+      create_owners_file("/cookbooks/pardot_mysql", teams)
+      create_pull_request_file("/cookbooks/pardot_mysql/files/default/mysqld.conf")
+      expect(@pull_request.ownership_teams.map(&:slug)).to match_array(teams)
+    end
 
-    @repository.repository_owners_files.create!(
-      path_name: "/scripts/#{Repository::OWNERS_FILENAME}",
-      content: "@heroku/bread"
-    )
-    expect(@pull_request.reload.ownership_users).to eq([team_ops, team_dba, team_bread])
+    it "returns file owners" do
+      create_owners_file("/", ["heroku/ops", "heroku/bread build.sh"])
+      create_pull_request_file("/build.sh")
+      expect(@pull_request.ownership_teams.map(&:slug)).to match_array(["heroku/bread"])
+      create_pull_request_file("/REAMDE.md")
+      expect(@pull_request.ownership_teams.map(&:slug)).to match_array(["heroku/ops", "heroku/bread"])
+    end
+
+    it "returns files owners for matching globs" do
+      create_owners_file("/script", ["heroku/bread *.sh"])
+      create_pull_request_file("/script/build")
+      expect(@pull_request.ownership_teams.map(&:slug)).to match_array([])
+      create_pull_request_file("/script/build.sh")
+      expect(@pull_request.ownership_teams.map(&:slug)).to match_array(["heroku/bread"])
+    end
+
+    it "returns repository, subtree, and file owners" do
+      create_owners_file("/", ["heroku/ops"])
+      create_owners_file("/script", ["heroku/bread"])
+      create_owners_file("/roles", ["heroku/dba pardot_mysql*"])
+
+      create_pull_request_file("/script/build")
+      create_pull_request_file("/roles/pardot_mysql_dfw.rb")
+
+      expect(@pull_request.ownership_teams.map(&:slug)).to match_array(["heroku/bread", "heroku/dba"])
+      create_pull_request_file("/README")
+      expect(@pull_request.ownership_teams.map(&:slug)).to match_array(["heroku/bread", "heroku/dba", "heroku/ops"])
+    end
+  end
+
+  describe "ownership_users" do
+    before(:all) do
+      @team_bread = %w[alindeman sr].map { |u| user(u) }
+      @team_developers = %w[smiley].map { |u| user(u) }
+      @team_ops = %w[alindeman sr].map { |u| user(u) }
+
+      GithubTeamMembership.delete_all
+
+      create_team_memberships(
+        "bread": @team_bread.map(&:login),
+        "developers": @team_developers.map(&:login),
+        "ops": @team_ops.map(&:login)
+      )
+    end
+
+    it "returns one array of users per owned directory" do
+      create_owners_file("/pardot", ["heroku/developers", "heroku/bread"])
+      create_pull_request_file("/pardot/README")
+      expect(@pull_request.reload.ownership_users).to eq([[user("alindeman"), user("sr"), user("smiley")]])
+
+      create_owners_file("/chef", ["heroku/ops"])
+      create_pull_request_file("/chef/README")
+      expect(@pull_request.reload.ownership_users).to eq([[user("alindeman"), user("sr"), user("smiley")], [user("alindeman"), user("sr")]])
+    end
+
+    it "returns one array of users per owned file" do
+      create_owners_file("/", ["heroku/developers index.php", "heroku/bread build.sh"])
+      expect(@pull_request.reload.ownership_users).to eq([])
+
+      create_pull_request_file("/index.php")
+      expect(@pull_request.reload.ownership_users).to eq([[user("smiley")]])
+
+      create_pull_request_file("/build.sh")
+      expect(@pull_request.reload.ownership_users).to eq([[user("smiley")], [user("alindeman"), user("sr")]])
+    end
+
+    it "ignores empty OWNERS files" do
+      create_owners_file("/a", ["heroku/developers"])
+      create_owners_file("/b", [])
+      create_pull_request_file("/a/a")
+      create_pull_request_file("/a/b")
+      expect(@pull_request.reload.ownership_users).to eq([[user("smiley")]])
+    end
+
+    it "ignores irrelevant OWNERS files" do
+      create_owners_file("/", ["heroku/developers", "heroku/bread"])
+      create_owners_file("/chef", ["heroku/ops"])
+
+      create_pull_request_file("/chef/README")
+      expect(@pull_request.reload.ownership_users).to eq([
+        [user("alindeman"), user("sr")]
+      ])
+    end
+
+    it "only applies glob to the current directory" do
+      create_owners_file("/a", ["heroku/developers file.txt"])
+      create_owners_file("/b", ["heroku/developers file.txt"])
+      create_pull_request_file("/a/file.txt")
+      expect(@pull_request.reload.ownership_users).to eq([[user("smiley")]])
+    end
   end
 end

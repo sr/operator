@@ -8,7 +8,12 @@ class PullRequestOwnership
   # Returns the list of GitHub team slugs (e.g. @Pardot/bread) that must
   # review and approve the pull request, based on ownership data.
   def teams
-    _files, slugs = load_ownership_data
+    data = load_ownership_data
+    slugs = Set.new([])
+
+    data.ownerships.each do |_ownable, teams|
+      slugs.merge(teams)
+    end
 
     slugs.map do |slug|
       GithubTeam.new(slug)
@@ -22,17 +27,14 @@ class PullRequestOwnership
   #
   # [["sr", "alindeman"], ["lstoll"]]
   def users
-    teams_members = []
+    data = load_ownership_data
+    reviewers = []
 
-    teams.each do |team|
-      members = GithubInstallation.current.team_members(team.slug)
-
-      if members.any?
-        teams_members << members
-      end
+    data.ownerships.each do |_ownable, teams|
+      reviewers << GithubInstallation.current.team_members(teams.to_a)
     end
 
-    teams_members
+    reviewers
   end
 
   # Returns the reviewer that has approved this pull request on the behalf of
@@ -48,15 +50,17 @@ class PullRequestOwnership
   # Returns the list of OWNERS files that cover files and directories being
   # changed in this pull request.
   def owners_files
-    files, _slugs = load_ownership_data
-    files.to_a
+    data = load_ownership_data
+    data.files
   end
 
   private
 
+  Data = Struct.new(:ownerships, :files)
+
   def load_ownership_data
     files = Set.new([])
-    slugs = Set.new([])
+    ownerships = {}
 
     by_directory = {}
     @pull_request.repository_owners_files.each do |file|
@@ -68,7 +72,7 @@ class PullRequestOwnership
     # and will be blocked until a valid OWNERS file is added at the root of
     # the repository.
     if by_directory.empty?
-      return [], []
+      return Data.new({}, [])
     end
 
     # Similarly, if the pull request doesn't have any change, pretend that the
@@ -93,9 +97,11 @@ class PullRequestOwnership
         owners_file.parsed.globs.each do |glob, team|
           next unless File.fnmatch?(glob, file.basename)
 
+          ownerships[file.to_s] ||= Set.new([])
+          ownerships[file.to_s].add(team)
+
           matched_glob = true
           files.add(owners_file)
-          slugs.add(team)
         end
 
         # If the file matched at least one glob its own directory, we don't need
@@ -111,13 +117,16 @@ class PullRequestOwnership
 
           if !owners_file.parsed.teams.empty?
             files.add(owners_file)
-            slugs.merge(owners_file.parsed.teams)
+
+            ownerships[owners_file.path_name] ||= Set.new([])
+            ownerships[owners_file.path_name].merge(owners_file.parsed.teams)
+
             break
           end
         end
       end
     end
 
-    [files, slugs]
+    Data.new(ownerships, files.to_a)
   end
 end
