@@ -222,3 +222,163 @@ resource "bamboo_repository" "workflow-stats" {
   repository     = "Pardot/workflow-stats"
   shallow_clones = true
 }
+
+resource "bamboo_repository" "vagrant-dev" {
+  name           = "vagrant-dev"
+  username       = "${var.bamboo_git_username}"
+  password       = "${var.bamboo_git_password}"
+  repository     = "Pardot/vagrant-dev"
+  shallow_clones = true
+}
+
+resource "bamboo_repository" "symfony" {
+  name           = "symfony"
+  username       = "${var.bamboo_git_username}"
+  password       = "${var.bamboo_git_password}"
+  repository     = "Pardot/symfony"
+  shallow_clones = true
+}
+
+resource "bamboo_repository" "bamboo-elastic-instance" {
+  name           = "bamboo-elastic-instance"
+  username       = "${var.bamboo_git_username}"
+  password       = "${var.bamboo_git_password}"
+  repository     = "Pardot/bamboo-elastic-instance"
+  shallow_clones = true
+}
+
+resource "bamboo_repository" "symfony-dic" {
+  name           = "symfony-dic"
+  username       = "${var.bamboo_git_username}"
+  password       = "${var.bamboo_git_password}"
+  repository     = "Pardot/symfony-dic"
+  shallow_clones = true
+}
+
+resource "bamboo_repository" "Discovery-Client" {
+  name           = "Discovery-Client"
+  username       = "${var.bamboo_git_username}"
+  password       = "${var.bamboo_git_password}"
+  repository     = "Pardot/Discovery-Client"
+  shallow_clones = true
+}
+
+resource "bamboo_repository" "Discovery-Agent" {
+  name           = "Discovery-Agent"
+  username       = "${var.bamboo_git_username}"
+  password       = "${var.bamboo_git_password}"
+  repository     = "Pardot/Discovery-Agent"
+  shallow_clones = true
+}
+
+resource "bamboo_repository" "java-snippets" {
+  name           = "java-snippets"
+  username       = "${var.bamboo_git_username}"
+  password       = "${var.bamboo_git_password}"
+  repository     = "Pardot/java-snippets"
+  shallow_clones = true
+}
+
+resource "bamboo_repository" "php-amqplib" {
+  name           = "php-amqplib"
+  username       = "${var.bamboo_git_username}"
+  password       = "${var.bamboo_git_password}"
+  repository     = "Pardot/php-amqplib"
+  shallow_clones = true
+}
+
+resource "bamboo_repository" "askeet" {
+  name           = "askeet"
+  username       = "${var.bamboo_git_username}"
+  password       = "${var.bamboo_git_password}"
+  repository     = "Pardot/askeet"
+  shallow_clones = true
+}
+
+resource "bamboo_repository" "murda" {
+  name           = "murda"
+  username       = "${var.bamboo_git_username}"
+  password       = "${var.bamboo_git_password}"
+  repository     = "Pardot/murda"
+  shallow_clones = true
+}
+
+resource "bamboo_repository" "all-the-bacon" {
+  name           = "all-the-bacon"
+  username       = "${var.bamboo_git_username}"
+  password       = "${var.bamboo_git_password}"
+  repository     = "Pardot/all-the-bacon"
+  shallow_clones = true
+}
+
+resource "bamboo_repository" "kendo" {
+  name           = "kendo"
+  username       = "${var.bamboo_git_username}"
+  password       = "${var.bamboo_git_password}"
+  repository     = "Pardot/kendo"
+  shallow_clones = true
+}
+
+resource "bamboo_repository" "SalesReachLicenseProvisioning" {
+  name           = "SalesReachLicenseProvisioning"
+  username       = "${var.bamboo_git_username}"
+  password       = "${var.bamboo_git_password}"
+  repository     = "Pardot/SalesReachLicenseProvisioning"
+  shallow_clones = true
+}
+
+resource "bamboo_repository" "encryptionmanager" {
+  name           = "encryptionmanager"
+  username       = "${var.bamboo_git_username}"
+  password       = "${var.bamboo_git_password}"
+  repository     = "Pardot/encryptionmanager"
+  shallow_clones = true
+}
+
+resource "bamboo_repository" "csrf-php" {
+  name           = "csrf-php"
+  username       = "${var.bamboo_git_username}"
+  password       = "${var.bamboo_git_password}"
+  repository     = "Pardot/csrf-php"
+  shallow_clones = true
+}
+
+resource "bamboo_repository" "gmail-chrome" {
+  name           = "gmail-chrome"
+  username       = "${var.bamboo_git_username}"
+  password       = "${var.bamboo_git_password}"
+  repository     = "Pardot/gmail-chrome"
+  shallow_clones = true
+}
+
+resource "bamboo_repository" "lead-deck-app" {
+  name           = "lead-deck-app"
+  username       = "${var.bamboo_git_username}"
+  password       = "${var.bamboo_git_password}"
+  repository     = "Pardot/lead-deck-app"
+  shallow_clones = true
+}
+
+resource "bamboo_repository" "salesforce-demo-package" {
+  name           = "salesforce-demo-package"
+  username       = "${var.bamboo_git_username}"
+  password       = "${var.bamboo_git_password}"
+  repository     = "Pardot/salesforce-demo-package"
+  shallow_clones = true
+}
+
+resource "bamboo_repository" "yubikey-ldap" {
+  name           = "yubikey-ldap"
+  username       = "${var.bamboo_git_username}"
+  password       = "${var.bamboo_git_password}"
+  repository     = "Pardot/yubikey-ldap"
+  shallow_clones = true
+}
+
+resource "bamboo_repository" "breakout" {
+  name           = "breakout"
+  username       = "${var.bamboo_git_username}"
+  password       = "${var.bamboo_git_password}"
+  repository     = "Pardot/breakout"
+  shallow_clones = true
+}
