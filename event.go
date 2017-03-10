@@ -6,6 +6,7 @@ import (
 	"crypto/sha1"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -39,15 +40,15 @@ type EventHandlerConfig struct {
 // NewEventHandler returns an http.Handler that receives JIRA and GitHub events
 // webhooks requests and forwards them to other HTTP endpoints after it has
 // verified their integrity if possible.
-func NewEventHandler(logger Logger, config *EventHandlerConfig) http.Handler {
+func NewEventHandler(logger Logger, config *EventHandlerConfig) (http.Handler, error) {
 	if config.GithubSecretToken == "" {
-		panic("required config struct field missing: GithubSecretToken")
+		return nil, errors.New("required config struct field missing: GithubSecretToken")
 	}
 	client := &http.Client{CheckRedirect: nil, Jar: nil}
 	if config.RequestTimeout != time.Duration(0) {
 		client.Timeout = config.RequestTimeout
 	}
-	return &eventHandler{logger, config, client, &jsonpb.Marshaler{}}
+	return &eventHandler{logger, config, client, &jsonpb.Marshaler{}}, nil
 }
 
 type eventHandler struct {

@@ -324,10 +324,11 @@ func run(invoker operator.InvokerFunc) error {
 		httpServer.Handle("/hipchat/webhook", bread.NewHandler(logger, webhookHandler))
 	}
 	if config.event.GithubSecretToken != "" {
-		httpServer.Handle(
-			"/",
-			bread.NewHandler(logger, bread.NewEventHandler(logger, config.event)),
-		)
+		event, err := bread.NewEventHandler(logger, config.event)
+		if err != nil {
+			return err
+		}
+		httpServer.Handle("/", bread.NewHandler(logger, event))
 	}
 	if config.httpAddr != "" {
 		logger.Printf("http server listening on %s", config.httpAddr)

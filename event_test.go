@@ -37,12 +37,15 @@ func TestEventHandler(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	handler := bread.NewEventHandler(log.New(ioutil.Discard, "", log.LstdFlags), &bread.EventHandlerConfig{
+	handler, err := bread.NewEventHandler(log.New(ioutil.Discard, "", log.LstdFlags), &bread.EventHandlerConfig{
 		RequestTimeout:    10 * time.Millisecond,
 		GithubEndpoints:   []*url.URL{endpointURL},
 		JIRAEndpoints:     []*url.URL{endpointURL},
 		GithubSecretToken: secret,
 	})
+	if err != nil {
+		t.Fatal(err)
+	}
 	ts := httptest.NewServer(handler)
 	defer ts.Close()
 	for _, tc := range []struct {
