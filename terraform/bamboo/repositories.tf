@@ -622,3 +622,11 @@ resource "bamboo_repository" "salesforce-actions-topologies" {
   repository     = "Pardot/salesforce-actions-topologies"
   shallow_clones = true
 }
+
+resource "bamboo_repository" "redis-roaring" {
+  name           = "redis-roaring"
+  username       = "${var.bamboo_git_username}"
+  password       = "${var.bamboo_git_password}"
+  repository     = "Pardot/redis-roaring"
+  shallow_clones = true
+}
