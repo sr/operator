@@ -45,12 +45,13 @@ GIT_BRANCH="$(git rev-parse --abbrev-ref HEAD)"
 GIT_COMMIT="$(git rev-parse HEAD)"
 
 TERRAFORM_PROJECT="$arg1"
+TERRAFORM_OPTS="${@:3}"
 TERRAFORM_BASEDIR="$(pwd)/terraform"
 TERRAFORM_VENDORDIR="${TERRAFORM_BASEDIR}/_vendor"
 TERRAFORM_DIR="${TERRAFORM_BASEDIR}/${TERRAFORM_PROJECT}"
 TERRAFORM_PLAN="${TERRAFORM_DIR}/plan.out"
 TERRAFORM_VAR_FILE="${TERRAFORM_BASEDIR}/terraform.tfvars"
-export TERRAFORM_DIR TERRAFORM_PLAN TERRAFORM_PROJECT TERRAFORM_VAR_FILE
+export TERRAFORM_DIR TERRAFORM_PLAN TERRAFORM_PROJECT TERRAFORM_VAR_FILE TERRAFORM_OPTS
 
 if test -z "${GOPATH:-""}" || test "$BREAD" != "${GOPATH}/src/git.dev.pardot.com/Pardot/bread"; then
     echo "Deploying Terraform changes requires a working Go environment:"
@@ -99,7 +100,7 @@ case "$action" in
       -terraform-plan "$TERRAFORM_PLAN" \
       -terraform-var-file "$TERRAFORM_VAR_FILE"
     ;;
-  pull|push)
+  pull|push|import)
     go install -v ./cmd/breadsignal
 
     artifactoryenv="terraform/artifactory.env"
@@ -134,9 +135,10 @@ case "$action" in
 
     if [ "$action" != "pull" ]; then
       breadsignal -terraform "$action" \
+        -terraform-resource "${3-""}" \
         -terraform-version "$(terraform version)" \
         -branch "$GIT_BRANCH" \
-        -terraform-path "TERRAFORM_PROJECT" \
+        -terraform-path "$TERRAFORM_PROJECT" \
         -testing=false
     fi
 

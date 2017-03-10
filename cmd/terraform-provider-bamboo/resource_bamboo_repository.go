@@ -71,6 +71,7 @@ func resourceBambooRepository() *schema.Resource {
 
 func resourceBambooRepositoryCreate(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*config)
+	name := d.Get("name").(string)
 
 	createRequest := &repositoryRequest{
 		Name:          d.Get("name").(string),
@@ -108,6 +109,7 @@ func resourceBambooRepositoryCreate(d *schema.ResourceData, meta interface{}) er
 		return err
 	}
 
+	d.SetId(name)
 	return resourceBambooRepositoryRead(d, meta)
 }
 
