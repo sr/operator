@@ -9,8 +9,6 @@
 **/*.tfvars
 **/*.tfstate
 **/*.tfstate.backup
-/src/pd-sync-chef/Gemfile.lock
-/src/rubylib/Gemfile.lock
 /bambooplugin/target
 .DS_Store
 coverage
