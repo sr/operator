@@ -382,3 +382,243 @@ resource "bamboo_repository" "breakout" {
   repository     = "Pardot/breakout"
   shallow_clones = true
 }
+
+resource "bamboo_repository" "SFdeploy" {
+  name           = "SFdeploy"
+  username       = "${var.bamboo_git_username}"
+  password       = "${var.bamboo_git_password}"
+  repository     = "Pardot/SFdeploy"
+  shallow_clones = true
+}
+
+resource "bamboo_repository" "php-amqplib2" {
+  name           = "php-amqplib2"
+  username       = "${var.bamboo_git_username}"
+  password       = "${var.bamboo_git_password}"
+  repository     = "Pardot/php-amqplib2"
+  shallow_clones = true
+}
+
+resource "bamboo_repository" "kb-articles" {
+  name           = "kb-articles"
+  username       = "${var.bamboo_git_username}"
+  password       = "${var.bamboo_git_password}"
+  repository     = "Pardot/kb-articles"
+  shallow_clones = true
+}
+
+resource "bamboo_repository" "pd-homebrew" {
+  name           = "pd-homebrew"
+  username       = "${var.bamboo_git_username}"
+  password       = "${var.bamboo_git_password}"
+  repository     = "Pardot/pd-homebrew"
+  shallow_clones = true
+}
+
+resource "bamboo_repository" "ops-stacki" {
+  name           = "ops-stacki"
+  username       = "${var.bamboo_git_username}"
+  password       = "${var.bamboo_git_password}"
+  repository     = "Pardot/ops-stacki"
+  shallow_clones = true
+}
+
+resource "bamboo_repository" "frame-js" {
+  name           = "frame-js"
+  username       = "${var.bamboo_git_username}"
+  password       = "${var.bamboo_git_password}"
+  repository     = "Pardot/frame-js"
+  shallow_clones = true
+}
+
+resource "bamboo_repository" "ParMeter" {
+  name           = "ParMeter"
+  username       = "${var.bamboo_git_username}"
+  password       = "${var.bamboo_git_password}"
+  repository     = "Pardot/ParMeter"
+  shallow_clones = true
+}
+
+resource "bamboo_repository" "babysitd" {
+  name           = "babysitd"
+  username       = "${var.bamboo_git_username}"
+  password       = "${var.bamboo_git_password}"
+  repository     = "Pardot/babysitd"
+  shallow_clones = true
+}
+
+resource "bamboo_repository" "rpms" {
+  name           = "rpms"
+  username       = "${var.bamboo_git_username}"
+  password       = "${var.bamboo_git_password}"
+  repository     = "Pardot/rpms"
+  shallow_clones = true
+}
+
+resource "bamboo_repository" "mesh-sync-package" {
+  name           = "mesh-sync-package"
+  username       = "${var.bamboo_git_username}"
+  password       = "${var.bamboo_git_password}"
+  repository     = "Pardot/mesh-sync-package"
+  shallow_clones = true
+}
+
+resource "bamboo_repository" "kendo-slds" {
+  name           = "kendo-slds"
+  username       = "${var.bamboo_git_username}"
+  password       = "${var.bamboo_git_password}"
+  repository     = "Pardot/kendo-slds"
+  shallow_clones = true
+}
+
+resource "bamboo_repository" "pardot-demo-org-visualforce" {
+  name           = "pardot-demo-org-visualforce"
+  username       = "${var.bamboo_git_username}"
+  password       = "${var.bamboo_git_password}"
+  repository     = "Pardot/pardot-demo-org-visualforce"
+  shallow_clones = true
+}
+
+resource "bamboo_repository" "pardot-storm-example" {
+  name           = "pardot-storm-example"
+  username       = "${var.bamboo_git_username}"
+  password       = "${var.bamboo_git_password}"
+  repository     = "Pardot/pardot-storm-example"
+  shallow_clones = true
+}
+
+resource "bamboo_repository" "poor-mans-asset-pipeline" {
+  name           = "poor-mans-asset-pipeline"
+  username       = "${var.bamboo_git_username}"
+  password       = "${var.bamboo_git_password}"
+  repository     = "Pardot/poor-mans-asset-pipeline"
+  shallow_clones = true
+}
+
+resource "bamboo_repository" "pcswg" {
+  name           = "pcswg"
+  username       = "${var.bamboo_git_username}"
+  password       = "${var.bamboo_git_password}"
+  repository     = "Pardot/pcswg"
+  shallow_clones = true
+}
+
+resource "bamboo_repository" "wave" {
+  name           = "wave"
+  username       = "${var.bamboo_git_username}"
+  password       = "${var.bamboo_git_password}"
+  repository     = "Pardot/wave"
+  shallow_clones = true
+}
+
+resource "bamboo_repository" "testdata" {
+  name           = "testdata"
+  username       = "${var.bamboo_git_username}"
+  password       = "${var.bamboo_git_password}"
+  repository     = "Pardot/testdata"
+  shallow_clones = true
+}
+
+resource "bamboo_repository" "crumb" {
+  name           = "crumb"
+  username       = "${var.bamboo_git_username}"
+  password       = "${var.bamboo_git_password}"
+  repository     = "Pardot/crumb"
+  shallow_clones = true
+}
+
+resource "bamboo_repository" "insert_ignore" {
+  name           = "insert_ignore"
+  username       = "${var.bamboo_git_username}"
+  password       = "${var.bamboo_git_password}"
+  repository     = "Pardot/insert_ignore"
+  shallow_clones = true
+}
+
+resource "bamboo_repository" "kafka-tools" {
+  name           = "kafka-tools"
+  username       = "${var.bamboo_git_username}"
+  password       = "${var.bamboo_git_password}"
+  repository     = "Pardot/kafka-tools"
+  shallow_clones = true
+}
+
+resource "bamboo_repository" "alert-dispatcher" {
+  name           = "alert-dispatcher"
+  username       = "${var.bamboo_git_username}"
+  password       = "${var.bamboo_git_password}"
+  repository     = "Pardot/alert-dispatcher"
+  shallow_clones = true
+}
+
+resource "bamboo_repository" "wax" {
+  name           = "wax"
+  username       = "${var.bamboo_git_username}"
+  password       = "${var.bamboo_git_password}"
+  repository     = "Pardot/wax"
+  shallow_clones = true
+}
+
+resource "bamboo_repository" "swiftmailer" {
+  name           = "swiftmailer"
+  username       = "${var.bamboo_git_username}"
+  password       = "${var.bamboo_git_password}"
+  repository     = "Pardot/swiftmailer"
+  shallow_clones = true
+}
+
+resource "bamboo_repository" "pd-homebrew-php" {
+  name           = "pd-homebrew-php"
+  username       = "${var.bamboo_git_username}"
+  password       = "${var.bamboo_git_password}"
+  repository     = "Pardot/pd-homebrew-php"
+  shallow_clones = true
+}
+
+resource "bamboo_repository" "CumulusCI" {
+  name           = "CumulusCI"
+  username       = "${var.bamboo_git_username}"
+  password       = "${var.bamboo_git_password}"
+  repository     = "Pardot/CumulusCI"
+  shallow_clones = true
+}
+
+resource "bamboo_repository" "ParDove" {
+  name           = "ParDove"
+  username       = "${var.bamboo_git_username}"
+  password       = "${var.bamboo_git_password}"
+  repository     = "Pardot/ParDove"
+  shallow_clones = true
+}
+
+resource "bamboo_repository" "pardot-es-parser" {
+  name           = "pardot-es-parser"
+  username       = "${var.bamboo_git_username}"
+  password       = "${var.bamboo_git_password}"
+  repository     = "Pardot/pardot-es-parser"
+  shallow_clones = true
+}
+
+resource "bamboo_repository" "geoip-api-php" {
+  name           = "geoip-api-php"
+  username       = "${var.bamboo_git_username}"
+  password       = "${var.bamboo_git_password}"
+  repository     = "Pardot/geoip-api-php"
+  shallow_clones = true
+}
+
+resource "bamboo_repository" "StormSupervisorValidationTool" {
+  name           = "StormSupervisorValidationTool"
+  username       = "${var.bamboo_git_username}"
+  password       = "${var.bamboo_git_password}"
+  repository     = "Pardot/StormSupervisorValidationTool"
+  shallow_clones = true
+}
+
+resource "bamboo_repository" "salesforce-actions-topologies" {
+  name           = "salesforce-actions-topologies"
+  username       = "${var.bamboo_git_username}"
+  password       = "${var.bamboo_git_password}"
+  repository     = "Pardot/salesforce-actions-topologies"
+  shallow_clones = true
+}
