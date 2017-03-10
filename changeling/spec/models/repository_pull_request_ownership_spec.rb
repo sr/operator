@@ -161,20 +161,65 @@ RSpec.describe RepositoryPullRequest, "ownership" do
     end
   end
 
-  it "returns the owners of every component being changed" do
-    team_bread = %w[alindeman sr].map { |u| user(u) }
-    team_dba = %w[glen].map { |u| user(u) }
-    team_ops = %w[alindeman glen sr].map { |u| user(u) }
-    GithubTeamMembership.delete_all
-    create_team_memberships(
-      "bread": team_bread.map(&:login),
-      "dba": team_dba.map(&:login),
-      "ops": team_ops.map(&:login)
-    )
+  describe "ownership_users" do
+    before(:all) do
+      @team_bread = %w[alindeman sr].map { |u| user(u) }
+      @team_developers = %w[smiley].map { |u| user(u) }
+      @team_ops = %w[alindeman sr].map { |u| user(u) }
 
-    create_owners_file("/", ["heroku/bread", "heroku/dba", "heroku/ops"])
-    create_pull_request_file("/README")
+      GithubTeamMembership.delete_all
 
-    expect(@pull_request.reload.ownership_users).to eq([team_bread, team_dba, team_ops])
+      create_team_memberships(
+        "bread": @team_bread.map(&:login),
+        "developers": @team_developers.map(&:login),
+        "ops": @team_ops.map(&:login)
+      )
+    end
+
+    it "returns one array of users per owned directory" do
+      create_owners_file("/pardot", ["heroku/developers", "heroku/bread"])
+      create_pull_request_file("/pardot/README")
+      expect(@pull_request.reload.ownership_users).to eq([[user("alindeman"), user("sr"), user("smiley")]])
+
+      create_owners_file("/chef", ["heroku/ops"])
+      create_pull_request_file("/chef/README")
+      expect(@pull_request.reload.ownership_users).to eq([[user("alindeman"), user("sr"), user("smiley")], [user("alindeman"), user("sr")]])
+    end
+
+    it "returns one array of users per owned file" do
+      create_owners_file("/", ["heroku/developers index.php", "heroku/bread build.sh"])
+      expect(@pull_request.reload.ownership_users).to eq([])
+
+      create_pull_request_file("/index.php")
+      expect(@pull_request.reload.ownership_users).to eq([[user("smiley")]])
+
+      create_pull_request_file("/build.sh")
+      expect(@pull_request.reload.ownership_users).to eq([[user("smiley")], [user("alindeman"), user("sr")]])
+    end
+
+    it "ignores empty OWNERS files" do
+      create_owners_file("/a", ["heroku/developers"])
+      create_owners_file("/b", [])
+      create_pull_request_file("/a/a")
+      create_pull_request_file("/a/b")
+      expect(@pull_request.reload.ownership_users).to eq([[user("smiley")]])
+    end
+
+    it "ignores irrelevant OWNERS files" do
+      create_owners_file("/", ["heroku/developers", "heroku/bread"])
+      create_owners_file("/chef", ["heroku/ops"])
+
+      create_pull_request_file("/chef/README")
+      expect(@pull_request.reload.ownership_users).to eq([
+        [user("alindeman"), user("sr")]
+      ])
+    end
+
+    it "only applies glob to the current directory" do
+      create_owners_file("/a", ["heroku/developers file.txt"])
+      create_owners_file("/b", ["heroku/developers file.txt"])
+      create_pull_request_file("/a/file.txt")
+      expect(@pull_request.reload.ownership_users).to eq([[user("smiley")]])
+    end
   end
 end
