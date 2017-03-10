@@ -22,6 +22,7 @@ func main() {
 
 func run() error {
 	terraformAction := flag.String("terraform", "", "Notify the BREAD team of a terraform actions (either plan or apply)")
+	terraformResource := flag.String("terraform-resource", "", "Resource being acted on (if any)")
 	terraformVersion := flag.String("terraform-version", "", "Installed terraform version")
 	terraformPath := flag.String("terraform-path", "", "the path being acted upon")
 	gitBranch := flag.String("branch", "unknown", "Checked out BREAD repo branch")
@@ -67,6 +68,15 @@ func run() error {
 		color = "yellow"
 		message = fmt.Sprintf(
 			"deploying terraform branch <code>%s</code> with <code>%s</code> to terraform path <code>%s</code>",
+			*gitBranch,
+			*terraformVersion,
+			*terraformPath,
+		)
+	case "import":
+		color = "yellow"
+		message = fmt.Sprintf(
+			"importing terraform resource <code>%s</code> from branch <code>%s</code> with <code>%s</code> to terraform path <code>%s</code>",
+			*terraformResource,
 			*gitBranch,
 			*terraformVersion,
 			*terraformPath,
