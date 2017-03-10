@@ -103,12 +103,6 @@ func resourceBambooRepositoryCreate(d *schema.ResourceData, meta interface{}) er
 		return fmt.Errorf("bad response code from Bamboo: %d", resp.StatusCode)
 	}
 
-	response := new(repositoryResponse)
-	err = json.NewDecoder(resp.Body).Decode(response)
-	if err != nil {
-		return err
-	}
-
 	d.SetId(name)
 	return resourceBambooRepositoryRead(d, meta)
 }
@@ -130,7 +124,7 @@ func resourceBambooRepositoryUpdate(d *schema.ResourceData, meta interface{}) er
 		return err
 	}
 
-	req, err := http.NewRequest("PUT", fmt.Sprintf("%s/rest/pardot/1.0/linkedrepos/%v", config.URL, name), bytes.NewBuffer(b))
+	req, err := http.NewRequest("PUT", fmt.Sprintf("%s/rest/pardot/1.0/linkedrepos/%s", config.URL, name), bytes.NewBuffer(b))
 	if err != nil {
 		return err
 	}
@@ -147,12 +141,6 @@ func resourceBambooRepositoryUpdate(d *schema.ResourceData, meta interface{}) er
 		return fmt.Errorf("bad response code from Bamboo: %d", resp.StatusCode)
 	}
 
-	response := new(repositoryResponse)
-	err = json.NewDecoder(resp.Body).Decode(response)
-	if err != nil {
-		return err
-	}
-
 	return resourceBambooRepositoryRead(d, meta)
 }
 
@@ -160,7 +148,7 @@ func resourceBambooRepositoryRead(d *schema.ResourceData, meta interface{}) erro
 	config := meta.(*config)
 	name := d.Id()
 
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/rest/pardot/1.0/linkedrepos/%v", config.URL, name), nil)
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s/rest/pardot/1.0/linkedrepos/%s", config.URL, name), nil)
 	if err != nil {
 		return err
 	}
@@ -185,6 +173,7 @@ func resourceBambooRepositoryRead(d *schema.ResourceData, meta interface{}) erro
 	}
 
 	d.SetId(response.Name)
+	_ = d.Set("id", response.ID)
 	_ = d.Set("name", response.Name)
 	_ = d.Set("branch", response.Branch)
 	_ = d.Set("repository", response.Repository)
@@ -196,7 +185,7 @@ func resourceBambooRepositoryDelete(d *schema.ResourceData, meta interface{}) er
 	config := meta.(*config)
 	name := d.Id()
 
-	req, err := http.NewRequest("DELETE", fmt.Sprintf("%s/rest/pardot/1.0/linkedrepos/%v", config.URL, name), nil)
+	req, err := http.NewRequest("DELETE", fmt.Sprintf("%s/rest/pardot/1.0/linkedrepos/%s", config.URL, name), nil)
 	if err != nil {
 		return err
 	}

@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.pardot.bread.bambooplugin</groupId>
     <artifactId>pardot-bamboo-plugin</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
     <organization>
         <name>Salesforce Pardot</name>
         <url>https://www.pardot.com/</url>

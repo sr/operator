@@ -10,15 +10,13 @@ import com.atlassian.bamboo.collections.ActionParametersMap;
 import com.atlassian.bamboo.deletion.DeletionService;
 import com.atlassian.bamboo.event.BuildConfigurationUpdatedEvent;
 import com.atlassian.bamboo.fieldvalue.BuildDefinitionConverter;
-import com.atlassian.bamboo.plan.Plan;
-import com.atlassian.bamboo.plan.PlanIdentifier;
-import com.atlassian.bamboo.plan.PlanKeys;
-import com.atlassian.bamboo.plan.PlanManager;
+import com.atlassian.bamboo.plan.*;
 import com.atlassian.bamboo.plan.branch.BranchIntegrationConfigurationImpl;
 import com.atlassian.bamboo.plan.branch.BranchMonitoringConfiguration;
 import com.atlassian.bamboo.plan.cache.CachedPlanManager;
 import com.atlassian.bamboo.plan.cache.ImmutableJob;
 import com.atlassian.bamboo.plan.cache.ImmutablePlan;
+import com.atlassian.bamboo.repository.RepositoryDefinition;
 import com.atlassian.bamboo.spring.ComponentAccessor;
 import com.atlassian.bamboo.task.*;
 import com.atlassian.bamboo.trigger.TriggerConfigurationService;
@@ -129,11 +127,20 @@ public class BuildPlanResource {
     static class PlanInformation {
         public String key;
         public String name;
+        public String description;
+        public long repositoryId;
 
-        public static PlanInformation newFromPlan(PlanIdentifier plan) {
+        public static PlanInformation newFromPlan(ImmutablePlan plan) {
             PlanInformation information = new PlanInformation();
             information.key = plan.getPlanKey().toString();
             information.name = plan.getName();
+            information.description = plan.getDescription();
+
+            RepositoryDefinition repositoryDefinition = PlanHelper.getDefaultRepositoryDefinition(plan);
+            if (repositoryDefinition != null) {
+                information.repositoryId = repositoryDefinition.getId();
+            }
+
             return information;
         }
     }
