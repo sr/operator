@@ -12,6 +12,7 @@ import (
 	"regexp"
 	"strings"
 	"syscall"
+	"time"
 
 	"git.dev.pardot.com/Pardot/bread"
 	"git.dev.pardot.com/Pardot/bread/swagger/client/canoe"
@@ -21,6 +22,7 @@ import (
 const program = "terra"
 
 var reTerraVersion = regexp.MustCompile("v([0-9.]*)")
+var maxPlanFileAge = 5 * time.Minute
 
 type afyRepo struct {
 	RepoName string
@@ -174,8 +176,14 @@ func terra() (int, string) {
 			return 1, fmt.Sprintf("Unable to determine local Terraform version: %s", err)
 		}
 		tf.Version = matches[1]
-		if _, err := os.Stat(tf.PlanFile); os.IsNotExist(err) {
-			return 1, fmt.Sprintf(`Plan file "%s" is missing. Please run "terra plan %s" first`, tf.PlanFile, tf.PlanFile)
+		planFileInfo, err := os.Stat(tf.PlanFile)
+		if os.IsNotExist(err) {
+			return 1, fmt.Sprintf(`Plan file "%s" is missing. Please run "terra plan %s" first`, tf.PlanFile, tf.Project)
+		} else if err != nil {
+			return 1, fmt.Sprintf(`Error getting statistics for plan file "%s": %s`, tf.PlanFile, err)
+		}
+		if time.Now().Sub(planFileInfo.ModTime()) > maxPlanFileAge {
+			return 1, fmt.Sprintf(`Plan file "%s" was generated more than %v ago. Please re-run "terra plan %s"`, tf.PlanFile, maxPlanFileAge, tf.Project)
 		}
 		if err := apply(client, &tf, &git, canoeUser); err != nil {
 			return 1, err.Error()

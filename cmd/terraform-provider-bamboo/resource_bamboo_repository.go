@@ -71,7 +71,6 @@ func resourceBambooRepository() *schema.Resource {
 
 func resourceBambooRepositoryCreate(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*config)
-	name := d.Get("name").(string)
 
 	createRequest := &repositoryRequest{
 		Name:          d.Get("name").(string),
@@ -109,13 +108,13 @@ func resourceBambooRepositoryCreate(d *schema.ResourceData, meta interface{}) er
 		return err
 	}
 
-	d.SetId(name)
+	d.SetId(fmt.Sprintf("%d", response.ID))
 	return resourceBambooRepositoryRead(d, meta)
 }
 
 func resourceBambooRepositoryUpdate(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*config)
-	name := d.Id()
+	id := d.Id()
 
 	createRequest := &repositoryRequest{
 		Name:          d.Get("name").(string),
@@ -130,7 +129,7 @@ func resourceBambooRepositoryUpdate(d *schema.ResourceData, meta interface{}) er
 		return err
 	}
 
-	req, err := http.NewRequest("PUT", fmt.Sprintf("%s/rest/pardot/1.0/linkedrepos/%v", config.URL, name), bytes.NewBuffer(b))
+	req, err := http.NewRequest("PUT", fmt.Sprintf("%s/rest/pardot/1.0/linkedrepos/%s", config.URL, id), bytes.NewBuffer(b))
 	if err != nil {
 		return err
 	}
@@ -147,20 +146,14 @@ func resourceBambooRepositoryUpdate(d *schema.ResourceData, meta interface{}) er
 		return fmt.Errorf("bad response code from Bamboo: %d", resp.StatusCode)
 	}
 
-	response := new(repositoryResponse)
-	err = json.NewDecoder(resp.Body).Decode(response)
-	if err != nil {
-		return err
-	}
-
 	return resourceBambooRepositoryRead(d, meta)
 }
 
 func resourceBambooRepositoryRead(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*config)
-	name := d.Id()
+	id := d.Id()
 
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/rest/pardot/1.0/linkedrepos/%v", config.URL, name), nil)
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s/rest/pardot/1.0/linkedrepos/%s", config.URL, id), nil)
 	if err != nil {
 		return err
 	}
@@ -170,6 +163,7 @@ func resourceBambooRepositoryRead(d *schema.ResourceData, meta interface{}) erro
 	if err != nil {
 		return err
 	}
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode == 404 {
 		d.SetId("")
@@ -184,7 +178,7 @@ func resourceBambooRepositoryRead(d *schema.ResourceData, meta interface{}) erro
 		return err
 	}
 
-	d.SetId(response.Name)
+	d.SetId(fmt.Sprintf("%d", response.ID))
 	_ = d.Set("name", response.Name)
 	_ = d.Set("branch", response.Branch)
 	_ = d.Set("repository", response.Repository)
@@ -194,9 +188,9 @@ func resourceBambooRepositoryRead(d *schema.ResourceData, meta interface{}) erro
 
 func resourceBambooRepositoryDelete(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*config)
-	name := d.Id()
+	id := d.Id()
 
-	req, err := http.NewRequest("DELETE", fmt.Sprintf("%s/rest/pardot/1.0/linkedrepos/%v", config.URL, name), nil)
+	req, err := http.NewRequest("DELETE", fmt.Sprintf("%s/rest/pardot/1.0/linkedrepos/%s", config.URL, id), nil)
 	if err != nil {
 		return err
 	}

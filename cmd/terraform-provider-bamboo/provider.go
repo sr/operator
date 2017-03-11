@@ -33,6 +33,7 @@ func Provider() terraform.ResourceProvider {
 		},
 		ResourcesMap: map[string]*schema.Resource{
 			"bamboo_repository": resourceBambooRepository(),
+			"bamboo_build_plan": resourceBambooBuildPlan(),
 		},
 		ConfigureFunc: configure,
 	}

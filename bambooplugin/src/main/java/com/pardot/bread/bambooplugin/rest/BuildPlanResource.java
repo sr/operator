@@ -10,15 +10,13 @@ import com.atlassian.bamboo.collections.ActionParametersMap;
 import com.atlassian.bamboo.deletion.DeletionService;
 import com.atlassian.bamboo.event.BuildConfigurationUpdatedEvent;
 import com.atlassian.bamboo.fieldvalue.BuildDefinitionConverter;
-import com.atlassian.bamboo.plan.Plan;
-import com.atlassian.bamboo.plan.PlanIdentifier;
-import com.atlassian.bamboo.plan.PlanKeys;
-import com.atlassian.bamboo.plan.PlanManager;
+import com.atlassian.bamboo.plan.*;
 import com.atlassian.bamboo.plan.branch.BranchIntegrationConfigurationImpl;
 import com.atlassian.bamboo.plan.branch.BranchMonitoringConfiguration;
 import com.atlassian.bamboo.plan.cache.CachedPlanManager;
 import com.atlassian.bamboo.plan.cache.ImmutableJob;
 import com.atlassian.bamboo.plan.cache.ImmutablePlan;
+import com.atlassian.bamboo.repository.*;
 import com.atlassian.bamboo.spring.ComponentAccessor;
 import com.atlassian.bamboo.task.*;
 import com.atlassian.bamboo.trigger.TriggerConfigurationService;
@@ -64,6 +62,7 @@ public class BuildPlanResource {
     private TriggerTypeManager triggerTypeManager;
     private EventPublisher eventPublisher;
     private DeletionService deletionService;
+    private RepositoryDefinitionManager repositoryDefinitionManager;
 
     public void setChainCreationService(ChainCreationService chainCreationService) {
         this.chainCreationService = chainCreationService;
@@ -113,6 +112,9 @@ public class BuildPlanResource {
         this.deletionService = deletionService;
     }
 
+    public void setRepositoryDefinitionManager(RepositoryDefinitionManager repositoryDefinitionManager) {
+        this.repositoryDefinitionManager = repositoryDefinitionManager;
+    }
 
     public BuildPlanResource() {
         // NOTE(alindeman): It's not clear why this doesn't work as a regular <component-import> but I could not get it to work
@@ -123,17 +125,26 @@ public class BuildPlanResource {
         public String key;
         public String name;
         public String description;
-        public long repositoryId;
+        public long defaultRepositoryId;
     }
 
     static class PlanInformation {
         public String key;
         public String name;
+        public String description;
+        public long defaultRepositoryId;
 
-        public static PlanInformation newFromPlan(PlanIdentifier plan) {
+        public static PlanInformation newFromPlan(ImmutablePlan plan) {
             PlanInformation information = new PlanInformation();
             information.key = plan.getPlanKey().toString();
-            information.name = plan.getName();
+            information.name = plan.getBuildName();
+            information.description = plan.getDescription();
+
+            RepositoryDefinition repositoryDefinition = PlanHelper.getDefaultRepositoryDefinition(plan);
+            if (repositoryDefinition != null) {
+                information.defaultRepositoryId = repositoryDefinition.getId();
+            }
+
             return information;
         }
     }
@@ -152,9 +163,15 @@ public class BuildPlanResource {
 
     @POST
     public Response create(final PlanRequest planRequest) {
+        final RepositoryDataEntity repositoryDataEntity = repositoryDefinitionManager.getRepositoryDataEntity(planRequest.defaultRepositoryId);
+        if (repositoryDataEntity == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        final RepositoryData repositoryData = new RepositoryDataImpl(repositoryDataEntity);
+
         String planKey;
         try {
-            planKey = createPlan(planRequest);
+            planKey = createPlan(planRequest, repositoryData);
         } catch (PlanCreationDeniedException e) {
             log.error("permission denied while creating plan", e);
             return Response.status(Response.Status.FORBIDDEN).build();
@@ -176,7 +193,7 @@ public class BuildPlanResource {
 
         createDefaultTask(planKey, jobKey);
         setupWebhookTrigger(planKey);
-        setupDailyPoll(planKey, planRequest.repositoryId);
+        setupDailyPoll(planKey, repositoryData);
         configureBranchManagement(planKey);
         dashboardCachingManager.updatePlanCache(PlanKeys.getPlanKey(planKey));
 
@@ -199,17 +216,17 @@ public class BuildPlanResource {
         return Response.noContent().build();
     }
 
-    private String createPlan(final PlanRequest planRequest) throws PlanCreationDeniedException {
+    private String createPlan(final PlanRequest planRequest, final RepositoryData repositoryData) throws PlanCreationDeniedException {
         HashMap<String,String> configuration = new HashMap<>();
         configuration.put("existingProjectKey", PlanKeys.getProjectKeyPart(PlanKeys.getPlanKey(planRequest.key)));
         configuration.put("chainName", planRequest.name);
         configuration.put("chainKey", PlanKeys.getPlanKeyPart(PlanKeys.getPlanKey(planRequest.key)));
         configuration.put("chainDescription", planRequest.description);
-        configuration.put("selectedRepository", Long.toString(planRequest.repositoryId));
+        configuration.put("selectedRepository", Long.toString(repositoryData.getId()));
         configuration.put("repositoryTypeOption", "LINKED");
 
         BuildConfiguration buildConfiguration = new BuildConfiguration();
-        buildConfiguration.setProperty("selectedRepository", Long.toString(planRequest.repositoryId));
+        buildConfiguration.setProperty("selectedRepository", Long.toString(repositoryData.getId()));
 
         return chainCreationService.createPlan(
                 buildConfiguration,
@@ -276,11 +293,11 @@ public class BuildPlanResource {
             );
     }
 
-    private TriggerDefinition setupDailyPoll(final String planKey, final Long repositoryId) {
+    private TriggerDefinition setupDailyPoll(final String planKey, final RepositoryData repositoryData) {
         TriggerModuleDescriptor triggerDescriptor = triggerTypeManager.getTriggerDescriptor(pollTriggerKey);
 
         HashSet<Long> triggeringRepositories = new HashSet<>();
-        triggeringRepositories.add(repositoryId);
+        triggeringRepositories.add(repositoryData.getId());
 
         HashMap<String, String> configuration = new HashMap<>();
         configuration.put(PollingTriggerConfigurationConstants.POLLING_TYPE, "CRON");
