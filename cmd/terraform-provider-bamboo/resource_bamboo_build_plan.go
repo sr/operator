@@ -10,17 +10,17 @@ import (
 )
 
 type buildPlanRequest struct {
-	Key          string `json:"key"`
-	Name         string `json:"name"`
-	Description  string `json:"description"`
-	RepositoryID int64  `json:"repository_id"`
+	Key                 string `json:"key"`
+	Name                string `json:"name"`
+	Description         string `json:"description"`
+	DefaultRepositoryID int64  `json:"defaultRepositoryId"`
 }
 
 type buildPlanResponse struct {
-	Key          string `json:"key"`
-	Name         string `json:"name"`
-	Description  string `json:"description"`
-	RepositoryID int64  `json:"repository_id"`
+	Key                 string `json:"key"`
+	Name                string `json:"name"`
+	Description         string `json:"description"`
+	DefaultRepositoryID int64  `json:"defaultRepositoryId"`
 }
 
 func resourceBambooBuildPlan() *schema.Resource {
@@ -48,7 +48,7 @@ func resourceBambooBuildPlan() *schema.Resource {
 				Default:  "",
 				ForceNew: true,
 			},
-			"repository_id": {
+			"default_repository_id": {
 				Type:     schema.TypeInt,
 				Required: true,
 				ForceNew: true,
@@ -62,10 +62,10 @@ func resourceBambooBuildPlanCreate(d *schema.ResourceData, meta interface{}) err
 	key := d.Get("key").(string)
 
 	createRequest := &buildPlanRequest{
-		Key:          d.Get("key").(string),
-		Name:         d.Get("name").(string),
-		Description:  d.Get("description").(string),
-		RepositoryID: d.Get("repository_id").(int64),
+		Key:                 d.Get("key").(string),
+		Name:                d.Get("name").(string),
+		Description:         d.Get("description").(string),
+		DefaultRepositoryID: d.Get("default_repository_id").(int64),
 	}
 	b, err := json.Marshal(createRequest)
 	if err != nil {
@@ -125,7 +125,7 @@ func resourceBambooBuildPlanRead(d *schema.ResourceData, meta interface{}) error
 	_ = d.Set("key", response.Key)
 	_ = d.Set("name", response.Name)
 	_ = d.Set("description", response.Description)
-	_ = d.Set("repository_id", response.RepositoryID)
+	_ = d.Set("default_repository_id", response.DefaultRepositoryID)
 	return nil
 }
 

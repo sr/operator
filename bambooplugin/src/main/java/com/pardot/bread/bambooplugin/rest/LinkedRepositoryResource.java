@@ -1,8 +1,6 @@
 package com.pardot.bread.bambooplugin.rest;
 
-import com.atlassian.bamboo.repository.RepositoryConfigurationService;
-import com.atlassian.bamboo.repository.RepositoryData;
-import com.atlassian.bamboo.repository.RepositoryDefinitionManager;
+import com.atlassian.bamboo.repository.*;
 import com.atlassian.bamboo.security.EncryptionService;
 import com.atlassian.bamboo.user.BambooAuthenticationContext;
 import com.atlassian.bamboo.utils.ConfigUtils;
@@ -77,35 +75,31 @@ public class LinkedRepositoryResource {
 
 
     @GET
-    @Path("/{name}")
-    public Response get(@PathParam("name") final String name) {
-        RepositoryData data = findGlobalRepositoryWithName(name);
-        if (data == null) {
+    @Path("/{id}")
+    public Response get(@PathParam("id") final long id) {
+        RepositoryDataEntity repositoryDataEntity = repositoryDefinitionManager.getRepositoryDataEntity(id);
+        if (repositoryDataEntity == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
 
-        RepositoryResponse information = RepositoryResponse.newFromRepositoryData(data);
+        RepositoryResponse information = RepositoryResponse.newFromRepositoryData(new RepositoryDataImpl(repositoryDataEntity));
         return Response.ok(information).build();
     }
 
     @DELETE
-    @Path("/{name}")
-    public Response delete(@PathParam("name") final String name) {
-        RepositoryData data = findGlobalRepositoryWithName(name);
-        if (data == null) {
+    @Path("/{id}")
+    public Response delete(@PathParam("id") final long id) {
+        RepositoryDataEntity repositoryDataEntity = repositoryDefinitionManager.getRepositoryDataEntity(id);
+        if (repositoryDataEntity == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
 
-        repositoryConfigurationService.deleteGlobalRepository(data.getId());
+        repositoryConfigurationService.deleteGlobalRepository(id);
         return Response.noContent().build();
     }
 
     @POST
     public Response create(final RepositoryRequest repositoryRequest) {
-        if (findGlobalRepositoryWithName(repositoryRequest.name) != null) {
-            return Response.status(Response.Status.CONFLICT).build();
-        }
-
         RepositoryData data = repositoryConfigurationService.createGlobalRepository(
                 repositoryRequest.name,
                 githubEnterpriseRepositoryKey,
@@ -122,15 +116,16 @@ public class LinkedRepositoryResource {
     }
 
     @PUT
-    @Path("/{name}")
-    public Response update(@PathParam("name") final String name, final RepositoryRequest repositoryRequest) {
-        RepositoryData data = findGlobalRepositoryWithName(name);
-        if (data == null) {
+    @Path("/{id}")
+    public Response update(@PathParam("id") final long id, final RepositoryRequest repositoryRequest) {
+        RepositoryDataEntity repositoryDataEntity = repositoryDefinitionManager.getRepositoryDataEntity(id);
+        if (repositoryDataEntity == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
+        RepositoryData data = new RepositoryDataImpl(repositoryDataEntity);
 
         data = repositoryConfigurationService.editGlobalRepository(
-                name,
+                repositoryRequest.name,
                 githubEnterpriseRepositoryKey,
                 noWebRepositoryKey,
                 data,
@@ -141,15 +136,6 @@ public class LinkedRepositoryResource {
         return Response.ok(information)
                 .build();
     }
-
-   private RepositoryData findGlobalRepositoryWithName(String name) {
-       for (RepositoryData repositoryData : repositoryDefinitionManager.getGlobalRepositoryDefinitionsForAdministration()) {
-           if (name.equals(repositoryData.getName())) {
-               return repositoryData;
-           }
-       }
-       return null;
-   }
 
    private HierarchicalConfiguration buildConfiguration(final RepositoryRequest request) {
        final HierarchicalConfiguration configuration = ConfigUtils.newConfiguration();
