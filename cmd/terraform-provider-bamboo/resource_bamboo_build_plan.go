@@ -65,7 +65,7 @@ func resourceBambooBuildPlanCreate(d *schema.ResourceData, meta interface{}) err
 		Key:                 d.Get("key").(string),
 		Name:                d.Get("name").(string),
 		Description:         d.Get("description").(string),
-		DefaultRepositoryID: d.Get("default_repository_id").(int64),
+		DefaultRepositoryID: int64(d.Get("default_repository_id").(int)),
 	}
 	b, err := json.Marshal(createRequest)
 	if err != nil {
@@ -107,6 +107,7 @@ func resourceBambooBuildPlanRead(d *schema.ResourceData, meta interface{}) error
 	if err != nil {
 		return err
 	}
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode == 404 {
 		d.SetId("")
@@ -143,6 +144,7 @@ func resourceBambooBuildPlanDelete(d *schema.ResourceData, meta interface{}) err
 	if err != nil {
 		return err
 	}
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode == 404 {
 		d.SetId("")

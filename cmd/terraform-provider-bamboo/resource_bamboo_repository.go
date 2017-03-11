@@ -163,6 +163,7 @@ func resourceBambooRepositoryRead(d *schema.ResourceData, meta interface{}) erro
 	if err != nil {
 		return err
 	}
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode == 404 {
 		d.SetId("")
