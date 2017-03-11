@@ -157,6 +157,15 @@
 			"notests": true
 		},
 		{
+			"importpath": "github.com/cyberdelia/heroku-go/v3",
+			"repository": "https://github.com/cyberdelia/heroku-go",
+			"vcs": "git",
+			"revision": "f4997531b0bc362f2bf350f1f1691de543c91383",
+			"branch": "master",
+			"path": "/v3",
+			"notests": true
+		},
+		{
 			"importpath": "github.com/dghubble/sling",
 			"repository": "https://github.com/dghubble/sling",
 			"vcs": "git",
@@ -659,6 +668,15 @@
 			"notests": true
 		},
 		{
+			"importpath": "github.com/google/go-querystring/query",
+			"repository": "https://github.com/google/go-querystring",
+			"vcs": "git",
+			"revision": "53e6ce116135b80d037921a7fdd5138cf32d7a8a",
+			"branch": "master",
+			"path": "/query",
+			"notests": true
+		},
+		{
 			"importpath": "github.com/googleapis/gax-go",
 			"repository": "https://github.com/googleapis/gax-go",
 			"vcs": "git",
@@ -1150,6 +1168,14 @@
 			"revision": "8a055cad4b24c9987be2f10ab2d98923e5ae9b1b",
 			"branch": "HEAD",
 			"path": "/libcontainer/user",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/pborman/uuid",
+			"repository": "https://github.com/pborman/uuid",
+			"vcs": "git",
+			"revision": "1b00554d822231195d1babd97ff4a781231955c9",
+			"branch": "master",
 			"notests": true
 		},
 		{
