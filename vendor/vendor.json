@@ -3,6 +3,7 @@
   "ignore": "test",
   "heroku": {
     "install": [
+      "./cmd/chatbotd",
       "./cmd/jib"
     ],
     "goVersion": "go1.8",
