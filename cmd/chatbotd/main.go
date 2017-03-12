@@ -9,12 +9,14 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"net/url"
 	"os"
 	"os/signal"
 	"strings"
 	"time"
 
 	heroku "github.com/cyberdelia/heroku-go/v3"
+	"golang.org/x/oauth2/clientcredentials"
 	"google.golang.org/grpc"
 
 	"git.dev.pardot.com/Pardot/bread"
@@ -96,6 +98,25 @@ func run() error {
 			return err
 		}
 		mux.HandleFunc("/hipchat/addon", handler)
+	} else {
+		webhookURL, err := url.Parse(hipchatAddonConfig.WebhookURL)
+		if err != nil {
+			return err
+		}
+
+		handler, err := breadhipchat.EventHandler(
+			&clientcredentials.Config{
+				ClientID:     *hipchatOAuthID,
+				ClientSecret: *hipchatOAuthSecret,
+				TokenURL:     fmt.Sprintf("%s/v2/oauth/token", bread.HipchatHost),
+				Scopes:       breadhipchat.DefaultScopes,
+			},
+			breadhipchat.LogHandler(logger),
+		)
+		if err != nil {
+			return err
+		}
+		mux.HandleFunc(webhookURL.Path, handler)
 	}
 
 	httpServer := &http.Server{
