@@ -1,5 +1,5 @@
 resource "github_team" "ateam" {
-  name        = "The A-Team"
+  name        = "A-Team"
   description = "https://gus.lightning.force.com/one/one.app#/sObject/a00B0000005MPjtIAG/view"
   privacy     = "closed"
 }
