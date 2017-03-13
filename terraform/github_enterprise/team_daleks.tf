@@ -27,4 +27,3 @@ resource "github_team_membership" "daleks_jan-ulrich" {
   username = "jan-ulrich"
   role     = "maintainer"
 }
-
