@@ -49,7 +49,11 @@ resource "github_repository" "#{safe_name}" {
   has_downloads = #{repo.has_downloads}
   has_wiki      = #{repo.has_wiki}
 }
-
+EOS
+      # Most repositories require the `compliance` check to be passing, but
+      # there are some exceptions
+      unless %w(kb-articles).include?(repo.name)
+        fp.puts <<-EOS
 resource "github_branch_protection" "#{safe_name}_#{repo.default_branch}" {
   repository = "\${github_repository.#{safe_name}.name}"
   branch     = "#{repo.default_branch}"
@@ -58,8 +62,9 @@ resource "github_branch_protection" "#{safe_name}_#{repo.default_branch}" {
   strict         = false
   contexts       = ["compliance"]
 }
-
 EOS
+      end
+
 
       teams = Octokit.repository_teams(repo.id)
 
