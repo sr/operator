@@ -204,6 +204,31 @@ public class BuildPlanResource {
                 .build();
     }
 
+    @PUT
+    @Path("/{key}")
+    public Response update(@PathParam("key") final String key, final PlanRequest planRequest) {
+        final Plan plan = planManager.getPlanByKey(PlanKeys.getPlanKey(key));
+        if (plan == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+        final RepositoryDataEntity repositoryDataEntity = repositoryDefinitionManager.getRepositoryDataEntity(planRequest.defaultRepositoryId);
+        if (repositoryDataEntity == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        final RepositoryData repositoryData = new RepositoryDataImpl(repositoryDataEntity);
+
+        plan.setBuildName(planRequest.name);
+        plan.setDescription(planRequest.description);
+        // TODO(alindeman): changing defaultRepositoryId is not implemented
+
+        planManager.savePlan(plan);
+        dashboardCachingManager.updatePlanCache(plan.getPlanKey());
+
+        PlanInformation information = PlanInformation.newFromPlan(plan);
+        return Response.ok(information).build();
+    }
+
     @DELETE
     @Path("/{key}")
     public Response delete(@PathParam("key") final String key) {
