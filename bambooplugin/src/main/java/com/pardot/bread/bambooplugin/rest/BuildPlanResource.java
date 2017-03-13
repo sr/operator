@@ -192,7 +192,7 @@ public class BuildPlanResource {
         }
 
         createDefaultTask(planKey, jobKey);
-        setupWebhookTrigger(planKey);
+        setupWebhookTrigger(planKey, repositoryData);
         setupDailyPoll(planKey, repositoryData);
         configureBranchManagement(planKey);
         dashboardCachingManager.updatePlanCache(PlanKeys.getPlanKey(planKey));
@@ -277,8 +277,11 @@ public class BuildPlanResource {
         );
     }
 
-    private TriggerDefinition setupWebhookTrigger(final String planKey) {
+    private TriggerDefinition setupWebhookTrigger(final String planKey, final RepositoryData repositoryData) {
         TriggerModuleDescriptor triggerDescriptor = triggerTypeManager.getTriggerDescriptor(githubWebhookTriggerKey);
+
+        HashSet<Long> triggeringRepositories = new HashSet<>();
+        triggeringRepositories.add(repositoryData.getId());
 
         HashMap<String, String> configuration = new HashMap<>();
 
@@ -287,7 +290,7 @@ public class BuildPlanResource {
                 triggerDescriptor,
                 "",
                 true,
-                null,
+                triggeringRepositories,
                 configuration,
                 new HashMap<>()
             );
