@@ -15,6 +15,10 @@ class GithubRepository < ApplicationRecord
   end
 
   def synchronize
+    if deleted_at
+      return
+    end
+
     synchronize_config_file
     synchronize_owners_files
   end
