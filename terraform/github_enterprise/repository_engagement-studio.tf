@@ -8,6 +8,15 @@ resource "github_repository" "engagement-studio" {
   has_wiki      = false
 }
 
+resource "github_branch_protection" "engagement-studio_master" {
+  repository = "${github_repository.engagement-studio.name}"
+  branch     = "master"
+
+  include_admins = false
+  strict         = false
+  contexts       = ["compliance"]
+}
+
 resource "github_team_repository" "engagement-studio_developers" {
   repository = "${github_repository.engagement-studio.name}"
   team_id    = "${github_team.developers.id}"
@@ -24,13 +33,4 @@ resource "github_team_repository" "engagement-studio_service-accounts-administra
   repository = "${github_repository.engagement-studio.name}"
   team_id    = "${github_team.service-accounts-administrators.id}"
   permission = "admin"
-}
-
-resource "github_branch_protection" "engagement-studio_master" {
-  repository = "${github_repository.engagement-studio.name}"
-  branch     = "master"
-
-  include_admins = false
-  strict         = false
-  contexts       = ["compliance"]
 }

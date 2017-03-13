@@ -8,6 +8,15 @@ resource "github_repository" "rpms" {
   has_wiki      = true
 }
 
+resource "github_branch_protection" "rpms_master" {
+  repository = "${github_repository.rpms.name}"
+  branch     = "master"
+
+  include_admins = false
+  strict         = false
+  contexts       = ["compliance"]
+}
+
 resource "github_team_repository" "rpms_developers" {
   repository = "${github_repository.rpms.name}"
   team_id    = "${github_team.developers.id}"

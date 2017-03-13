@@ -49,8 +49,22 @@ resource "github_repository" "#{safe_name}" {
   has_downloads = #{repo.has_downloads}
   has_wiki      = #{repo.has_wiki}
 }
-
 EOS
+      # Most repositories require the `compliance` check to be passing, but
+      # there are some exceptions
+      unless %w(kb-articles).include?(repo.name)
+        fp.puts <<-EOS
+resource "github_branch_protection" "#{safe_name}_#{repo.default_branch}" {
+  repository = "\${github_repository.#{safe_name}.name}"
+  branch     = "#{repo.default_branch}"
+
+  include_admins = false
+  strict         = false
+  contexts       = ["compliance"]
+}
+EOS
+      end
+
 
       teams = Octokit.repository_teams(repo.id)
 
@@ -77,6 +91,9 @@ EOS
       end
 
       Octokit.branches(repo.full_name, protected: true, accept: "application/vnd.github.loki-preview+json").each do |branch|
+        # The default branch is always protected
+        next if branch.name == repo.default_branch
+
         protection = Octokit.branch_protection(repo.full_name, branch.name, accept: "application/vnd.github.loki-preview+json")
         fp.puts <<-EOS
 resource "github_branch_protection" "#{safe_name}_#{branch.name}" {

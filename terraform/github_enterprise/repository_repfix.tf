@@ -8,6 +8,15 @@ resource "github_repository" "repfix" {
   has_wiki      = false
 }
 
+resource "github_branch_protection" "repfix_master" {
+  repository = "${github_repository.repfix.name}"
+  branch     = "master"
+
+  include_admins = false
+  strict         = false
+  contexts       = ["compliance"]
+}
+
 resource "github_team_repository" "repfix_service-accounts-read-only" {
   repository = "${github_repository.repfix.name}"
   team_id    = "${github_team.service-accounts-read-only.id}"
@@ -30,13 +39,4 @@ resource "github_team_repository" "repfix_service-accounts-administrators" {
   repository = "${github_repository.repfix.name}"
   team_id    = "${github_team.service-accounts-administrators.id}"
   permission = "admin"
-}
-
-resource "github_branch_protection" "repfix_master" {
-  repository = "${github_repository.repfix.name}"
-  branch     = "master"
-
-  include_admins = false
-  strict         = false
-  contexts       = ["compliance"]
 }

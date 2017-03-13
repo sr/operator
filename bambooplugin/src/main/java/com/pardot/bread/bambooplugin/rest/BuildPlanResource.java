@@ -192,7 +192,7 @@ public class BuildPlanResource {
         }
 
         createDefaultTask(planKey, jobKey);
-        setupWebhookTrigger(planKey);
+        setupWebhookTrigger(planKey, repositoryData);
         setupDailyPoll(planKey, repositoryData);
         configureBranchManagement(planKey);
         dashboardCachingManager.updatePlanCache(PlanKeys.getPlanKey(planKey));
@@ -202,6 +202,31 @@ public class BuildPlanResource {
         return Response.ok(information)
                 .status(Response.Status.CREATED)
                 .build();
+    }
+
+    @PUT
+    @Path("/{key}")
+    public Response update(@PathParam("key") final String key, final PlanRequest planRequest) {
+        final Plan plan = planManager.getPlanByKey(PlanKeys.getPlanKey(key));
+        if (plan == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+        final RepositoryDataEntity repositoryDataEntity = repositoryDefinitionManager.getRepositoryDataEntity(planRequest.defaultRepositoryId);
+        if (repositoryDataEntity == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        final RepositoryData repositoryData = new RepositoryDataImpl(repositoryDataEntity);
+
+        plan.setBuildName(planRequest.name);
+        plan.setDescription(planRequest.description);
+        // TODO(alindeman): changing defaultRepositoryId is not implemented
+
+        planManager.savePlan(plan);
+        dashboardCachingManager.updatePlanCache(plan.getPlanKey());
+
+        PlanInformation information = PlanInformation.newFromPlan(plan);
+        return Response.ok(information).build();
     }
 
     @DELETE
@@ -277,8 +302,11 @@ public class BuildPlanResource {
         );
     }
 
-    private TriggerDefinition setupWebhookTrigger(final String planKey) {
+    private TriggerDefinition setupWebhookTrigger(final String planKey, final RepositoryData repositoryData) {
         TriggerModuleDescriptor triggerDescriptor = triggerTypeManager.getTriggerDescriptor(githubWebhookTriggerKey);
+
+        HashSet<Long> triggeringRepositories = new HashSet<>();
+        triggeringRepositories.add(repositoryData.getId());
 
         HashMap<String, String> configuration = new HashMap<>();
 
@@ -287,7 +315,7 @@ public class BuildPlanResource {
                 triggerDescriptor,
                 "",
                 true,
-                null,
+                triggeringRepositories,
                 configuration,
                 new HashMap<>()
             );

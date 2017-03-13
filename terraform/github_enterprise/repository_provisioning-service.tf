@@ -8,6 +8,15 @@ resource "github_repository" "provisioning-service" {
   has_wiki      = true
 }
 
+resource "github_branch_protection" "provisioning-service_master" {
+  repository = "${github_repository.provisioning-service.name}"
+  branch     = "master"
+
+  include_admins = false
+  strict         = false
+  contexts       = ["compliance"]
+}
+
 resource "github_team_repository" "provisioning-service_developers" {
   repository = "${github_repository.provisioning-service.name}"
   team_id    = "${github_team.developers.id}"

@@ -8,6 +8,15 @@ resource "github_repository" "pd-homebrew" {
   has_wiki      = true
 }
 
+resource "github_branch_protection" "pd-homebrew_master" {
+  repository = "${github_repository.pd-homebrew.name}"
+  branch     = "master"
+
+  include_admins = false
+  strict         = false
+  contexts       = ["compliance"]
+}
+
 resource "github_team_repository" "pd-homebrew_developers" {
   repository = "${github_repository.pd-homebrew.name}"
   team_id    = "${github_team.developers.id}"

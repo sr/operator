@@ -8,6 +8,15 @@ resource "github_repository" "salesforce-actions-topologies" {
   has_wiki      = false
 }
 
+resource "github_branch_protection" "salesforce-actions-topologies_master" {
+  repository = "${github_repository.salesforce-actions-topologies.name}"
+  branch     = "master"
+
+  include_admins = false
+  strict         = false
+  contexts       = ["compliance"]
+}
+
 resource "github_team_repository" "salesforce-actions-topologies_developers" {
   repository = "${github_repository.salesforce-actions-topologies.name}"
   team_id    = "${github_team.developers.id}"

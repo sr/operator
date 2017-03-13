@@ -8,6 +8,15 @@ resource "github_repository" "pardot-storm" {
   has_wiki      = true
 }
 
+resource "github_branch_protection" "pardot-storm_master" {
+  repository = "${github_repository.pardot-storm.name}"
+  branch     = "master"
+
+  include_admins = false
+  strict         = false
+  contexts       = ["compliance"]
+}
+
 resource "github_team_repository" "pardot-storm_developers" {
   repository = "${github_repository.pardot-storm.name}"
   team_id    = "${github_team.developers.id}"

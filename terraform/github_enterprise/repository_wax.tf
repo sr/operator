@@ -8,6 +8,15 @@ resource "github_repository" "wax" {
   has_wiki      = false
 }
 
+resource "github_branch_protection" "wax_master" {
+  repository = "${github_repository.wax.name}"
+  branch     = "master"
+
+  include_admins = false
+  strict         = false
+  contexts       = ["compliance"]
+}
+
 resource "github_team_repository" "wax_service-accounts-write-only" {
   repository = "${github_repository.wax.name}"
   team_id    = "${github_team.service-accounts-write-only.id}"

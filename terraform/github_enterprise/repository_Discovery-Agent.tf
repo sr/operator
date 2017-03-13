@@ -8,6 +8,15 @@ resource "github_repository" "Discovery-Agent" {
   has_wiki      = true
 }
 
+resource "github_branch_protection" "Discovery-Agent_master" {
+  repository = "${github_repository.Discovery-Agent.name}"
+  branch     = "master"
+
+  include_admins = false
+  strict         = false
+  contexts       = ["compliance"]
+}
+
 resource "github_team_repository" "Discovery-Agent_developers" {
   repository = "${github_repository.Discovery-Agent.name}"
   team_id    = "${github_team.developers.id}"

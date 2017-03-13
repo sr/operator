@@ -410,12 +410,6 @@ resource "bamboo_build_plan" "PDT-AMQPLIB2" {
   default_repository_id = "${bamboo_repository.php-amqplib2.id}"
 }
 
-resource "bamboo_build_plan" "PDT-KBARTICLE" {
-  key                   = "PDT-KBARTICLE"
-  name                  = "kb-articles"
-  default_repository_id = "${bamboo_repository.kb-articles.id}"
-}
-
 resource "bamboo_build_plan" "PDT-HOMEBREW" {
   key                   = "PDT-HOMEBREW"
   name                  = "pd-homebrew"
