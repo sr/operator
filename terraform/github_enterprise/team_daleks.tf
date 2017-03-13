@@ -4,18 +4,6 @@ resource "github_team" "daleks" {
   privacy     = "closed"
 }
 
-resource "github_team_membership" "daleks_william-castillo" {
-  team_id  = "${github_team.daleks.id}"
-  username = "william-castillo"
-  role     = "maintainer"
-}
-
-resource "github_team_membership" "daleks_david-peterson" {
-  team_id  = "${github_team.daleks.id}"
-  username = "david-peterson"
-  role     = "maintainer"
-}
-
 resource "github_team_membership" "daleks_brian-hays" {
   team_id  = "${github_team.daleks.id}"
   username = "brian-hays"
