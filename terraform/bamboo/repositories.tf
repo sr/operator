@@ -519,14 +519,6 @@ resource "bamboo_repository" "crumb" {
   shallow_clones = true
 }
 
-resource "bamboo_repository" "insert_ignore" {
-  name           = "insert_ignore"
-  username       = "${var.bamboo_git_username}"
-  password       = "${var.bamboo_git_password}"
-  repository     = "Pardot/insert_ignore"
-  shallow_clones = true
-}
-
 resource "bamboo_repository" "kafka-tools" {
   name           = "kafka-tools"
   username       = "${var.bamboo_git_username}"

@@ -488,12 +488,6 @@ resource "bamboo_build_plan" "PDT-CRUMB" {
   default_repository_id = "${bamboo_repository.crumb.id}"
 }
 
-resource "bamboo_build_plan" "PDT-II" {
-  key                   = "PDT-II"
-  name                  = "insert_ignore"
-  default_repository_id = "${bamboo_repository.insert_ignore.id}"
-}
-
 resource "bamboo_build_plan" "PDT-KT" {
   key                   = "PDT-KT"
   name                  = "kafka-tools"
