@@ -309,6 +309,14 @@ resource "aws_route53_record" "events_dev_pardot_com_CNAMErecord" {
   ttl     = "900"
 }
 
+resource "aws_route53_record" "chatbot_dev_pardot_com_CNAMErecord" {
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name    = "chatbot.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["mysterious-sierra-9543.whispering-wildwood-3486.herokuspace.com"]
+  type    = "CNAME"
+  ttl     = "900"
+}
+
 resource "aws_route53_record" "bread_sentry_dev_pardot_com_CNAMErecord" {
   zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
   name    = "bread-sentry.${aws_route53_zone.dev_pardot_com.name}"
