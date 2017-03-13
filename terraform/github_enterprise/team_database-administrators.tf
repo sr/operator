@@ -21,4 +21,3 @@ resource "github_team_membership" "database-administrators_glenn-nadeau" {
   username = "glenn-nadeau"
   role     = "maintainer"
 }
-
