@@ -439,14 +439,6 @@ resource "bamboo_repository" "ParMeter" {
   shallow_clones = true
 }
 
-resource "bamboo_repository" "babysitd" {
-  name           = "babysitd"
-  username       = "${var.bamboo_git_username}"
-  password       = "${var.bamboo_git_password}"
-  repository     = "Pardot/babysitd"
-  shallow_clones = true
-}
-
 resource "bamboo_repository" "rpms" {
   name           = "rpms"
   username       = "${var.bamboo_git_username}"
