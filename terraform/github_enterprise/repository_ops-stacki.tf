@@ -8,6 +8,15 @@ resource "github_repository" "ops-stacki" {
   has_wiki      = true
 }
 
+resource "github_branch_protection" "ops-stacki_master" {
+  repository = "${github_repository.ops-stacki.name}"
+  branch     = "master"
+
+  include_admins = false
+  strict         = false
+  contexts       = ["compliance"]
+}
+
 resource "github_team_repository" "ops-stacki_ops" {
   repository = "${github_repository.ops-stacki.name}"
   team_id    = "${github_team.ops.id}"

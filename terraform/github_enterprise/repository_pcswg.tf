@@ -8,6 +8,15 @@ resource "github_repository" "pcswg" {
   has_wiki      = true
 }
 
+resource "github_branch_protection" "pcswg_master" {
+  repository = "${github_repository.pcswg.name}"
+  branch     = "master"
+
+  include_admins = false
+  strict         = false
+  contexts       = ["compliance"]
+}
+
 resource "github_team_repository" "pcswg_developers" {
   repository = "${github_repository.pcswg.name}"
   team_id    = "${github_team.developers.id}"

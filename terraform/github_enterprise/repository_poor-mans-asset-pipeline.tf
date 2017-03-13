@@ -8,6 +8,15 @@ resource "github_repository" "poor-mans-asset-pipeline" {
   has_wiki      = true
 }
 
+resource "github_branch_protection" "poor-mans-asset-pipeline_master" {
+  repository = "${github_repository.poor-mans-asset-pipeline.name}"
+  branch     = "master"
+
+  include_admins = false
+  strict         = false
+  contexts       = ["compliance"]
+}
+
 resource "github_team_repository" "poor-mans-asset-pipeline_developers" {
   repository = "${github_repository.poor-mans-asset-pipeline.name}"
   team_id    = "${github_team.developers.id}"

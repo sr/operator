@@ -8,6 +8,15 @@ resource "github_repository" "ParDove" {
   has_wiki      = true
 }
 
+resource "github_branch_protection" "ParDove_master" {
+  repository = "${github_repository.ParDove.name}"
+  branch     = "master"
+
+  include_admins = false
+  strict         = false
+  contexts       = ["compliance"]
+}
+
 resource "github_team_repository" "ParDove_developers" {
   repository = "${github_repository.ParDove.name}"
   team_id    = "${github_team.developers.id}"

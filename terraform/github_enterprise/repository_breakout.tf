@@ -8,6 +8,15 @@ resource "github_repository" "breakout" {
   has_wiki      = true
 }
 
+resource "github_branch_protection" "breakout_master" {
+  repository = "${github_repository.breakout.name}"
+  branch     = "master"
+
+  include_admins = false
+  strict         = false
+  contexts       = ["compliance"]
+}
+
 resource "github_team_repository" "breakout_developers" {
   repository = "${github_repository.breakout.name}"
   team_id    = "${github_team.developers.id}"

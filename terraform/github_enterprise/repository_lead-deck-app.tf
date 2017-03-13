@@ -8,6 +8,15 @@ resource "github_repository" "lead-deck-app" {
   has_wiki      = true
 }
 
+resource "github_branch_protection" "lead-deck-app_master" {
+  repository = "${github_repository.lead-deck-app.name}"
+  branch     = "master"
+
+  include_admins = false
+  strict         = false
+  contexts       = ["compliance"]
+}
+
 resource "github_team_repository" "lead-deck-app_developers" {
   repository = "${github_repository.lead-deck-app.name}"
   team_id    = "${github_team.developers.id}"

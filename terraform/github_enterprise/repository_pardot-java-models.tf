@@ -8,6 +8,15 @@ resource "github_repository" "pardot-java-models" {
   has_wiki      = true
 }
 
+resource "github_branch_protection" "pardot-java-models_master" {
+  repository = "${github_repository.pardot-java-models.name}"
+  branch     = "master"
+
+  include_admins = false
+  strict         = false
+  contexts       = ["compliance"]
+}
+
 resource "github_team_repository" "pardot-java-models_developers" {
   repository = "${github_repository.pardot-java-models.name}"
   team_id    = "${github_team.developers.id}"

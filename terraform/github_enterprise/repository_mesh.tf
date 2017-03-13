@@ -8,6 +8,15 @@ resource "github_repository" "mesh" {
   has_wiki      = false
 }
 
+resource "github_branch_protection" "mesh_master" {
+  repository = "${github_repository.mesh.name}"
+  branch     = "master"
+
+  include_admins = false
+  strict         = false
+  contexts       = ["compliance"]
+}
+
 resource "github_team_repository" "mesh_developers" {
   repository = "${github_repository.mesh.name}"
   team_id    = "${github_team.developers.id}"
@@ -30,13 +39,4 @@ resource "github_team_repository" "mesh_service-accounts-administrators" {
   repository = "${github_repository.mesh.name}"
   team_id    = "${github_team.service-accounts-administrators.id}"
   permission = "admin"
-}
-
-resource "github_branch_protection" "mesh_master" {
-  repository = "${github_repository.mesh.name}"
-  branch     = "master"
-
-  include_admins = false
-  strict         = false
-  contexts       = ["compliance"]
 }
