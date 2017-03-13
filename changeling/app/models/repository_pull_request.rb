@@ -250,6 +250,10 @@ class RepositoryPullRequest
   end
 
   def synchronize_change_categorization
+    if !github_repository.compliance_enabled?
+      return
+    end
+
     if @multipass.change_type == ChangeCategorization::EMERGENCY || (@multipass.affects_default_branch? && @multipass.merged? && !@multipass.complete?)
       change_type = ChangeCategorization::EMERGENCY
     else
