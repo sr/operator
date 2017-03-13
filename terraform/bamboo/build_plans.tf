@@ -290,6 +290,12 @@ resource "bamboo_build_plan" "BREAD-BEI" {
   default_repository_id = "${bamboo_repository.bamboo-elastic-instance.id}"
 }
 
+resource "bamboo_build_plan" "BREAD-BC" {
+  key                   = "BREAD-BC"
+  name                  = "bamboo-configuration"
+  default_repository_id = "${bamboo_repository.bamboo-configuration.id}"
+}
+
 resource "bamboo_build_plan" "PDT-SYMDIC" {
   key                   = "PDT-SYMDIC"
   name                  = "symfony-dic"
