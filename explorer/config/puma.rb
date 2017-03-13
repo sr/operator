@@ -1,6 +1,7 @@
 workers Integer(ENV.fetch("WEB_CONCURRENCY", 1))
 threads_count = Integer(ENV.fetch("MAX_THREADS", 5))
 threads threads_count, threads_count
+worker_timeout Integer(ENV.fetch("PUMA_WORKER_TIMEOUT", 10))
 
 preload_app!
 
