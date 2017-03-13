@@ -19,5 +19,7 @@ bamboo_username = ""
 bamboo_password = ""
 
 bamboo_git_username = "sa_bamboo"
-# sa_bamboo's github token from secrets.ops
+
+# "GitHub Personal Access Token for Bamboo" from here:
+# https://secrets.ops.pardot.com/index.php?page=items&group=3&id=1887
 bamboo_git_password = ""
