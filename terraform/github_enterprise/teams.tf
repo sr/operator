@@ -10,12 +10,6 @@ resource "github_team" "core-production-security" {
   privacy     = "closed"
 }
 
-resource "github_team" "database-administrators" {
-  name        = "Database Administrators"
-  description = ""
-  privacy     = "closed"
-}
-
 resource "github_team" "developers" {
   name        = "Developers"
   description = "DEVLEOPERZ DEVOLEPRZ JACKALOPES"
