@@ -13,5 +13,5 @@ resource "github_team_membership" "daleks_brian-hays" {
 resource "github_team_membership" "daleks_jan-ulrich" {
   team_id  = "${github_team.daleks.id}"
   username = "jan-ulrich"
-  role     = "maintainer"
+  role     = "member"
 }
