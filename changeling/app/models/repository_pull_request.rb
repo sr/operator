@@ -420,6 +420,10 @@ class RepositoryPullRequest
   end
 
   def set_github_labels
+    if !github_repository.compliance_enabled?
+      return
+    end
+
     label_names = github_client.labels_for_issue(repository_full_name, number)
       .map { |l| l[:name] }
 
