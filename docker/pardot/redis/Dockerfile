@@ -20,7 +20,8 @@ RUN yum install -y make gcc && \
   rpm -e make gcc && \
   yum clean all
 
-RUN yum --nogpgcheck localinstall -y "https://${artifactory_host}/artifactory/${dist}-pardot-rpms/redis-roaring-${redis_roaring_pkg_ver}.${dist}.centos.x86_64.rpm"
+RUN yum --nogpgcheck localinstall -y "https://${artifactory_host}/artifactory/${dist}-pardot-rpms/redis-roaring-${redis_roaring_pkg_ver}.${dist}.centos.x86_64.rpm" && \
+  yum clean all
 
 RUN groupadd -r redis -g 533 && \
   useradd -r -g redis -d /var/lib/redis -s /sbin/nologin -c "Redis" -u 533 redis
