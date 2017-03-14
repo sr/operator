@@ -476,12 +476,6 @@ resource "bamboo_build_plan" "PDT-WAVE" {
   default_repository_id = "${bamboo_repository.wave.id}"
 }
 
-resource "bamboo_build_plan" "PDT-TD" {
-  key                   = "PDT-TD"
-  name                  = "testdata"
-  default_repository_id = "${bamboo_repository.testdata.id}"
-}
-
 resource "bamboo_build_plan" "PDT-CRUMB" {
   key                   = "PDT-CRUMB"
   name                  = "crumb"
@@ -522,12 +516,6 @@ resource "bamboo_build_plan" "PDT-CUMUCI" {
   key                   = "PDT-CUMUCI"
   name                  = "CumulusCI"
   default_repository_id = "${bamboo_repository.CumulusCI.id}"
-}
-
-resource "bamboo_build_plan" "PDT-PARDOVE" {
-  key                   = "PDT-PARDOVE"
-  name                  = "ParDove"
-  default_repository_id = "${bamboo_repository.ParDove.id}"
 }
 
 resource "bamboo_build_plan" "PDT-PESP" {
