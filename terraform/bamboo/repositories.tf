@@ -503,14 +503,6 @@ resource "bamboo_repository" "wave" {
   shallow_clones = true
 }
 
-resource "bamboo_repository" "testdata" {
-  name           = "testdata"
-  username       = "${var.bamboo_git_username}"
-  password       = "${var.bamboo_git_password}"
-  repository     = "Pardot/testdata"
-  shallow_clones = true
-}
-
 resource "bamboo_repository" "crumb" {
   name           = "crumb"
   username       = "${var.bamboo_git_username}"
@@ -564,14 +556,6 @@ resource "bamboo_repository" "CumulusCI" {
   username       = "${var.bamboo_git_username}"
   password       = "${var.bamboo_git_password}"
   repository     = "Pardot/CumulusCI"
-  shallow_clones = true
-}
-
-resource "bamboo_repository" "ParDove" {
-  name           = "ParDove"
-  username       = "${var.bamboo_git_username}"
-  password       = "${var.bamboo_git_password}"
-  repository     = "Pardot/ParDove"
   shallow_clones = true
 }
 
