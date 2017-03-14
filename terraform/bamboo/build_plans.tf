@@ -290,6 +290,12 @@ resource "bamboo_build_plan" "BREAD-BEI" {
   default_repository_id = "${bamboo_repository.bamboo-elastic-instance.id}"
 }
 
+resource "bamboo_build_plan" "BREAD-BC" {
+  key                   = "BREAD-BC"
+  name                  = "bamboo-configuration"
+  default_repository_id = "${bamboo_repository.bamboo-configuration.id}"
+}
+
 resource "bamboo_build_plan" "PDT-SYMDIC" {
   key                   = "PDT-SYMDIC"
   name                  = "symfony-dic"
@@ -404,12 +410,6 @@ resource "bamboo_build_plan" "PDT-AMQPLIB2" {
   default_repository_id = "${bamboo_repository.php-amqplib2.id}"
 }
 
-resource "bamboo_build_plan" "PDT-KBARTICLE" {
-  key                   = "PDT-KBARTICLE"
-  name                  = "kb-articles"
-  default_repository_id = "${bamboo_repository.kb-articles.id}"
-}
-
 resource "bamboo_build_plan" "PDT-HOMEBREW" {
   key                   = "PDT-HOMEBREW"
   name                  = "pd-homebrew"
@@ -486,12 +486,6 @@ resource "bamboo_build_plan" "PDT-CRUMB" {
   key                   = "PDT-CRUMB"
   name                  = "crumb"
   default_repository_id = "${bamboo_repository.crumb.id}"
-}
-
-resource "bamboo_build_plan" "PDT-II" {
-  key                   = "PDT-II"
-  name                  = "insert_ignore"
-  default_repository_id = "${bamboo_repository.insert_ignore.id}"
 }
 
 resource "bamboo_build_plan" "PDT-KT" {

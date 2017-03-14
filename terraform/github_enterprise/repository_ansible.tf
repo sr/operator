@@ -8,6 +8,15 @@ resource "github_repository" "ansible" {
   has_wiki      = false
 }
 
+resource "github_branch_protection" "ansible_master" {
+  repository = "${github_repository.ansible.name}"
+  branch     = "master"
+
+  include_admins = false
+  strict         = false
+  contexts       = ["compliance"]
+}
+
 resource "github_team_repository" "ansible_service-accounts-read-only" {
   repository = "${github_repository.ansible.name}"
   team_id    = "${github_team.service-accounts-read-only.id}"
@@ -30,13 +39,4 @@ resource "github_team_repository" "ansible_service-accounts-administrators" {
   repository = "${github_repository.ansible.name}"
   team_id    = "${github_team.service-accounts-administrators.id}"
   permission = "admin"
-}
-
-resource "github_branch_protection" "ansible_master" {
-  repository = "${github_repository.ansible.name}"
-  branch     = "master"
-
-  include_admins = false
-  strict         = false
-  contexts       = ["compliance"]
 }

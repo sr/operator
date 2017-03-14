@@ -8,6 +8,15 @@ resource "github_repository" "symfony" {
   has_wiki      = true
 }
 
+resource "github_branch_protection" "symfony_master" {
+  repository = "${github_repository.symfony.name}"
+  branch     = "master"
+
+  include_admins = false
+  strict         = false
+  contexts       = ["compliance"]
+}
+
 resource "github_team_repository" "symfony_service-accounts-read-only" {
   repository = "${github_repository.symfony.name}"
   team_id    = "${github_team.service-accounts-read-only.id}"

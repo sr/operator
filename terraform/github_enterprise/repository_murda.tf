@@ -8,6 +8,15 @@ resource "github_repository" "murda" {
   has_wiki      = true
 }
 
+resource "github_branch_protection" "murda_master" {
+  repository = "${github_repository.murda.name}"
+  branch     = "master"
+
+  include_admins = false
+  strict         = false
+  contexts       = ["compliance"]
+}
+
 resource "github_team_repository" "murda_developers" {
   repository = "${github_repository.murda.name}"
   team_id    = "${github_team.developers.id}"

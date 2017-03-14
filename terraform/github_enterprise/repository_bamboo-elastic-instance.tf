@@ -8,6 +8,15 @@ resource "github_repository" "bamboo-elastic-instance" {
   has_wiki      = true
 }
 
+resource "github_branch_protection" "bamboo-elastic-instance_master" {
+  repository = "${github_repository.bamboo-elastic-instance.name}"
+  branch     = "master"
+
+  include_admins = false
+  strict         = false
+  contexts       = ["compliance"]
+}
+
 resource "github_team_repository" "bamboo-elastic-instance_developers" {
   repository = "${github_repository.bamboo-elastic-instance.name}"
   team_id    = "${github_team.developers.id}"

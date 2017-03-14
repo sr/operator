@@ -8,6 +8,15 @@ resource "github_repository" "bread" {
   has_wiki      = false
 }
 
+resource "github_branch_protection" "bread_master" {
+  repository = "${github_repository.bread.name}"
+  branch     = "master"
+
+  include_admins = false
+  strict         = false
+  contexts       = ["compliance"]
+}
+
 resource "github_team_repository" "bread_service-accounts-write-only" {
   repository = "${github_repository.bread.name}"
   team_id    = "${github_team.service-accounts-write-only.id}"
@@ -30,13 +39,4 @@ resource "github_team_repository" "bread_service-accounts-administrators" {
   repository = "${github_repository.bread.name}"
   team_id    = "${github_team.service-accounts-administrators.id}"
   permission = "admin"
-}
-
-resource "github_branch_protection" "bread_master" {
-  repository = "${github_repository.bread.name}"
-  branch     = "master"
-
-  include_admins = false
-  strict         = false
-  contexts       = ["compliance"]
 }
