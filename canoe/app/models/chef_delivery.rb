@@ -120,10 +120,6 @@ class ChefDelivery
       return
     end
 
-    if request.command[0, 3] == %w[node from file]
-      return
-    end
-
     notification.knife_command(
       @config.chat_room_id(request.server),
       request.server,

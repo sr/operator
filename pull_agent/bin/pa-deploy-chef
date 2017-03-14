@@ -109,7 +109,8 @@ case "$action" in
         else
             knife pd sync \
                 --skip-berkshelf \
-                --environment-file "$chefenvfile"
+                --environment-file "$chefenvfile" \
+                --nodes-dir "$nodesdir"
                 2>&1
         fi
         ;;

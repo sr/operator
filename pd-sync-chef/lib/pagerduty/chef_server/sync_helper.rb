@@ -80,7 +80,7 @@ module PagerDuty
       end
 
       def upload_nodes
-        Dir[@nodes_dir+'/*'].each do |path|
+        Dir[@nodes_dir+'/**/*'].each do |path|
           ext = File.extname(path)
 
           if File.directory?(path) || ![".json", ".rb"].include?(ext)

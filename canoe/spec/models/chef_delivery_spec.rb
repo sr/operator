@@ -226,14 +226,6 @@ RSpec.describe ChefDelivery do
     assert_includes msg.message, "pardot0-chef1"
   end
 
-  it "ignores 'knife node from file' commands" do
-    server = ChefDelivery::Server.new("dfw", "dev", "chef1")
-    command = %w[node from file nodes/aws/node.json]
-    request = KnifeRequest.new(server, command)
-    @delivery.knife(request)
-    assert_equal 0, @config.notifier.messages.size
-  end
-
   it "ignores knife help commands" do
     server = ChefDelivery::Server.new("dfw", "dev", "chef1")
     command = %w[help list]
