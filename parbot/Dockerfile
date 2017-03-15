@@ -1,4 +1,4 @@
-FROM docker.dev.pardot.com/base/node:4
+FROM docker.dev.pardot.com/base/node:6
 MAINTAINER pd-bread@salesforce.com
 
 RUN npm install -g coffeelint jslint
