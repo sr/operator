@@ -1,4 +1,4 @@
-FROM docker.dev.pardot.com/base/node:4
+FROM docker.dev.pardot.com/base/node:6
 
 ARG dist=el6
 ARG phantomjs_version=2.1.1-1
