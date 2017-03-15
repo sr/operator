@@ -8,6 +8,15 @@ resource "github_repository" "murdoc" {
   has_wiki      = true
 }
 
+resource "github_branch_protection" "murdoc_master" {
+  repository = "${github_repository.murdoc.name}"
+  branch     = "master"
+
+  include_admins = false
+  strict         = false
+  contexts       = ["compliance"]
+}
+
 resource "github_team_repository" "murdoc_developers" {
   repository = "${github_repository.murdoc.name}"
   team_id    = "${github_team.developers.id}"
@@ -30,13 +39,4 @@ resource "github_team_repository" "murdoc_service-accounts-administrators" {
   repository = "${github_repository.murdoc.name}"
   team_id    = "${github_team.service-accounts-administrators.id}"
   permission = "admin"
-}
-
-resource "github_branch_protection" "murdoc_master" {
-  repository = "${github_repository.murdoc.name}"
-  branch     = "master"
-
-  include_admins = false
-  strict         = false
-  contexts       = ["compliance"]
 }

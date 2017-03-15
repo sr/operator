@@ -37,11 +37,3 @@ resource "github_team_repository" "kb-articles_service-accounts-administrators" 
   team_id    = "${github_team.service-accounts-administrators.id}"
   permission = "admin"
 }
-
-resource "github_branch_protection" "kb-articles_master" {
-  repository = "${github_repository.kb-articles.name}"
-  branch     = "master"
-
-  users_restriction = []
-  teams_restriction = ["documentation-editors"]
-}

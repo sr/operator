@@ -8,6 +8,15 @@ resource "github_repository" "php-amqplib" {
   has_wiki      = true
 }
 
+resource "github_branch_protection" "php-amqplib_master" {
+  repository = "${github_repository.php-amqplib.name}"
+  branch     = "master"
+
+  include_admins = false
+  strict         = false
+  contexts       = ["compliance"]
+}
+
 resource "github_team_repository" "php-amqplib_developers" {
   repository = "${github_repository.php-amqplib.name}"
   team_id    = "${github_team.developers.id}"

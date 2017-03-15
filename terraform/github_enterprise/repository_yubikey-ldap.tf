@@ -8,6 +8,15 @@ resource "github_repository" "yubikey-ldap" {
   has_wiki      = true
 }
 
+resource "github_branch_protection" "yubikey-ldap_master" {
+  repository = "${github_repository.yubikey-ldap.name}"
+  branch     = "master"
+
+  include_admins = false
+  strict         = false
+  contexts       = ["compliance"]
+}
+
 resource "github_team_repository" "yubikey-ldap_service-accounts-read-only" {
   repository = "${github_repository.yubikey-ldap.name}"
   team_id    = "${github_team.service-accounts-read-only.id}"
