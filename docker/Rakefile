@@ -26,7 +26,6 @@ BUILDS = {
   "ssh-forwarder"                   => Build.new("ssh-forwarder"),
   "chefdk:0.17.17"                  => Build.new("chefdk/0.17.17", common: true),
   "node:6"                          => Build.new("node/6"),
-  "node:4"                          => Build.new("node/4"),
   "node:0.10.6"                     => Build.new("node/0.10.6"),
 
   # Application base images
