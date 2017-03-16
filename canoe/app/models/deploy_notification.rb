@@ -18,10 +18,8 @@ class DeployNotification < ApplicationRecord
       end
 
     project_name = deploy.project_name.capitalize
-    if project_name.eql? "Murdoc"
-      if deploy.options.present?
-        project_name += " (#{deploy.options["topology"].split(":")[0]})"
-      end
+    if deploy.options && deploy.options["topology"].present?
+      project_name += " (#{deploy.options["topology"].split(":")[0]})"
     end
 
     msg = "#{deploy.deploy_target.name.capitalize}: #{deploy.auth_user.email} " \
@@ -58,10 +56,8 @@ class DeployNotification < ApplicationRecord
 
   def notify_deploy_complete(deploy)
     project_name = deploy.project_name.capitalize
-    if project_name.eql? "Murdoc"
-      if deploy.options.present?
-        project_name += " (#{deploy.options["topology"].split(":")[0]})"
-      end
+    if deploy.options && deploy.options["topology"].present?
+      project_name += " (#{deploy.options["topology"].split(":")[0]})"
     end
 
     msg = "#{deploy.deploy_target.name.capitalize}: #{deploy.auth_user.email} " \
