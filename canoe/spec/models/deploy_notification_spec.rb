@@ -26,6 +26,14 @@ RSpec.describe DeployNotification do
       expect(notifier.messages[0].color).to eq("red")
       expect(notifier.messages[0].message).to match(/PENDING BUILD/)
     end
+
+    it "notifies a HipChat room with full_project_name if the project has a topology set in the options" do
+      deploy.update!(project_name: "murdoc", options: { "topology" => "action-topo:murdoc.processing.topology.ActionApplicationTopology" })
+      notification.notify_deploy_start(deploy)
+      expect(notifier.messages.size).to eq(1)
+      expect(notifier.messages[0].room_id).to eq(notification.hipchat_room_id)
+      expect(notifier.messages[0].message).to match(/just began syncing Murdoc \(action-topo\)/)
+    end
   end
 
   describe "#notify_deploy_complete" do
@@ -35,6 +43,14 @@ RSpec.describe DeployNotification do
       expect(notifier.messages[0].room_id).to eq(notification.hipchat_room_id)
       expect(notifier.messages[0].message).to match(/just finished syncing/)
     end
+
+    it "notifies a HipChat room with full_project_name if the project has a topology set in the options" do
+      deploy.update!(project_name: "murdoc", options: { "topology" => "action-topo:murdoc.processing.topology.ActionApplicationTopology" })
+      notification.notify_deploy_complete(deploy)
+      expect(notifier.messages.size).to eq(1)
+      expect(notifier.messages[0].room_id).to eq(notification.hipchat_room_id)
+      expect(notifier.messages[0].message).to match(/just finished syncing Murdoc \(action-topo\)/)
+    end
   end
 
   describe "#notify_deploy_cancelled" do
@@ -43,6 +59,14 @@ RSpec.describe DeployNotification do
       expect(notifier.messages.size).to eq(1)
       expect(notifier.messages[0].room_id).to eq(notification.hipchat_room_id)
       expect(notifier.messages[0].message).to match(/CANCELLED syncing/)
+    end
+
+    it "notifies a HipChat room with full_project_name if the project has a topology set in the options" do
+      deploy.update!(project_name: "murdoc", options: { "topology" => "action-topo:murdoc.processing.topology.ActionApplicationTopology" })
+      notification.notify_deploy_cancelled(deploy)
+      expect(notifier.messages.size).to eq(1)
+      expect(notifier.messages[0].room_id).to eq(notification.hipchat_room_id)
+      expect(notifier.messages[0].message).to match(/CANCELLED syncing Murdoc \(action-topo\)/)
     end
   end
 end
