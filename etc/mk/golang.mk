@@ -21,7 +21,7 @@ clean:
 	$(GO) clean -i ./...
 
 fmt: $(GOFMT)
-	@ for file in $$(find src -name '*.go' | grep -v -E 'vendor/|\.pb\.go$$'); do \
+	@ for file in $$(find . -name '*.go' | grep -v -E 'vendor/|\.pb\.go$$'); do \
 			out="$$($< -s -d $$file)"; \
 			if [ $$? -ne 0 ]; then \
 				echo "fmt: $$out"; \
