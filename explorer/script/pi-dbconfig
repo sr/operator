@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 #/ Usage: script/pi-dbconfig <rails-env>
 #/ Sync the database configuration and list of shards from the Pardot/pardot
-#/ repository on GHE. This requires a personnal access token to be set via
-#/ the GITHUB_USER and GITHUB_TOKEN environment variables. Create a token for
+#/ repository on GHE. This requires a personal access token to be set via
+#/ the GITHUB_TOKEN environment variable. Create a token for
 #/ your user here: https://git.dev.pardot.com/settings/tokens/new
 set -eu
 cd "$(dirname "$0")/.."
@@ -25,7 +25,7 @@ esac
 
 path="config/databaseConnections/${filename}"
 download_url="$(
-  curl -fs -u"${GITHUB_USER}:${GITHUB_TOKEN}" \
+  curl -fs -H "Authorization: Bearer ${GITHUB_TOKEN}" \
   "https://git.dev.pardot.com/api/v3/repos/Pardot/pardot/contents/${path}" |
   jq -c -r '.download_url'
 )"
