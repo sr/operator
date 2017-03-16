@@ -68,6 +68,22 @@
 			"notests": true
 		},
 		{
+			"importpath": "github.com/alecthomas/template",
+			"repository": "https://github.com/alecthomas/template",
+			"vcs": "git",
+			"revision": "a0175ee3bccc567396460bf5acd36800cb10c49c",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/alecthomas/units",
+			"repository": "https://github.com/alecthomas/units",
+			"vcs": "git",
+			"revision": "2efee857e7cfd4f3d0138cc3cbb1b4966962b93a",
+			"branch": "master",
+			"notests": true
+		},
+		{
 			"importpath": "github.com/asaskevich/govalidator",
 			"repository": "https://github.com/asaskevich/govalidator",
 			"vcs": "git",
@@ -154,6 +170,15 @@
 			"revision": "7a81396c57134038e554b2ac86be4653018b20f9",
 			"branch": "HEAD",
 			"path": "vendor/github.com/jmespath/go-jmespath",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/cyberdelia/heroku-go/v3",
+			"repository": "https://github.com/cyberdelia/heroku-go",
+			"vcs": "git",
+			"revision": "f4997531b0bc362f2bf350f1f1691de543c91383",
+			"branch": "master",
+			"path": "/v3",
 			"notests": true
 		},
 		{
@@ -659,6 +684,15 @@
 			"notests": true
 		},
 		{
+			"importpath": "github.com/google/go-querystring/query",
+			"repository": "https://github.com/google/go-querystring",
+			"vcs": "git",
+			"revision": "53e6ce116135b80d037921a7fdd5138cf32d7a8a",
+			"branch": "master",
+			"path": "/query",
+			"notests": true
+		},
+		{
 			"importpath": "github.com/googleapis/gax-go",
 			"repository": "https://github.com/googleapis/gax-go",
 			"vcs": "git",
@@ -1153,6 +1187,14 @@
 			"notests": true
 		},
 		{
+			"importpath": "github.com/pborman/uuid",
+			"repository": "https://github.com/pborman/uuid",
+			"vcs": "git",
+			"revision": "1b00554d822231195d1babd97ff4a781231955c9",
+			"branch": "master",
+			"notests": true
+		},
+		{
 			"importpath": "github.com/rogpeppe/fastuuid",
 			"repository": "https://github.com/rogpeppe/fastuuid",
 			"vcs": "git",
@@ -1165,6 +1207,14 @@
 			"repository": "https://github.com/satori/go.uuid",
 			"vcs": "git",
 			"revision": "b061729afc07e77a8aa4fad0a2fd840958f1942a",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/square/go-jose",
+			"repository": "https://github.com/square/go-jose",
+			"vcs": "git",
+			"revision": "50df5ca198e569d06795909c091ac0cea62e925a",
 			"branch": "master",
 			"notests": true
 		},
@@ -1536,6 +1586,14 @@
 			"repository": "https://gopkg.in/airbrake/gobrake.v2",
 			"vcs": "git",
 			"revision": "668876711219e8b0206e2994bf0a59d889c775aa",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "gopkg.in/alecthomas/kingpin.v2",
+			"repository": "https://gopkg.in/alecthomas/kingpin.v2",
+			"vcs": "git",
+			"revision": "e9044be3ab2a8e11d4e1f418d12f0790d57e8d70",
 			"branch": "master",
 			"notests": true
 		},
