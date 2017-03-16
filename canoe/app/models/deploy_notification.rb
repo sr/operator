@@ -17,10 +17,11 @@ class DeployNotification < ApplicationRecord
         deploy.all_servers.join(", ")
       end
 
-    if deploy.project_name = "Murdoc"
-      project_name = "#{deploy.project_name} (#{deploy.options["topology"].split(":")[0]})"
-    else
-      project_name = deploy.project_name.capitalize
+    project_name = deploy.project_name.capitalize
+    if project_name = "Murdoc"
+      if (deploy.options.present?)
+        project_name += " (#{deploy.options["topology"].split(":")[0]})"
+      end
     end
 
     msg = "#{deploy.deploy_target.name.capitalize}: #{deploy.auth_user.email} " \
@@ -56,10 +57,11 @@ class DeployNotification < ApplicationRecord
   end
 
   def notify_deploy_complete(deploy)
-    if deploy.project_name = "Murdoc"
-      project_name = "#{deploy.project_name} (#{deploy.options["topology"].split(":")[0]})"
-    else
-      project_name = deploy.project_name.capitalize
+    project_name = deploy.project_name.capitalize
+    if project_name = "Murdoc"
+      if (deploy.options.present?)
+        project_name += " (#{deploy.options["topology"].split(":")[0]})"
+      end
     end
 
     msg = "#{deploy.deploy_target.name.capitalize}: #{deploy.auth_user.email} " \
