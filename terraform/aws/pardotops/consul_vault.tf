@@ -187,7 +187,7 @@ resource "aws_elb" "vault_public_elb" {
     lb_protocol        = "https"
     instance_port      = 8200
     instance_protocol  = "https"
-    ssl_certificate_id = "arn:aws:iam::${var.pardotops_account_number}:server-certificate/dev.pardot.com-2016-with-intermediate"
+    ssl_certificate_id = "arn:aws:iam::${var.pardotops_account_number}:server-certificate/dev.pardot.com-2017-with-intermediate"
   }
 
   health_check {
