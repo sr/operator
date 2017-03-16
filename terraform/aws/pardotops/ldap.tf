@@ -39,8 +39,9 @@ resource "aws_security_group" "pardot0_ue1_ldap_server" {
       "${aws_eip.appdev_ldap_host_eip.public_ip}/32",
       "${aws_eip.github_enterprise_server_1.public_ip}/32",
       "${aws_eip.github_enterprise_server_2.public_ip}/32",
-      "52.4.132.69/32",                                            # 1.git.dev.pardot.com
-      "52.3.83.197/32",                                            # 2.git.dev.pardot.com
+      "${var.sfdc_pardot_tools_production_heroku_space_cidr_blocks}",
+      "52.4.132.69/32",                                               # 1.git.dev.pardot.com
+      "52.3.83.197/32",                                               # 2.git.dev.pardot.com
     ]
   }
 
@@ -57,8 +58,9 @@ resource "aws_security_group" "pardot0_ue1_ldap_server" {
       "${aws_eip.appdev_ldap_host_eip.public_ip}/32",
       "${aws_eip.github_enterprise_server_1.public_ip}/32",
       "${aws_eip.github_enterprise_server_2.public_ip}/32",
-      "52.4.132.69/32",                                            # 1.git.dev.pardot.com
-      "52.3.83.197/32",                                            # 2.git.dev.pardot.com
+      "${var.sfdc_pardot_tools_production_heroku_space_cidr_blocks}",
+      "52.4.132.69/32",                                               # 1.git.dev.pardot.com
+      "52.3.83.197/32",                                               # 2.git.dev.pardot.com
     ]
   }
 
