@@ -725,7 +725,7 @@ resource "aws_alb_listener" "public_alb_all_hosts_https" {
   port              = 443
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2015-05"
-  certificate_arn   = "arn:aws:iam::364709603225:server-certificate/dev.pardot.com-2016-with-intermediate"
+  certificate_arn   = "arn:aws:iam::364709603225:server-certificate/dev.pardot.com-2017-with-intermediate"
 
   "default_action" {
     target_group_arn = "${aws_alb_target_group.public_artifactory_all_hosts_target_group.arn}"
@@ -805,7 +805,7 @@ resource "aws_alb_listener" "private_alb_all_hosts_https" {
   port              = 443
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2015-05"
-  certificate_arn   = "arn:aws:iam::364709603225:server-certificate/dev.pardot.com-2016-with-intermediate"
+  certificate_arn   = "arn:aws:iam::364709603225:server-certificate/dev.pardot.com-2017-with-intermediate"
 
   "default_action" {
     target_group_arn = "${aws_alb_target_group.private_artifactory_all_hosts_target_group.arn}"
@@ -925,7 +925,7 @@ resource "aws_elb" "artifactory_primary_machine_access_elb" {
     lb_protocol        = "https"
     instance_port      = 80
     instance_protocol  = "http"
-    ssl_certificate_id = "arn:aws:iam::${var.pardotops_account_number}:server-certificate/dev.pardot.com-2016-with-intermediate"
+    ssl_certificate_id = "arn:aws:iam::${var.pardotops_account_number}:server-certificate/dev.pardot.com-2017-with-intermediate"
   }
 
   listener {

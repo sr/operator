@@ -64,7 +64,7 @@ resource "aws_alb_listener" "operator" {
   port              = "443"
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2015-05"
-  certificate_arn   = "arn:aws:iam::364709603225:server-certificate/dev.pardot.com-2016-with-intermediate"
+  certificate_arn   = "arn:aws:iam::364709603225:server-certificate/dev.pardot.com-2017-with-intermediate"
 
   default_action {
     target_group_arn = "${aws_alb_target_group.operator.arn}"
