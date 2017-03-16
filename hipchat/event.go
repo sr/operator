@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"strings"
 
+	"git.dev.pardot.com/Pardot/bread"
+
 	jose "github.com/square/go-jose"
 	"golang.org/x/oauth2/clientcredentials"
 )
@@ -14,41 +16,21 @@ import (
 // https://www.hipchat.com/docs/apiv2/webhooks#room_message
 const eventRoomMessage = "room_message"
 
-// A MessageHandler handles chat messages.
-type MessageHandler func(*Item) error
-
 // A messagePayload is the payload sent by Hipchat for every message.
 type messagePayload struct {
 	Event string `json:"event"`
-	Item  *Item  `json:"item"`
-}
-
-type Item struct {
-	Message *Message `json:"message"`
-	Room    *Room    `json:"room"`
-}
-
-type Message struct {
-	Message string `json:"message"`
-	From    *User  `json:"from"`
-}
-
-type Room struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
-}
-
-type User struct {
-	ID          int    `json:"id"`
-	Name        string `json:"name"`
-	Email       string `json:"email"`
-	Deleted     bool   `json:"is_deleted"`
-	MentionName string `json:"mention_name"`
+	Item  struct {
+		Message struct {
+			Message string      `json:"message"`
+			From    *bread.User `json:"from"`
+		} `json:"message"`
+	} `json:"item"`
+	Room *bread.Room `json:"room"`
 }
 
 // EventHandler is a HTTP handler that verifies the integrity of Hipchat
 // webhook requests and calls MessageHandler with every message received.
-func EventHandler(creds *clientcredentials.Config, handler MessageHandler) (http.HandlerFunc, error) {
+func EventHandler(creds *clientcredentials.Config, handler bread.ChatMessageHandler) (http.HandlerFunc, error) {
 	if creds == nil {
 		return nil, errors.New("required argument is nil: creds")
 	}
@@ -80,10 +62,16 @@ func EventHandler(creds *clientcredentials.Config, handler MessageHandler) (http
 		// Normally we should **only** receive event_message payloads but
 		// check anyway in case the integration setup is weird.
 		if payload.Event == eventRoomMessage {
-			if err := handler(payload.Item); err != nil {
+			err := handler(&bread.ChatMessage{
+				Text: payload.Item.Message.Message,
+				Room: payload.Room,
+				User: payload.Item.Message.From,
+			})
+			if err == nil {
+				w.WriteHeader(http.StatusAccepted)
+			} else {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 			}
-			w.WriteHeader(http.StatusAccepted)
 		} else {
 			http.Error(w, fmt.Sprintf("unhandleable event type: %s", payload.Event), http.StatusBadRequest)
 		}

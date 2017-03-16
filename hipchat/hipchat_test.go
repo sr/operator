@@ -9,6 +9,7 @@ import (
 
 	jose "github.com/square/go-jose"
 
+	"git.dev.pardot.com/Pardot/bread"
 	"git.dev.pardot.com/Pardot/bread/hipchat"
 	"golang.org/x/oauth2/clientcredentials"
 )
@@ -17,8 +18,8 @@ type testMessageHandler struct {
 	lastMessage string
 }
 
-func (h *testMessageHandler) Handle(msg *breadhipchat.Item) error {
-	h.lastMessage = msg.Message.Message
+func (h *testMessageHandler) Handle(msg *bread.ChatMessage) error {
+	h.lastMessage = msg.Text
 	return nil
 }
 
