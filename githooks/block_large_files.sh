@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-readonly LARGE_FILE_SIZE="$((20*1024*1024))"
+readonly LARGE_FILE_SIZE="$((10*1024*1024))"
 readonly NULL_SHA="0000000000000000000000000000000000000000"
 
 large_files=()
@@ -15,6 +15,9 @@ while read -r oldref newref _; do
     oldref="HEAD"
   fi
 
+  report="$(git rev-list --objects "${oldref}..${newref}" | \
+    git cat-file --batch-check='%(objectname) %(objecttype) %(objectsize) %(rest)')"
+
   while read -r _ type size name; do
     if [ "$type" != "blob" ]; then
       continue
@@ -23,8 +26,7 @@ while read -r oldref newref _; do
     if [ "$size" -ge "$LARGE_FILE_SIZE" ]; then
       large_files+=("$name")
     fi
-  done < <(git rev-list --objects "${oldref}..${newref}" | \
-    git cat-file --batch-check='%(objectname) %(objecttype) %(objectsize) %(rest)')
+  done <<<"$report"
 done
 
 if [ "${#large_files[@]}" -gt 0 ]; then
