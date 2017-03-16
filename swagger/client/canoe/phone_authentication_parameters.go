@@ -63,7 +63,7 @@ for the phone authentication operation typically these are written to a http.Req
 type PhoneAuthenticationParams struct {
 
 	/*Body*/
-	Body *models.CanoePhoneAuthenticationRequest
+	Body *models.BreadPhoneAuthenticationRequest
 
 	timeout    time.Duration
 	Context    context.Context
@@ -104,13 +104,13 @@ func (o *PhoneAuthenticationParams) SetHTTPClient(client *http.Client) {
 }
 
 // WithBody adds the body to the phone authentication params
-func (o *PhoneAuthenticationParams) WithBody(body *models.CanoePhoneAuthenticationRequest) *PhoneAuthenticationParams {
+func (o *PhoneAuthenticationParams) WithBody(body *models.BreadPhoneAuthenticationRequest) *PhoneAuthenticationParams {
 	o.SetBody(body)
 	return o
 }
 
 // SetBody adds the body to the phone authentication params
-func (o *PhoneAuthenticationParams) SetBody(body *models.CanoePhoneAuthenticationRequest) {
+func (o *PhoneAuthenticationParams) SetBody(body *models.BreadPhoneAuthenticationRequest) {
 	o.Body = body
 }
 
@@ -121,7 +121,7 @@ func (o *PhoneAuthenticationParams) WriteToRequest(r runtime.ClientRequest, reg 
 	var res []error
 
 	if o.Body == nil {
-		o.Body = new(models.CanoePhoneAuthenticationRequest)
+		o.Body = new(models.BreadPhoneAuthenticationRequest)
 	}
 
 	if err := r.SetBodyParam(o.Body); err != nil {

@@ -45,7 +45,7 @@ func NewPhoneAuthenticationOK() *PhoneAuthenticationOK {
 PhoneAuthenticationOK phone authentication o k
 */
 type PhoneAuthenticationOK struct {
-	Payload *models.CanoePhoneAuthenticationResponse
+	Payload *models.BreadPhoneAuthenticationResponse
 }
 
 func (o *PhoneAuthenticationOK) Error() string {
@@ -54,7 +54,7 @@ func (o *PhoneAuthenticationOK) Error() string {
 
 func (o *PhoneAuthenticationOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.CanoePhoneAuthenticationResponse)
+	o.Payload = new(models.BreadPhoneAuthenticationResponse)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

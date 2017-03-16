@@ -45,7 +45,7 @@ func NewUnlockTerraformProjectOK() *UnlockTerraformProjectOK {
 UnlockTerraformProjectOK unlock terraform project o k
 */
 type UnlockTerraformProjectOK struct {
-	Payload *models.CanoeTerraformDeployResponse
+	Payload *models.BreadTerraformDeployResponse
 }
 
 func (o *UnlockTerraformProjectOK) Error() string {
@@ -54,7 +54,7 @@ func (o *UnlockTerraformProjectOK) Error() string {
 
 func (o *UnlockTerraformProjectOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.CanoeTerraformDeployResponse)
+	o.Payload = new(models.BreadTerraformDeployResponse)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

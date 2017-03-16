@@ -9,9 +9,9 @@ import (
 	"github.com/go-openapi/errors"
 )
 
-// CanoePhoneAuthenticationResponse canoe phone authentication response
-// swagger:model canoePhoneAuthenticationResponse
-type CanoePhoneAuthenticationResponse struct {
+// BreadPhoneAuthenticationResponse bread phone authentication response
+// swagger:model breadPhoneAuthenticationResponse
+type BreadPhoneAuthenticationResponse struct {
 
 	// error
 	Error bool `json:"error,omitempty"`
@@ -23,8 +23,8 @@ type CanoePhoneAuthenticationResponse struct {
 	UserEmail string `json:"user_email,omitempty"`
 }
 
-// Validate validates this canoe phone authentication response
-func (m *CanoePhoneAuthenticationResponse) Validate(formats strfmt.Registry) error {
+// Validate validates this bread phone authentication response
+func (m *BreadPhoneAuthenticationResponse) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if len(res) > 0 {

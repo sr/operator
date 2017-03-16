@@ -9,19 +9,28 @@ import (
 	"github.com/go-openapi/errors"
 )
 
-// CanoeUnlockTerraformProjectRequest canoe unlock terraform project request
-// swagger:model canoeUnlockTerraformProjectRequest
-type CanoeUnlockTerraformProjectRequest struct {
+// BreadCreateDeployRequest bread create deploy request
+// swagger:model breadCreateDeployRequest
+type BreadCreateDeployRequest struct {
+
+	// artifact url
+	ArtifactURL string `json:"artifact_url,omitempty"`
+
+	// lock
+	Lock bool `json:"lock,omitempty"`
 
 	// project
 	Project string `json:"project,omitempty"`
+
+	// target name
+	TargetName string `json:"target_name,omitempty"`
 
 	// user email
 	UserEmail string `json:"user_email,omitempty"`
 }
 
-// Validate validates this canoe unlock terraform project request
-func (m *CanoeUnlockTerraformProjectRequest) Validate(formats strfmt.Registry) error {
+// Validate validates this bread create deploy request
+func (m *BreadCreateDeployRequest) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if len(res) > 0 {

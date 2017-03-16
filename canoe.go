@@ -96,7 +96,7 @@ func (d *canoeDeployer) Deploy(ctx context.Context, sender *operator.RequestSend
 		return nil, errors.New("unable to deploy without a user")
 	}
 	resp, err := d.client.CreateDeploy(canoe.NewCreateDeployParamsWithContext(ctx).
-		WithBody(&models.CanoeCreateDeployRequest{
+		WithBody(&models.BreadCreateDeployRequest{
 			UserEmail:   req.UserEmail,
 			Project:     req.Target.Name,
 			TargetName:  canoeProductionTarget,

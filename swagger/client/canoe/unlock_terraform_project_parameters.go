@@ -63,7 +63,7 @@ for the unlock terraform project operation typically these are written to a http
 type UnlockTerraformProjectParams struct {
 
 	/*Body*/
-	Body *models.CanoeUnlockTerraformProjectRequest
+	Body *models.BreadUnlockTerraformProjectRequest
 
 	timeout    time.Duration
 	Context    context.Context
@@ -104,13 +104,13 @@ func (o *UnlockTerraformProjectParams) SetHTTPClient(client *http.Client) {
 }
 
 // WithBody adds the body to the unlock terraform project params
-func (o *UnlockTerraformProjectParams) WithBody(body *models.CanoeUnlockTerraformProjectRequest) *UnlockTerraformProjectParams {
+func (o *UnlockTerraformProjectParams) WithBody(body *models.BreadUnlockTerraformProjectRequest) *UnlockTerraformProjectParams {
 	o.SetBody(body)
 	return o
 }
 
 // SetBody adds the body to the unlock terraform project params
-func (o *UnlockTerraformProjectParams) SetBody(body *models.CanoeUnlockTerraformProjectRequest) {
+func (o *UnlockTerraformProjectParams) SetBody(body *models.BreadUnlockTerraformProjectRequest) {
 	o.Body = body
 }
 
@@ -121,7 +121,7 @@ func (o *UnlockTerraformProjectParams) WriteToRequest(r runtime.ClientRequest, r
 	var res []error
 
 	if o.Body == nil {
-		o.Body = new(models.CanoeUnlockTerraformProjectRequest)
+		o.Body = new(models.BreadUnlockTerraformProjectRequest)
 	}
 
 	if err := r.SetBodyParam(o.Body); err != nil {
