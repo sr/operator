@@ -28,7 +28,7 @@ RSpec.describe DeployNotification do
     end
 
     it "notifies a HipChat room with full_project_name if the project has a topology set in the options" do
-      deploy.update!(project_name: 'murdoc', options: { "topology" => "action-topo:murdoc.processing.topology.ActionApplicationTopology" })
+      deploy.update!(project_name: "murdoc", options: { "topology" => "action-topo:murdoc.processing.topology.ActionApplicationTopology" })
       notification.notify_deploy_start(deploy)
       expect(notifier.messages.size).to eq(1)
       expect(notifier.messages[0].room_id).to eq(notification.hipchat_room_id)
@@ -45,7 +45,7 @@ RSpec.describe DeployNotification do
     end
 
     it "notifies a HipChat room with full_project_name if the project has a topology set in the options" do
-      deploy.update!(project_name: 'murdoc', options: { "topology" => "action-topo:murdoc.processing.topology.ActionApplicationTopology" })
+      deploy.update!(project_name: "murdoc", options: { "topology" => "action-topo:murdoc.processing.topology.ActionApplicationTopology" })
       notification.notify_deploy_complete(deploy)
       expect(notifier.messages.size).to eq(1)
       expect(notifier.messages[0].room_id).to eq(notification.hipchat_room_id)
@@ -62,7 +62,7 @@ RSpec.describe DeployNotification do
     end
 
     it "notifies a HipChat room with full_project_name if the project has a topology set in the options" do
-      deploy.update!(project_name: 'murdoc', options: { "topology" => "action-topo:murdoc.processing.topology.ActionApplicationTopology" })
+      deploy.update!(project_name: "murdoc", options: { "topology" => "action-topo:murdoc.processing.topology.ActionApplicationTopology" })
       notification.notify_deploy_cancelled(deploy)
       expect(notifier.messages.size).to eq(1)
       expect(notifier.messages[0].room_id).to eq(notification.hipchat_room_id)
