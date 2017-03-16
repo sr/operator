@@ -8,6 +8,15 @@ resource "github_repository" "realtime-frontend" {
   has_wiki      = false
 }
 
+resource "github_branch_protection" "realtime-frontend_master" {
+  repository = "${github_repository.realtime-frontend.name}"
+  branch     = "master"
+
+  include_admins = false
+  strict         = false
+  contexts       = ["compliance"]
+}
+
 resource "github_team_repository" "realtime-frontend_developers" {
   repository = "${github_repository.realtime-frontend.name}"
   team_id    = "${github_team.developers.id}"
@@ -30,13 +39,4 @@ resource "github_team_repository" "realtime-frontend_service-accounts-administra
   repository = "${github_repository.realtime-frontend.name}"
   team_id    = "${github_team.service-accounts-administrators.id}"
   permission = "admin"
-}
-
-resource "github_branch_protection" "realtime-frontend_master" {
-  repository = "${github_repository.realtime-frontend.name}"
-  branch     = "master"
-
-  include_admins = false
-  strict         = false
-  contexts       = ["compliance"]
 }

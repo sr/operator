@@ -8,6 +8,15 @@ resource "github_repository" "java-snippets" {
   has_wiki      = true
 }
 
+resource "github_branch_protection" "java-snippets_master" {
+  repository = "${github_repository.java-snippets.name}"
+  branch     = "master"
+
+  include_admins = false
+  strict         = false
+  contexts       = ["compliance"]
+}
+
 resource "github_team_repository" "java-snippets_developers" {
   repository = "${github_repository.java-snippets.name}"
   team_id    = "${github_team.developers.id}"

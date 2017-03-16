@@ -8,6 +8,15 @@ resource "github_repository" "internal-api" {
   has_wiki      = false
 }
 
+resource "github_branch_protection" "internal-api_master" {
+  repository = "${github_repository.internal-api.name}"
+  branch     = "master"
+
+  include_admins = false
+  strict         = false
+  contexts       = ["compliance"]
+}
+
 resource "github_team_repository" "internal-api_developers" {
   repository = "${github_repository.internal-api.name}"
   team_id    = "${github_team.developers.id}"
@@ -30,13 +39,4 @@ resource "github_team_repository" "internal-api_service-accounts-administrators"
   repository = "${github_repository.internal-api.name}"
   team_id    = "${github_team.service-accounts-administrators.id}"
   permission = "admin"
-}
-
-resource "github_branch_protection" "internal-api_master" {
-  repository = "${github_repository.internal-api.name}"
-  branch     = "master"
-
-  include_admins = false
-  strict         = false
-  contexts       = ["compliance"]
 }

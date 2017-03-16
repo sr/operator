@@ -8,6 +8,15 @@ resource "github_repository" "chef" {
   has_wiki      = false
 }
 
+resource "github_branch_protection" "chef_master" {
+  repository = "${github_repository.chef.name}"
+  branch     = "master"
+
+  include_admins = false
+  strict         = false
+  contexts       = ["compliance"]
+}
+
 resource "github_team_repository" "chef_ops" {
   repository = "${github_repository.chef.name}"
   team_id    = "${github_team.ops.id}"
@@ -36,13 +45,4 @@ resource "github_team_repository" "chef_service-accounts-administrators" {
   repository = "${github_repository.chef.name}"
   team_id    = "${github_team.service-accounts-administrators.id}"
   permission = "admin"
-}
-
-resource "github_branch_protection" "chef_master" {
-  repository = "${github_repository.chef.name}"
-  branch     = "master"
-
-  include_admins = false
-  strict         = false
-  contexts       = ["compliance"]
 }

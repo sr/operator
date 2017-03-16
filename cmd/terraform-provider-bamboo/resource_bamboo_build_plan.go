@@ -27,6 +27,7 @@ func resourceBambooBuildPlan() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceBambooBuildPlanCreate,
 		Read:   resourceBambooBuildPlanRead,
+		Update: resourceBambooBuildPlanUpdate,
 		Delete: resourceBambooBuildPlanDelete,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
@@ -40,13 +41,11 @@ func resourceBambooBuildPlan() *schema.Resource {
 			"name": {
 				Type:     schema.TypeString,
 				Required: true,
-				ForceNew: true,
 			},
 			"description": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "",
-				ForceNew: true,
 			},
 			"default_repository_id": {
 				Type:     schema.TypeInt,
@@ -90,6 +89,41 @@ func resourceBambooBuildPlanCreate(d *schema.ResourceData, meta interface{}) err
 	}
 
 	d.SetId(key)
+	return resourceBambooBuildPlanRead(d, meta)
+}
+
+func resourceBambooBuildPlanUpdate(d *schema.ResourceData, meta interface{}) error {
+	config := meta.(*config)
+	key := d.Id()
+
+	createRequest := &buildPlanRequest{
+		Key:                 d.Get("key").(string),
+		Name:                d.Get("name").(string),
+		Description:         d.Get("description").(string),
+		DefaultRepositoryID: int64(d.Get("default_repository_id").(int)),
+	}
+	b, err := json.Marshal(createRequest)
+	if err != nil {
+		return err
+	}
+
+	req, err := http.NewRequest("PUT", fmt.Sprintf("%s/rest/pardot/1.0/buildplans/%s", config.URL, key), bytes.NewBuffer(b))
+	if err != nil {
+		return err
+	}
+	req.Header.Set("content-type", "application/json")
+	req.SetBasicAuth(config.Username, config.Password)
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return err
+	}
+	defer func() { _ = resp.Body.Close() }()
+
+	if resp.StatusCode < 200 || resp.StatusCode > 299 {
+		return fmt.Errorf("bad response code from Bamboo: %d", resp.StatusCode)
+	}
+
 	return resourceBambooBuildPlanRead(d, meta)
 }
 

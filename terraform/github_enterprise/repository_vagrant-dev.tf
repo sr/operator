@@ -8,6 +8,15 @@ resource "github_repository" "vagrant-dev" {
   has_wiki      = true
 }
 
+resource "github_branch_protection" "vagrant-dev_master" {
+  repository = "${github_repository.vagrant-dev.name}"
+  branch     = "master"
+
+  include_admins = false
+  strict         = false
+  contexts       = ["compliance"]
+}
+
 resource "github_team_repository" "vagrant-dev_developers" {
   repository = "${github_repository.vagrant-dev.name}"
   team_id    = "${github_team.developers.id}"

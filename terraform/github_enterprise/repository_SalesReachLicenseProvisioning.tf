@@ -8,6 +8,15 @@ resource "github_repository" "SalesReachLicenseProvisioning" {
   has_wiki      = true
 }
 
+resource "github_branch_protection" "SalesReachLicenseProvisioning_master" {
+  repository = "${github_repository.SalesReachLicenseProvisioning.name}"
+  branch     = "master"
+
+  include_admins = false
+  strict         = false
+  contexts       = ["compliance"]
+}
+
 resource "github_team_repository" "SalesReachLicenseProvisioning_developers" {
   repository = "${github_repository.SalesReachLicenseProvisioning.name}"
   team_id    = "${github_team.developers.id}"

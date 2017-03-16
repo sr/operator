@@ -147,7 +147,7 @@ resource "aws_elb" "artifact_cache_lb" {
     lb_protocol        = "https"
     instance_port      = 80
     instance_protocol  = "http"
-    ssl_certificate_id = "arn:aws:iam::364709603225:server-certificate/dev.pardot.com-2016-with-intermediate"
+    ssl_certificate_id = "arn:aws:iam::364709603225:server-certificate/dev.pardot.com-2017-with-intermediate"
   }
 
   health_check {
@@ -197,7 +197,7 @@ resource "aws_elb" "external_artifact_cache_lb" {
     lb_protocol        = "https"
     instance_port      = 80
     instance_protocol  = "http"
-    ssl_certificate_id = "arn:aws:iam::364709603225:server-certificate/dev.pardot.com-2016-with-intermediate"
+    ssl_certificate_id = "arn:aws:iam::364709603225:server-certificate/dev.pardot.com-2017-with-intermediate"
   }
 
   health_check {

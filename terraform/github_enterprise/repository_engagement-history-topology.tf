@@ -8,6 +8,15 @@ resource "github_repository" "engagement-history-topology" {
   has_wiki      = false
 }
 
+resource "github_branch_protection" "engagement-history-topology_master" {
+  repository = "${github_repository.engagement-history-topology.name}"
+  branch     = "master"
+
+  include_admins = false
+  strict         = false
+  contexts       = ["compliance"]
+}
+
 resource "github_team_repository" "engagement-history-topology_service-accounts-write-only" {
   repository = "${github_repository.engagement-history-topology.name}"
   team_id    = "${github_team.service-accounts-write-only.id}"
@@ -30,13 +39,4 @@ resource "github_team_repository" "engagement-history-topology_service-accounts-
   repository = "${github_repository.engagement-history-topology.name}"
   team_id    = "${github_team.service-accounts-administrators.id}"
   permission = "admin"
-}
-
-resource "github_branch_protection" "engagement-history-topology_master" {
-  repository = "${github_repository.engagement-history-topology.name}"
-  branch     = "master"
-
-  include_admins = false
-  strict         = false
-  contexts       = ["compliance"]
 }

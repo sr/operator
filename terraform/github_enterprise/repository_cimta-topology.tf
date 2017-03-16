@@ -8,6 +8,15 @@ resource "github_repository" "cimta-topology" {
   has_wiki      = true
 }
 
+resource "github_branch_protection" "cimta-topology_master" {
+  repository = "${github_repository.cimta-topology.name}"
+  branch     = "master"
+
+  include_admins = false
+  strict         = false
+  contexts       = ["compliance"]
+}
+
 resource "github_team_repository" "cimta-topology_developers" {
   repository = "${github_repository.cimta-topology.name}"
   team_id    = "${github_team.developers.id}"
