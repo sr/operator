@@ -89,9 +89,9 @@ class DeployNotification < ApplicationRecord
 
   def full_project_name(deploy)
     project_name = deploy.project_name.capitalize
-    puts deploy.options
     if deploy.options && deploy.options["topology"].present?
       project_name += " (#{deploy.options["topology"].split(":")[0]})"
     end
+    project_name
   end
 end
