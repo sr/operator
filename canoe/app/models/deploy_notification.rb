@@ -17,8 +17,14 @@ class DeployNotification < ApplicationRecord
         deploy.all_servers.join(", ")
       end
 
+    if deploy.project_name = "Murdoc"
+      project_name = "#{deploy.project_name} (#{deploy.options["topology"].split(":")[0]})"
+    else
+      project_name = deploy.projet_name.capitalize
+    end
+
     msg = "#{deploy.deploy_target.name.capitalize}: #{deploy.auth_user.email} " \
-      "just began syncing #{deploy.project_name.capitalize} to " \
+      "just began syncing #{project_name} to " \
       "#{build_link(deploy)} [#{server_msg}]"
 
     if !deploy.passed_ci?
@@ -50,8 +56,14 @@ class DeployNotification < ApplicationRecord
   end
 
   def notify_deploy_complete(deploy)
+    if deploy.project_name = "Murdoc"
+      project_name = "#{deploy.project_name} (#{deploy.options["topology"].split(":")[0]})"
+    else
+      project_name = deploy.projet_name.capitalize
+    end
+
     msg = "#{deploy.deploy_target.name.capitalize}: #{deploy.auth_user.email} " \
-      "just finished syncing #{deploy.project_name.capitalize} to #{build_link(deploy)}"
+      "just finished syncing #{project_name} to #{build_link(deploy)}"
 
     notifier.notify_room(
       hipchat_room_id,
