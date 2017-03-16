@@ -20,7 +20,7 @@ class DeployNotification < ApplicationRecord
     if deploy.project_name = "Murdoc"
       project_name = "#{deploy.project_name} (#{deploy.options["topology"].split(":")[0]})"
     else
-      project_name = deploy.projet_name.capitalize
+      project_name = deploy.project_name.capitalize
     end
 
     msg = "#{deploy.deploy_target.name.capitalize}: #{deploy.auth_user.email} " \
@@ -59,7 +59,7 @@ class DeployNotification < ApplicationRecord
     if deploy.project_name = "Murdoc"
       project_name = "#{deploy.project_name} (#{deploy.options["topology"].split(":")[0]})"
     else
-      project_name = deploy.projet_name.capitalize
+      project_name = deploy.project_name.capitalize
     end
 
     msg = "#{deploy.deploy_target.name.capitalize}: #{deploy.auth_user.email} " \
