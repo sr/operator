@@ -39,7 +39,14 @@
   <rest name="Pardot Bamboo REST API" i18n-name-key="pardot-bamboo-rest.name" key="pardot-bamboo-rest" path="/pardot" version="1.0">
     <description key="pardot-bamboo-rest.description">The Pardot Bamboo REST API</description>
   </rest>
+  <additionalBuildConfigurationPlugin key="githubStatusConfiguration" class="com.pardot.bread.bambooplugin.GithubStatusBuildConfiguration">
+    <resource type="freemarker" name="edit" location="templates/githubStatusBuildConfigurationEdit.ftl" />
+  </additionalBuildConfigurationPlugin>
+  <preStageAction key="pardotPreStage" class="com.pardot.bread.bambooplugin.action.PreStage" />
+  <postStageAction key="pardotPostStage" class="com.pardot.bread.bambooplugin.action.PostStage" />
+  <postChainAction key="pardotPostChain" class="com.pardot.bread.bambooplugin.action.PostChain" />
 
+  <component-import key="administrationConfigurationAccessor" interface="com.atlassian.bamboo.configuration.AdministrationConfigurationAccessor" />
   <component-import key="authenticationContext" interface="com.atlassian.bamboo.user.BambooAuthenticationContext" />
   <component-import key="branchDetectionService" interface="com.atlassian.bamboo.plan.branch.BranchDetectionService" />
   <component-import key="branchIntegrationHelper" interface="com.atlassian.bamboo.plan.branch.BranchIntegrationHelper" />
