@@ -1,7 +1,6 @@
 package com.pardot.bread.bambooplugin.rest;
 
 import com.atlassian.bamboo.repository.*;
-import com.atlassian.bamboo.security.EncryptionService;
 import com.atlassian.bamboo.user.BambooAuthenticationContext;
 import com.atlassian.bamboo.utils.ConfigUtils;
 import com.pardot.bread.bambooplugin.repository.GithubEnterpriseRepository;
@@ -28,7 +27,6 @@ public class LinkedRepositoryResource {
     private BambooAuthenticationContext authenticationContext;
     private RepositoryConfigurationService repositoryConfigurationService;
     private RepositoryDefinitionManager repositoryDefinitionManager;
-    private EncryptionService encryptionService;
 
     public void setAuthenticationContext(final BambooAuthenticationContext authenticationContext) {
         this.authenticationContext = authenticationContext;
@@ -40,10 +38,6 @@ public class LinkedRepositoryResource {
 
     public void setRepositoryDefinitionManager(RepositoryDefinitionManager repositoryDefinitionManager) {
         this.repositoryDefinitionManager = repositoryDefinitionManager;
-    }
-
-    public void setEncryptionService(EncryptionService encryptionService) {
-        this.encryptionService = encryptionService;
     }
 
     static class RepositoryRequest {
@@ -141,7 +135,7 @@ public class LinkedRepositoryResource {
        final HierarchicalConfiguration configuration = ConfigUtils.newConfiguration();
        configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_HOSTNAME, GithubEnterpriseRepository.getDefaultHostname());
        configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_USERNAME, request.username);
-       configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_PASSWORD, encryptionService.encrypt(request.password));
+       configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_PASSWORD, request.password);
        configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_REPOSITORY, request.repository);
        configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_BRANCH, request.branch);
        configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_USE_SHALLOW_CLONES, request.shallowClones);

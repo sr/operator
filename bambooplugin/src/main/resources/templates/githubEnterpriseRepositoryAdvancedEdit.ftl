@@ -3,4 +3,4 @@
 [@s.textfield labelKey='repository.githubenterprise.commandTimeout' name='repository.githubenterprise.commandTimeout' /]
 [@s.checkbox labelKey='repository.githubenterprise.verbose.logs' name='repository.githubenterprise.verbose.logs' /]
 [@s.checkbox labelKey='repository.githubenterprise.fetch.whole.repository' name='repository.githubenterprise.fetch.whole.repository' /]
-
+[@s.checkbox labelKey='repository.githubenterprise.lfs' name='repository.githubenterprise.lfs' /]

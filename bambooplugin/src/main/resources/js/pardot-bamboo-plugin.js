@@ -1,4 +1,4 @@
-(function ($, BAMBOO) {
+(function($, BAMBOO) {
     BAMBOO.GITHUBENTERPRISE = {};
 
     /**
@@ -30,23 +30,24 @@
         this._jqXHRBranch = null;
 
         // Form controls
-        this._$fieldset = $("fieldset#repository-edit-" + BAMBOO.escapeIdToJQuerySelector(options.repositoryKey));
         this.$repositoryType = $(options.selectors.repositoryType);
-        this.$username = this._$fieldset.find(options.selectors.username);
-        this.$password = this._$fieldset.find(options.selectors.password);
-        this.$loadRepositoriesButton = this._$fieldset.find(options.selectors.loadRepositoriesButton);
-        this.$repository = this._$fieldset.find(options.selectors.repository);
-        this.$branch = this._$fieldset.find(options.selectors.branch);
+        this.$username = $(options.selectors.username);
+        this.$password = $(options.selectors.password);
+        this.$loadRepositoriesButton = $(options.selectors.loadRepositoriesButton);
+        this.$repository = $(options.selectors.repository);
+        this.$branch = $(options.selectors.branch);
+        this._$fieldset = this.$username.closest('fieldset');
     }
 
     RepositoryForm.prototype = {
-        init: function () {
+        init: function() {
+            this.$repository.select2({enable: false, width: 'copy'});
             // Attach handlers
             this.$loadRepositoriesButton.click(_.bind(this.loadRepositoriesClick, this));
             this.$repository.change(_.bind(this.repositoryChange, this));
 
             // Load repository list on load
-            if (this.$repositoryType.val() == this.repositoryKey && (this.repositoryId || (this.$username.val() && this.$password.val()))) {
+            if (this.$repositoryType.val() === this.repositoryKey && (this.repositoryId || (this.$username.val() && this.$password.val()))) {
                 this.loadRepositories();
 
                 if (this.$repository.val() !== null) {
@@ -54,15 +55,15 @@
                 }
             }
         },
-        loadRepositoriesClick: function () {
+        loadRepositoriesClick: function() {
             this.clearFieldErrors();
             this.$repository.prop('disabled', true);
             this.$branch.prop('disabled', true);
             if (this._jqXHRBranch) { this._jqXHRBranch.abort(); }
-            this.loadRepositories().done(_.bind(function (json) {
+            this.loadRepositories().done(_.bind(function(json) {
                 var repositories = json['repositories'];
 
-                if (json['status'] == "OK" && repositories && repositories.length) {
+                if (json['status'] === 'OK' && repositories && repositories.length) {
                     this.$repository.focus();
                     if (!this.$branch.children().length) {
                         this.$branch.append(this.generateBranchOption(this.defaultBranch()));
@@ -75,22 +76,22 @@
                 }
             }, this));
         },
-        repositoryChange: function () {
+        repositoryChange: function() {
             this.clearFieldErrors();
             this.$branch.prop('disabled', true).empty().append(this.generateBranchOption(this.defaultBranch()));
             this.loadBranches();
         },
-        loadRepositories: function () {
+        loadRepositories: function() {
             var $repository = this.$repository,
                 $loadingOptgroup = $('<optgroup />').attr('label', AJS.I18n.getText('repository.github.loadingRepositories')).appendTo($repository),
                 currentlySelected = $repository.val(),
                 generateRepositoryOption = this.generateRepositoryOption,
-                update = _.bind(function (json, textStatus, jqXHR) {
+                update = _.bind(function(json, textStatus, jqXHR) {
                     var $list = document.createDocumentFragment(),
                         repositories = json['repositories'];
 
-                    if (json['status'] == "OK" && repositories && repositories.length) {
-                        $.each(repositories, function () {
+                    if (json['status'] === 'OK' && repositories && repositories.length) {
+                        $.each(repositories, function() {
                             $list.appendChild(generateRepositoryOption(this).get(0));
                         });
 
@@ -100,11 +101,11 @@
                         showError(jqXHR);
                     }
                 }, this),
-                restore = _.bind(function () {
+                restore = _.bind(function() {
                     $loadingOptgroup.remove();
                     this.$loadRepositoriesButton.prop('disabled', false);
                 }, this),
-                showError = _.bind(function (jqXHR) {
+                showError = _.bind(function(jqXHR) {
                     var response, errors = [], repositories;
 
                     if (jqXHR.statusText != 'abort') {
@@ -128,25 +129,25 @@
             this.$loadRepositoriesButton.prop('disabled', true);
             return this.getRepositoryList().done(update).fail(showError).always(restore);
         },
-        generateRepositoryOption: function (repository) {
+        generateRepositoryOption: function(repository) {
             return $('<option/>', {
                 text: repository['full_name'],
                 val: repository['full_name'],
                 data: repository
             });
         },
-        loadBranches: function () {
+        loadBranches: function() {
             var $branch = this.$branch,
                 $loadingOptgroup = $('<optgroup />').attr('label', AJS.I18n.getText('repository.github.loadingBranches')).appendTo($branch),
                 $container = $branch.closest('.field-group'),
                 currentlySelected = $branch.val(),
                 generateBranchOption = this.generateBranchOption,
-                update = _.bind(function (json, textStatus, jqXHR) {
+                update = _.bind(function(json, textStatus, jqXHR) {
                     var $list = $(),
                         branches = json['branches'];
 
-                    if (json['status'] == "OK" && branches) {
-                        $.each(branches, function () {
+                    if (json['status'] === 'OK' && branches) {
+                        $.each(branches, function() {
                             $list = $list.add(generateBranchOption(this['name']));
                         });
                         $branch.empty().append($list).prop('disabled', false).val(currentlySelected);
@@ -157,8 +158,8 @@
                         showError(jqXHR);
                     }
                 }, this),
-                restore = _.bind(function () { $loadingOptgroup.remove(); }, this),
-                showError = _.bind(function (jqXHR) {
+                restore = _.bind(function() { $loadingOptgroup.remove(); }, this),
+                showError = _.bind(function(jqXHR) {
                     var response, errors = [];
 
                     if (jqXHR.statusText != 'abort') {
@@ -181,13 +182,13 @@
             }
             return this.getBranchList(this.$repository.val()).done(update).fail(showError).always(restore);
         },
-        generateBranchOption: function (branch) {
+        generateBranchOption: function(branch) {
             return $('<option/>', { text: branch });
         },
-        defaultBranch: function () {
+        defaultBranch: function() {
             return 'master';
         },
-        getJsonResponse: function (url, data, jqXHR, $field) {
+        getJsonResponse: function(url, data, jqXHR, $field) {
             var $container = $field.closest('.field-group'),
                 loadingClass = 'loading';
 
@@ -202,9 +203,9 @@
                 contentType: 'application/json',
                 processData: false,
                 dataType: 'json'
-            }).always(function () { $container.removeClass(loadingClass); });
+            }).always(function() { $container.removeClass(loadingClass); });
         },
-        getRepositoryList: function () {
+        getRepositoryList: function() {
             var url = AJS.contextPath() + '/rest/git/latest/gh/repositories/' + this.$username.val() + '/';
 
             return this._jqXHRRepository = this.getJsonResponse(url, {
@@ -212,7 +213,7 @@
                 repositoryId: this.repositoryId
             }, this._jqXHRRepository, this.$repository);
         },
-        getBranchList: function (repository) {
+        getBranchList: function(repository) {
             var url = AJS.contextPath() + '/rest/git/latest/gh/repositories/' + repository + '/branches/';
 
             return this._jqXHRBranch = this.getJsonResponse(url, {
@@ -222,11 +223,11 @@
                 repositoryId: this.repositoryId
             }, this._jqXHRBranch, this.$branch);
         },
-        addFieldErrors: function ($field, errors) {
+        addFieldErrors: function($field, errors) {
             BAMBOO.addFieldErrors($field.closest('form'), $field.attr('name'), errors, true);
         },
-        clearFieldErrors: function () {
-            this._$fieldset.find('.error').slideUp(function () { $(this).remove(); });
+        clearFieldErrors: function() {
+            this._$fieldset.find('.error').slideUp(function() { $(this).remove(); });
         }
     };
 
