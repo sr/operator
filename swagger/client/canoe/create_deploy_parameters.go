@@ -63,7 +63,7 @@ for the create deploy operation typically these are written to a http.Request
 type CreateDeployParams struct {
 
 	/*Body*/
-	Body *models.CanoeCreateDeployRequest
+	Body *models.BreadCreateDeployRequest
 
 	timeout    time.Duration
 	Context    context.Context
@@ -104,13 +104,13 @@ func (o *CreateDeployParams) SetHTTPClient(client *http.Client) {
 }
 
 // WithBody adds the body to the create deploy params
-func (o *CreateDeployParams) WithBody(body *models.CanoeCreateDeployRequest) *CreateDeployParams {
+func (o *CreateDeployParams) WithBody(body *models.BreadCreateDeployRequest) *CreateDeployParams {
 	o.SetBody(body)
 	return o
 }
 
 // SetBody adds the body to the create deploy params
-func (o *CreateDeployParams) SetBody(body *models.CanoeCreateDeployRequest) {
+func (o *CreateDeployParams) SetBody(body *models.BreadCreateDeployRequest) {
 	o.Body = body
 }
 
@@ -121,7 +121,7 @@ func (o *CreateDeployParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.
 	var res []error
 
 	if o.Body == nil {
-		o.Body = new(models.CanoeCreateDeployRequest)
+		o.Body = new(models.BreadCreateDeployRequest)
 	}
 
 	if err := r.SetBodyParam(o.Body); err != nil {

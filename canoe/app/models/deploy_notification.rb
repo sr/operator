@@ -18,7 +18,7 @@ class DeployNotification < ApplicationRecord
       end
 
     msg = "#{deploy.deploy_target.name.capitalize}: #{deploy.auth_user.email} " \
-      "just began syncing #{deploy.project_name.capitalize} to " \
+      "just began syncing #{full_project_name(deploy)} to " \
       "#{build_link(deploy)} [#{server_msg}]"
 
     if !deploy.passed_ci?
@@ -51,7 +51,7 @@ class DeployNotification < ApplicationRecord
 
   def notify_deploy_complete(deploy)
     msg = "#{deploy.deploy_target.name.capitalize}: #{deploy.auth_user.email} " \
-      "just finished syncing #{deploy.project_name.capitalize} to #{build_link(deploy)}"
+      "just finished syncing #{full_project_name(deploy)} to #{build_link(deploy)}"
 
     notifier.notify_room(
       hipchat_room_id,
@@ -62,7 +62,7 @@ class DeployNotification < ApplicationRecord
 
   def notify_deploy_cancelled(deploy)
     msg = "#{deploy.deploy_target.name.capitalize}: #{deploy.auth_user.email} just " \
-      "CANCELLED syncing #{deploy.project_name.capitalize} to #{build_link(deploy, false)}"
+      "CANCELLED syncing #{full_project_name(deploy)} to #{build_link(deploy, false)}"
 
     notifier.notify_room(
       hipchat_room_id,
@@ -85,5 +85,13 @@ class DeployNotification < ApplicationRecord
     end
     commit_link = project.commit_url(deploy)
     link ? "<a href='#{commit_link}'>#{build_txt}</a>" : build_txt
+  end
+
+  def full_project_name(deploy)
+    project_name = deploy.project_name.capitalize
+    if deploy.options && deploy.options["topology"].present?
+      project_name += " (#{deploy.options["topology"].split(":")[0]})"
+    end
+    project_name
   end
 end

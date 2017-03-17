@@ -195,7 +195,7 @@ func terra() (int, string) {
 		}
 		resp, err := client.UnlockTerraformProject(
 			canoe.NewUnlockTerraformProjectParams().WithBody(
-				&models.CanoeUnlockTerraformProjectRequest{
+				&models.BreadUnlockTerraformProjectRequest{
 					UserEmail: canoeUser,
 					Project:   tf.Project,
 				},
@@ -251,7 +251,7 @@ func apply(client bread.CanoeClient, tf *terraform, git *gitRepo, canoeUser stri
 	resp, err := client.CreateTerraformDeploy(
 		canoe.NewCreateTerraformDeployParams().
 			WithTimeout(bread.CanoeTimeout).
-			WithBody(&models.CanoeCreateTerraformDeployRequest{
+			WithBody(&models.BreadCreateTerraformDeployRequest{
 				UserEmail:        canoeUser,
 				Project:          tf.Project,
 				Branch:           git.Branch,
@@ -291,7 +291,7 @@ func apply(client bread.CanoeClient, tf *terraform, git *gitRepo, canoeUser stri
 	completeResp, err := client.CompleteTerraformDeploy(
 		canoe.NewCompleteTerraformDeployParams().
 			WithTimeout(bread.CanoeTimeout).
-			WithBody(&models.CanoeCompleteTerraformDeployRequest{
+			WithBody(&models.BreadCompleteTerraformDeployRequest{
 				UserEmail:  canoeUser,
 				DeployID:   resp.Payload.DeployID,
 				Successful: success,

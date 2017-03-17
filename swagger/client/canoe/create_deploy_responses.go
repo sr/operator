@@ -45,7 +45,7 @@ func NewCreateDeployOK() *CreateDeployOK {
 CreateDeployOK create deploy o k
 */
 type CreateDeployOK struct {
-	Payload *models.CanoeCreateDeployResponse
+	Payload *models.BreadCreateDeployResponse
 }
 
 func (o *CreateDeployOK) Error() string {
@@ -54,7 +54,7 @@ func (o *CreateDeployOK) Error() string {
 
 func (o *CreateDeployOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.CanoeCreateDeployResponse)
+	o.Payload = new(models.BreadCreateDeployResponse)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

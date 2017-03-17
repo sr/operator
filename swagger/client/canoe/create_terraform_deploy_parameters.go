@@ -63,7 +63,7 @@ for the create terraform deploy operation typically these are written to a http.
 type CreateTerraformDeployParams struct {
 
 	/*Body*/
-	Body *models.CanoeCreateTerraformDeployRequest
+	Body *models.BreadCreateTerraformDeployRequest
 
 	timeout    time.Duration
 	Context    context.Context
@@ -104,13 +104,13 @@ func (o *CreateTerraformDeployParams) SetHTTPClient(client *http.Client) {
 }
 
 // WithBody adds the body to the create terraform deploy params
-func (o *CreateTerraformDeployParams) WithBody(body *models.CanoeCreateTerraformDeployRequest) *CreateTerraformDeployParams {
+func (o *CreateTerraformDeployParams) WithBody(body *models.BreadCreateTerraformDeployRequest) *CreateTerraformDeployParams {
 	o.SetBody(body)
 	return o
 }
 
 // SetBody adds the body to the create terraform deploy params
-func (o *CreateTerraformDeployParams) SetBody(body *models.CanoeCreateTerraformDeployRequest) {
+func (o *CreateTerraformDeployParams) SetBody(body *models.BreadCreateTerraformDeployRequest) {
 	o.Body = body
 }
 
@@ -121,7 +121,7 @@ func (o *CreateTerraformDeployParams) WriteToRequest(r runtime.ClientRequest, re
 	var res []error
 
 	if o.Body == nil {
-		o.Body = new(models.CanoeCreateTerraformDeployRequest)
+		o.Body = new(models.BreadCreateTerraformDeployRequest)
 	}
 
 	if err := r.SetBodyParam(o.Body); err != nil {
