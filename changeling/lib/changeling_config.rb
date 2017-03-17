@@ -137,7 +137,7 @@ class ChangelingConfig
   end
 
   def github_source_ips
-    Array(ENV.fetch("GITHUB_WEBHOOK_SOURCE_IP", "192.30.252.0/22"))
+    Array(ENV.fetch("GITHUB_WEBHOOK_SOURCE_IP", "192.30.252.0/22").split(","))
   end
 
   def github_api_endpoint
