@@ -44,7 +44,7 @@ public class GithubEnterpriseRepository extends GitHubRepository {
     private static final String REPOSITORY_GITHUBENTERPRISE_ERROR_MISSING_HOSTNAME = "repository.githubenterprise.error.missingHostname";
     private static final String REPOSITORY_GITHUBENTERPRISE_ERROR_MISSING_REPOSITORY = "repository.githubenterprise.error.missingRepository";
 
-    static final String GITHUB_API_BASE_URL = new SystemProperty(false, "atlassian.bamboo.github.api.base.url",
+    public static final String GITHUB_API_BASE_URL = new SystemProperty(false, "atlassian.bamboo.github.api.base.url",
             "ATLASSIAN_BAMBOO_GITHUB_API_BASE_URL").getValue("https://api.github.com/");
 
     // The only difference between a GitHubRepository and a GitHubEnterpriseRepository is the ability to specify
