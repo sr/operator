@@ -306,7 +306,7 @@ resource "aws_route53_record" "events_dev_pardot_com_CNAMErecord" {
   name    = "events.${aws_route53_zone.dev_pardot_com.name}"
   records = ["${aws_alb.operator_production.dns_name}"]
   type    = "CNAME"
-  ttl     = "900"
+  ttl     = "60"
 }
 
 resource "aws_route53_record" "chatbot_dev_pardot_com_CNAMErecord" {
