@@ -12,7 +12,7 @@ import (
 	"git.dev.pardot.com/Pardot/bread/swagger/client/canoe"
 )
 
-// Default config canoe proto HTTP client.
+// Default canoe proto HTTP client.
 var Default = NewHTTPClient(nil)
 
 const (
@@ -27,14 +27,14 @@ const (
 // DefaultSchemes are the default schemes found in Meta (info) section of spec file
 var DefaultSchemes = []string{"http", "https"}
 
-// NewHTTPClient creates a new config canoe proto HTTP client.
-func NewHTTPClient(formats strfmt.Registry) *ConfigCanoeProto {
+// NewHTTPClient creates a new canoe proto HTTP client.
+func NewHTTPClient(formats strfmt.Registry) *CanoeProto {
 	return NewHTTPClientWithConfig(formats, nil)
 }
 
-// NewHTTPClientWithConfig creates a new config canoe proto HTTP client,
+// NewHTTPClientWithConfig creates a new canoe proto HTTP client,
 // using a customizable transport config.
-func NewHTTPClientWithConfig(formats strfmt.Registry, cfg *TransportConfig) *ConfigCanoeProto {
+func NewHTTPClientWithConfig(formats strfmt.Registry, cfg *TransportConfig) *CanoeProto {
 	// ensure nullable parameters have default
 	if formats == nil {
 		formats = strfmt.Default
@@ -48,9 +48,9 @@ func NewHTTPClientWithConfig(formats strfmt.Registry, cfg *TransportConfig) *Con
 	return New(transport, formats)
 }
 
-// New creates a new config canoe proto client
-func New(transport runtime.ClientTransport, formats strfmt.Registry) *ConfigCanoeProto {
-	cli := new(ConfigCanoeProto)
+// New creates a new canoe proto client
+func New(transport runtime.ClientTransport, formats strfmt.Registry) *CanoeProto {
+	cli := new(CanoeProto)
 	cli.Transport = transport
 
 	cli.Canoe = canoe.New(transport, formats)
@@ -97,15 +97,15 @@ func (cfg *TransportConfig) WithSchemes(schemes []string) *TransportConfig {
 	return cfg
 }
 
-// ConfigCanoeProto is a client for config canoe proto
-type ConfigCanoeProto struct {
+// CanoeProto is a client for canoe proto
+type CanoeProto struct {
 	Canoe *canoe.Client
 
 	Transport runtime.ClientTransport
 }
 
 // SetTransport changes the transport on the client and all its subresources
-func (c *ConfigCanoeProto) SetTransport(transport runtime.ClientTransport) {
+func (c *CanoeProto) SetTransport(transport runtime.ClientTransport) {
 	c.Transport = transport
 
 	c.Canoe.SetTransport(transport)

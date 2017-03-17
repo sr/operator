@@ -9,9 +9,9 @@ import (
 	"github.com/go-openapi/errors"
 )
 
-// CanoeCreateDeployResponse canoe create deploy response
-// swagger:model canoeCreateDeployResponse
-type CanoeCreateDeployResponse struct {
+// BreadCreateDeployResponse bread create deploy response
+// swagger:model breadCreateDeployResponse
+type BreadCreateDeployResponse struct {
 
 	// deploy id
 	DeployID int64 `json:"deploy_id,omitempty"`
@@ -23,8 +23,8 @@ type CanoeCreateDeployResponse struct {
 	Message string `json:"message,omitempty"`
 }
 
-// Validate validates this canoe create deploy response
-func (m *CanoeCreateDeployResponse) Validate(formats strfmt.Registry) error {
+// Validate validates this bread create deploy response
+func (m *BreadCreateDeployResponse) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if len(res) > 0 {

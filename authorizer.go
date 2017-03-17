@@ -84,7 +84,7 @@ func authenticatePhone(canoeAPI CanoeClient, email, action string) error {
 	resp, err := canoeAPI.PhoneAuthentication(
 		canoe.NewPhoneAuthenticationParams().
 			WithTimeout(CanoeTimeout).
-			WithBody(&models.CanoePhoneAuthenticationRequest{
+			WithBody(&models.BreadPhoneAuthenticationRequest{
 				Action:    action,
 				UserEmail: email,
 			}),

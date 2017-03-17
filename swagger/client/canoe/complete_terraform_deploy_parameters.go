@@ -63,7 +63,7 @@ for the complete terraform deploy operation typically these are written to a htt
 type CompleteTerraformDeployParams struct {
 
 	/*Body*/
-	Body *models.CanoeCompleteTerraformDeployRequest
+	Body *models.BreadCompleteTerraformDeployRequest
 
 	timeout    time.Duration
 	Context    context.Context
@@ -104,13 +104,13 @@ func (o *CompleteTerraformDeployParams) SetHTTPClient(client *http.Client) {
 }
 
 // WithBody adds the body to the complete terraform deploy params
-func (o *CompleteTerraformDeployParams) WithBody(body *models.CanoeCompleteTerraformDeployRequest) *CompleteTerraformDeployParams {
+func (o *CompleteTerraformDeployParams) WithBody(body *models.BreadCompleteTerraformDeployRequest) *CompleteTerraformDeployParams {
 	o.SetBody(body)
 	return o
 }
 
 // SetBody adds the body to the complete terraform deploy params
-func (o *CompleteTerraformDeployParams) SetBody(body *models.CanoeCompleteTerraformDeployRequest) {
+func (o *CompleteTerraformDeployParams) SetBody(body *models.BreadCompleteTerraformDeployRequest) {
 	o.Body = body
 }
 
@@ -121,7 +121,7 @@ func (o *CompleteTerraformDeployParams) WriteToRequest(r runtime.ClientRequest, 
 	var res []error
 
 	if o.Body == nil {
-		o.Body = new(models.CanoeCompleteTerraformDeployRequest)
+		o.Body = new(models.BreadCompleteTerraformDeployRequest)
 	}
 
 	if err := r.SetBodyParam(o.Body); err != nil {

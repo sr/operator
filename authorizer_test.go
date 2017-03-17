@@ -94,7 +94,7 @@ func TestLDAPAuthorizer(t *testing.T) {
 	swe := "srozet@salesforce.com"
 	unknown := "boom@gmail.com"
 	authOK := &canoe.PhoneAuthenticationOK{
-		Payload: &models.CanoePhoneAuthenticationResponse{
+		Payload: &models.BreadPhoneAuthenticationResponse{
 			Error: false,
 		},
 	}
@@ -112,7 +112,7 @@ func TestLDAPAuthorizer(t *testing.T) {
 		{unknown, "bread.Ping", "Ping", authOK, nil, errors.New("no user matching email `boom@gmail.com`")},
 		{swe, "bread.Ping", "Ping", nil, errors.New("panic"), errors.New("Canoe phone authentication request failed")},
 		{swe, "bread.Ping", "Ping", &canoe.PhoneAuthenticationOK{
-			Payload: &models.CanoePhoneAuthenticationResponse{
+			Payload: &models.BreadPhoneAuthenticationResponse{
 				Error:   true,
 				Message: "denied",
 			},

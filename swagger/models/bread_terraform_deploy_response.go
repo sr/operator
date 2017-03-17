@@ -9,9 +9,9 @@ import (
 	"github.com/go-openapi/errors"
 )
 
-// CanoeTerraformDeployResponse canoe terraform deploy response
-// swagger:model canoeTerraformDeployResponse
-type CanoeTerraformDeployResponse struct {
+// BreadTerraformDeployResponse bread terraform deploy response
+// swagger:model breadTerraformDeployResponse
+type BreadTerraformDeployResponse struct {
 
 	// deploy id
 	DeployID int64 `json:"deploy_id,omitempty"`
@@ -29,8 +29,8 @@ type CanoeTerraformDeployResponse struct {
 	RequestID string `json:"request_id,omitempty"`
 }
 
-// Validate validates this canoe terraform deploy response
-func (m *CanoeTerraformDeployResponse) Validate(formats strfmt.Registry) error {
+// Validate validates this bread terraform deploy response
+func (m *BreadTerraformDeployResponse) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if len(res) > 0 {
