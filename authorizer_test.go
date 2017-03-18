@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/go-ldap/ldap"
-	"github.com/sr/operator"
 	"golang.org/x/net/context"
 
 	"git.dev.pardot.com/Pardot/bread"
@@ -92,8 +91,9 @@ func TestLDAPAuthorizer(t *testing.T) {
 		canoeClient,
 		[]*bread.ACLEntry{
 			{
-				Call: &operator.Call{
-					Service: "bread.Ping",
+				Call: &bread.RPC{
+					Package: "bread",
+					Service: "Ping",
 					Method:  "ping",
 				},
 				Group: "developers",
@@ -106,56 +106,56 @@ func TestLDAPAuthorizer(t *testing.T) {
 	const validUserEmail = "srozet@salesforce.com"
 	for _, tc := range []struct {
 		userEmail string
-		call      *operator.Call
+		call      *bread.RPC
 		authResp  *canoe.PhoneAuthenticationOK
 		authErr   error
 		wantErr   error
 	}{
 		{
 			validUserEmail,
-			&operator.Call{Service: "bread.Ping", Method: "ping"},
+			&bread.RPC{Package: "bread", Service: "Ping", Method: "ping"},
 			&canoe.PhoneAuthenticationOK{Payload: &models.BreadPhoneAuthenticationResponse{Error: false}},
 			nil,
 			nil,
 		},
 		{
 			"",
-			&operator.Call{Service: "bread.Ping", Method: "ping"},
+			&bread.RPC{Package: "bread", Service: "Ping", Method: "ping"},
 			&canoe.PhoneAuthenticationOK{Payload: &models.BreadPhoneAuthenticationResponse{Error: false}},
 			nil,
 			errors.New("unable to authorize request without an user email"),
 		},
 		{
 			"unknown@salesforce.com",
-			&operator.Call{Service: "bread.Ping", Method: "ping"},
+			&bread.RPC{Package: "bread", Service: "Ping", Method: "ping"},
 			&canoe.PhoneAuthenticationOK{Payload: &models.BreadPhoneAuthenticationResponse{Error: false}},
 			nil,
 			errors.New("no user matching email `unknown@salesforce.com`"),
 		},
 		{
 			validUserEmail,
-			&operator.Call{Service: "bread.Ping", Method: "not-found-method"},
+			&bread.RPC{Package: "bread", Service: "Ping", Method: "not-found-method"},
 			&canoe.PhoneAuthenticationOK{Payload: &models.BreadPhoneAuthenticationResponse{Error: false}},
 			nil,
 			errors.New("no ACL entry found for service `bread.Ping not-found-method`"),
 		},
 		{
 			validUserEmail,
-			&operator.Call{Service: "bread.Ping", Method: "ping"},
+			&bread.RPC{Package: "bread", Service: "Ping", Method: "ping"},
 			&canoe.PhoneAuthenticationOK{Payload: &models.BreadPhoneAuthenticationResponse{Error: true}},
 			nil,
 			errors.New("Salesforce Authenticator verification failed"),
 		},
 		{
 			validUserEmail,
-			&operator.Call{Service: "bread.Ping", Method: "ping"},
+			&bread.RPC{Package: "bread", Service: "Ping", Method: "ping"},
 			&canoe.PhoneAuthenticationOK{Payload: &models.BreadPhoneAuthenticationResponse{Error: true, Message: "boomtown"}},
 			nil,
 			errors.New("boomtown"),
 		},
 		{
 			validUserEmail,
-			&operator.Call{Service: "bread.Ping", Method: "ping"},
+			&bread.RPC{Package: "bread", Service: "Ping", Method: "ping"},
 			nil,
 			errors.New("canoe RPC error"),
 			errors.New("Salesforce Authenticator verification failed due to an internal server error"),
@@ -163,16 +163,7 @@ func TestLDAPAuthorizer(t *testing.T) {
 	} {
 		canoeClient.authErr = tc.authErr
 		canoeClient.authResp = tc.authResp
-		err := auth.Authorize(context.Background(), &operator.Request{
-			Call: tc.call,
-			Source: &operator.Source{
-				Type: operator.SourceType_HUBOT,
-				User: &operator.User{
-					Email: tc.userEmail,
-				},
-			},
-		})
-		if err == nil {
+		if err := auth.Authorize(context.Background(), tc.call, tc.userEmail); err == nil {
 			if tc.wantErr != nil {
 				t.Errorf("RPC %+v by user %+v should not be authorized", tc.call, tc.userEmail)
 			}

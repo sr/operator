@@ -125,7 +125,7 @@ func run(invoker operator.InvokerFunc) error {
 	var (
 		httpServer *http.ServeMux
 		logger     bread.Logger
-		auth       operator.Authorizer
+		auth       bread.Authorizer
 		sender     operator.Sender
 
 		store    operatorhipchat.ClientCredentialsStore
@@ -319,7 +319,7 @@ func main() {
 
 type noopAuthorizer struct{}
 
-func (a *noopAuthorizer) Authorize(_ context.Context, _ *operator.Request) error {
+func (a *noopAuthorizer) Authorize(_ context.Context, _ *bread.RPC, _ string) error {
 	return nil
 }
 

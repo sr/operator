@@ -1,6 +1,7 @@
 package bread
 
 import (
+	"errors"
 	"net/url"
 	"strings"
 	"time"
@@ -51,7 +52,7 @@ func NewCanoeClient(url *url.URL, token string) CanoeClient {
 }
 
 // NewUnaryServerInterceptor returns a gRPC server interceptor that logs requests and authorizes requests.
-func NewUnaryServerInterceptor(logger Logger, jsonpbm *jsonpb.Marshaler, authorizer operator.Authorizer) grpc.UnaryServerInterceptor {
+func NewUnaryServerInterceptor(logger Logger, jsonpbm *jsonpb.Marshaler, authorizer Authorizer) grpc.UnaryServerInterceptor {
 	return func(
 		ctx context.Context,
 		in interface{},
@@ -63,19 +64,22 @@ func NewUnaryServerInterceptor(logger Logger, jsonpbm *jsonpb.Marshaler, authori
 		})
 		req := requester.GetRequest()
 		if !ok || req == nil {
-			return nil, operator.ErrInvalidRequest
+			return nil, errors.New("invalid RPC request")
 		}
 		if req.GetSource() == nil {
-			return nil, operator.ErrInvalidRequest
+			return nil, errors.New("invalid RPC request")
 		}
-		s := strings.Split(info.FullMethod, "/")
-		if len(s) != 3 || s[0] != "" || s[1] == "" || s[2] == "" {
-			return nil, operator.ErrInvalidRequest
+		p := strings.Split(info.FullMethod, "/")
+		if len(p) != 3 || p[0] != "" || p[1] == "" || p[2] == "" {
+			return nil, errors.New("invalid RPC request")
 		}
-		req.Call = &operator.Call{Service: s[1], Method: s[2]}
-
+		pp := strings.Split(p[0], ".")
+		if len(pp) != 2 || p[0] == "" || p[1] == "" {
+			return nil, errors.New("invalid RPC request")
+		}
 		// Authorize the request and log any error.
-		if err := authorizer.Authorize(ctx, req); err != nil {
+		call := &RPC{Package: pp[0], Service: pp[1], Method: p[2]}
+		if err := authorizer.Authorize(ctx, call, req.GetUserEmail()); err != nil {
 			req.Call.Error = err.Error()
 			logRequest(logger, jsonpbm, req.Call)
 			return nil, err

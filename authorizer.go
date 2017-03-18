@@ -8,7 +8,6 @@ import (
 
 	"github.com/go-ldap/ldap"
 	"github.com/go-openapi/runtime"
-	"github.com/sr/operator"
 	"golang.org/x/net/context"
 
 	"git.dev.pardot.com/Pardot/bread/swagger/client/canoe"
@@ -22,42 +21,71 @@ type LDAPConfig struct {
 	Base string
 }
 
-type authorizer struct {
+// A RPC is a Remote Procedure Call made against a gRPC service.
+type RPC struct {
+	Package string
+	Service string
+	Method  string
+}
+
+// An ACLEntry describes which LDAP group membership and 2FA requirements
+// for RPCs.
+type ACLEntry struct {
+	Call              *RPC
+	Group             string
+	PhoneAuthOptional bool
+}
+
+// A Authorizer authorizes RPC requests.
+type Authorizer interface {
+	Authorize(context.Context, *RPC, string) error
+}
+
+type ldapAuthorizer struct {
 	ldap  *LDAPConfig
 	canoe CanoeClient
 	acl   []*ACLEntry
 }
 
-// NewAuthorizer returns an operator.Authorizer that enforces ACLs using LDAP
-// for authentication and LDAP group membership for authorization. Additionally,
-// this uses the Canoe API to enforce 2FA via Salesforce Authenticator for some
-// requests.
-func NewAuthorizer(ldap *LDAPConfig, canoe CanoeClient, acl []*ACLEntry) (operator.Authorizer, error) {
+// NewAuthorizer returns an Authorizer that enforces ACLs via LDAP, and Canoe
+// for 2FA.
+func NewAuthorizer(ldap *LDAPConfig, canoe CanoeClient, acl []*ACLEntry) (Authorizer, error) {
 	if ldap.Base == "" {
 		ldap.Base = LDAPBase
 	}
 	for _, e := range acl {
-		if e.Call == nil || e.Call.Service == "" || e.Call.Method == "" || e.Group == "" {
-			return nil, fmt.Errorf("invalid ACL entry: %#v", e)
+		if e.Call == nil || e.Call.Package == "" || e.Call.Service == "" || e.Call.Method == "" || e.Group == "" {
+			return nil, fmt.Errorf("ACL entry is invalid: %+v", e)
 		}
 	}
-	return &authorizer{ldap, canoe, acl}, nil
+	return &ldapAuthorizer{ldap, canoe, acl}, nil
 }
 
-func (a *authorizer) Authorize(ctx context.Context, req *operator.Request) error {
-	email := req.GetUserEmail()
+func (a *ldapAuthorizer) Authorize(ctx context.Context, req *RPC, email string) error {
+	if req == nil {
+		return errors.New("required argument is nil: request")
+	}
 	if email == "" {
-		return fmt.Errorf("unable to authorize request without an user email")
+		return errors.New("unable to authorize request without an user email")
+	}
+	if req.Package == "" {
+		return errors.New("required RPC field is nil: Package")
+	}
+	if req.Service == "" {
+		return errors.New("required RPC field is nil: Service")
+	}
+	if req.Method == "" {
+		return errors.New("required RPC field is nil: Method")
 	}
 	var entry *ACLEntry
 	for _, e := range a.acl {
-		if e.Call.Service == req.Call.Service && e.Call.Method == req.Call.Method {
+		if e.Call.Package == req.Package && e.Call.Service == req.Service && e.Call.Method == req.Method {
 			entry = e
 			break
 		}
 	}
 	if entry == nil {
-		return fmt.Errorf("no ACL entry found for service `%s %s`", req.Call.Service, req.Call.Method)
+		return fmt.Errorf("no ACL entry found for service `%s.%s %s`", req.Package, req.Service, req.Method)
 	}
 	groups, err := a.getLDAPUserGroups(email)
 	if err != nil {
@@ -70,7 +98,7 @@ func (a *authorizer) Authorize(ctx context.Context, req *operator.Request) error
 		}
 	}
 	if !ok {
-		return fmt.Errorf("service `%s %s` requires to be a member of LDAP group `%s`", req.Call.Service, req.Call.Method, entry.Group)
+		return fmt.Errorf("service `%s %s` requires to be a member of LDAP group `%s`", req.Service, req.Method, entry.Group)
 	}
 	if !entry.PhoneAuthOptional {
 		if err := authenticatePhone(a.canoe, email, "Chat command"); err != nil {
@@ -80,31 +108,7 @@ func (a *authorizer) Authorize(ctx context.Context, req *operator.Request) error
 	return nil
 }
 
-func authenticatePhone(canoeAPI CanoeClient, email, action string) error {
-	resp, err := canoeAPI.PhoneAuthentication(
-		canoe.NewPhoneAuthenticationParams().
-			WithTimeout(CanoeTimeout).
-			WithBody(&models.BreadPhoneAuthenticationRequest{
-				Action:    action,
-				UserEmail: email,
-			}),
-	)
-	if err != nil || resp.Payload == nil {
-		if v, ok := err.(*runtime.APIError); ok {
-			return fmt.Errorf("Salesforce Authenticator verification failed due an internal server error (status %d)", v.Code)
-		}
-		return fmt.Errorf("Salesforce Authenticator verification failed due to an internal server error")
-	}
-	if resp.Payload.Error {
-		if resp.Payload.Message == "" {
-			return errors.New("Salesforce Authenticator verification failed for an unknown reason")
-		}
-		return errors.New(resp.Payload.Message)
-	}
-	return nil
-}
-
-func (a *authorizer) getLDAPUserGroups(email string) ([]string, error) {
+func (a *ldapAuthorizer) getLDAPUserGroups(email string) ([]string, error) {
 	var conn *ldap.Conn
 	c, err := net.DialTimeout("tcp", a.ldap.Addr, ldapTimeout)
 	if err != nil {
@@ -154,4 +158,28 @@ func (a *authorizer) getLDAPUserGroups(email string) ([]string, error) {
 		groups = append(groups, entry.GetAttributeValue("cn"))
 	}
 	return groups, nil
+}
+
+func authenticatePhone(canoeAPI CanoeClient, email, action string) error {
+	resp, err := canoeAPI.PhoneAuthentication(
+		canoe.NewPhoneAuthenticationParams().
+			WithTimeout(CanoeTimeout).
+			WithBody(&models.BreadPhoneAuthenticationRequest{
+				Action:    action,
+				UserEmail: email,
+			}),
+	)
+	if err != nil || resp.Payload == nil {
+		if v, ok := err.(*runtime.APIError); ok {
+			return fmt.Errorf("Salesforce Authenticator verification failed due an internal server error (status %d)", v.Code)
+		}
+		return fmt.Errorf("Salesforce Authenticator verification failed due to an internal server error")
+	}
+	if resp.Payload.Error {
+		if resp.Payload.Message == "" {
+			return errors.New("Salesforce Authenticator verification failed for an unknown reason")
+		}
+		return errors.New(resp.Payload.Message)
+	}
+	return nil
 }

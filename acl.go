@@ -1,68 +1,67 @@
 package bread
 
-import "github.com/sr/operator"
-
 // ACL is the Access Control List for all gRPC methods exposed via chat.
 var ACL = []*ACLEntry{
 	{
-		Call: &operator.Call{
-			Service: "bread.Ping",
+		Call: &RPC{
+			Package: "bread",
+			Service: "Ping",
 			Method:  "Ping",
 		},
 		Group: "developers",
 	},
 	{
-		Call: &operator.Call{
-			Service: "bread.Ping",
+		Call: &RPC{
+			Package: "bread",
+			Service: "Ping",
 			Method:  "SlowLoris",
 		},
 		Group:             "developers",
 		PhoneAuthOptional: true,
 	},
 	{
-		Call: &operator.Call{
-			Service: "bread.Deploy",
+		Call: &RPC{
+			Package: "bread",
+			Service: "Deploy",
 			Method:  "ListTargets",
 		},
 		Group:             "developers",
 		PhoneAuthOptional: true,
 	},
 	{
-		Call: &operator.Call{
-			Service: "bread.Deploy",
+		Call: &RPC{
+			Package: "bread",
+			Service: "Deploy",
 			Method:  "ListBuilds",
 		},
 		Group:             "developers",
 		PhoneAuthOptional: true,
 	},
 	{
-		Call: &operator.Call{
-			Service: "bread.Deploy",
+		Call: &RPC{
+			Package: "bread",
+			Service: "Deploy",
 			Method:  "Trigger",
 		},
 		Group:             "developers",
 		PhoneAuthOptional: true,
 	},
 	{
-		Call: &operator.Call{
-			Service: "bread.Tickets",
+		Call: &RPC{
+			Package: "bread",
+			Service: "Tickets",
 			Method:  "Mine",
 		},
 		Group:             "developers",
 		PhoneAuthOptional: true,
 	},
 	{
-		Call: &operator.Call{
-			Service: "bread.Tickets",
+		Call: &RPC{
+			Package: "bread",
+			Service: "Tickets",
 			Method:  "SprintStatus",
 		},
 		Group:             "developers",
 		PhoneAuthOptional: true,
 	},
-}
-
-type ACLEntry struct {
-	Call              *operator.Call
-	Group             string
-	PhoneAuthOptional bool
 }
