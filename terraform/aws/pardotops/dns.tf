@@ -304,7 +304,7 @@ resource "aws_route53_record" "operator_dev_pardot_com_CNAMErecord" {
 resource "aws_route53_record" "events_dev_pardot_com_CNAMErecord" {
   zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
   name    = "events.${aws_route53_zone.dev_pardot_com.name}"
-  records = ["${aws_alb.operator_production.dns_name}"]
+  records = ["aqueous-wave-8748.whispering-wildwood-3486.herokuspace.com"]
   type    = "CNAME"
   ttl     = "900"
 }
