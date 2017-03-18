@@ -87,63 +87,101 @@ func TestLDAPAuthorizer(t *testing.T) {
 	}
 	defer conn.Close()
 	canoeClient := &fakeCanoeClient{}
-	auth, err := bread.NewAuthorizer(&bread.LDAPConfig{Addr: ldapAddr}, canoeClient, bread.ACL)
+	auth, err := bread.NewAuthorizer(
+		&bread.LDAPConfig{Addr: ldapAddr},
+		canoeClient,
+		[]*bread.ACLEntry{
+			{
+				Call: &operator.Call{
+					Service: "bread.Ping",
+					Method:  "ping",
+				},
+				Group: "developers",
+			},
+		},
+	)
 	if err != nil {
 		t.Fatal(err)
 	}
-	swe := "srozet@salesforce.com"
-	unknown := "boom@gmail.com"
-	authOK := &canoe.PhoneAuthenticationOK{
-		Payload: &models.BreadPhoneAuthenticationResponse{
-			Error: false,
-		},
-	}
+	const validUserEmail = "srozet@salesforce.com"
 	for _, tc := range []struct {
-		user     string
-		service  string
-		method   string
-		authResp *canoe.PhoneAuthenticationOK
-		authErr  error
-		err      error
+		userEmail string
+		call      *operator.Call
+		authResp  *canoe.PhoneAuthenticationOK
+		authErr   error
+		wantErr   error
 	}{
-		{swe, "bread.Ping", "Ping", authOK, nil, nil},
-		{"", "bread.Ping", "Ping", authOK, nil, errors.New("unable to authorize request without an user email")},
-		{swe, "bread.Ping", "Pong", authOK, nil, errors.New("no ACL entry found for service `bread.Ping Pong`")},
-		{unknown, "bread.Ping", "Ping", authOK, nil, errors.New("no user matching email `boom@gmail.com`")},
-		{swe, "bread.Ping", "Ping", nil, errors.New("panic"), errors.New("Canoe phone authentication request failed")},
-		{swe, "bread.Ping", "Ping", &canoe.PhoneAuthenticationOK{
-			Payload: &models.BreadPhoneAuthenticationResponse{
-				Error:   true,
-				Message: "denied",
-			},
-		}, nil, errors.New("denied")},
+		{
+			validUserEmail,
+			&operator.Call{Service: "bread.Ping", Method: "ping"},
+			&canoe.PhoneAuthenticationOK{Payload: &models.BreadPhoneAuthenticationResponse{Error: false}},
+			nil,
+			nil,
+		},
+		{
+			"",
+			&operator.Call{Service: "bread.Ping", Method: "ping"},
+			&canoe.PhoneAuthenticationOK{Payload: &models.BreadPhoneAuthenticationResponse{Error: false}},
+			nil,
+			errors.New("unable to authorize request without an user email"),
+		},
+		{
+			"unknown@salesforce.com",
+			&operator.Call{Service: "bread.Ping", Method: "ping"},
+			&canoe.PhoneAuthenticationOK{Payload: &models.BreadPhoneAuthenticationResponse{Error: false}},
+			nil,
+			errors.New("no user matching email `unknown@salesforce.com`"),
+		},
+		{
+			validUserEmail,
+			&operator.Call{Service: "bread.Ping", Method: "not-found-method"},
+			&canoe.PhoneAuthenticationOK{Payload: &models.BreadPhoneAuthenticationResponse{Error: false}},
+			nil,
+			errors.New("no ACL entry found for service `bread.Ping not-found-method`"),
+		},
+		{
+			validUserEmail,
+			&operator.Call{Service: "bread.Ping", Method: "ping"},
+			&canoe.PhoneAuthenticationOK{Payload: &models.BreadPhoneAuthenticationResponse{Error: true}},
+			nil,
+			errors.New("Salesforce Authenticator verification failed"),
+		},
+		{
+			validUserEmail,
+			&operator.Call{Service: "bread.Ping", Method: "ping"},
+			&canoe.PhoneAuthenticationOK{Payload: &models.BreadPhoneAuthenticationResponse{Error: true, Message: "boomtown"}},
+			nil,
+			errors.New("boomtown"),
+		},
+		{
+			validUserEmail,
+			&operator.Call{Service: "bread.Ping", Method: "ping"},
+			nil,
+			errors.New("canoe RPC error"),
+			errors.New("Salesforce Authenticator verification failed due to an internal server error"),
+		},
 	} {
-		t.Run(fmt.Sprintf("%s %s", tc.service, tc.method), func(t *testing.T) {
-			canoeClient.authErr = tc.authErr
-			canoeClient.authResp = tc.authResp
-			err := auth.Authorize(context.Background(), &operator.Request{
-				Call: &operator.Call{
-					Service: tc.service,
-					Method:  tc.method,
+		canoeClient.authErr = tc.authErr
+		canoeClient.authResp = tc.authResp
+		err := auth.Authorize(context.Background(), &operator.Request{
+			Call: tc.call,
+			Source: &operator.Source{
+				Type: operator.SourceType_HUBOT,
+				User: &operator.User{
+					Email: tc.userEmail,
 				},
-				Source: &operator.Source{
-					Type: operator.SourceType_HUBOT,
-					User: &operator.User{
-						Email: tc.user,
-					},
-				},
-			})
-			if err == nil {
-				if tc.err != nil {
-					t.Errorf("user %#v should not be authorized", tc.user)
-				}
-			} else {
-				if tc.err == nil {
-					t.Errorf("unexpected error: %s", err)
-				} else if !strings.Contains(err.Error(), tc.err.Error()) {
-					t.Errorf("expected error message to contain %#v, got %#v", tc.err.Error(), err.Error())
-				}
-			}
+			},
 		})
+		if err == nil {
+			if tc.wantErr != nil {
+				t.Errorf("RPC %+v by user %+v should not be authorized", tc.call, tc.userEmail)
+			}
+		} else {
+			if tc.wantErr == nil {
+				t.Errorf("RPC %+v want error: %s, got %+v", tc.call, tc.wantErr, err)
+			} else if !strings.Contains(err.Error(), tc.wantErr.Error()) {
+				t.Errorf("RPC %+v want error message to contain %+v, got %+v", tc.call, tc.wantErr.Error(), err.Error())
+			}
+		}
 	}
 }

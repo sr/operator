@@ -91,13 +91,13 @@ func authenticatePhone(canoeAPI CanoeClient, email, action string) error {
 	)
 	if err != nil || resp.Payload == nil {
 		if v, ok := err.(*runtime.APIError); ok {
-			return fmt.Errorf("Canoe phone authentication request failed with status %d", v.Code)
+			return fmt.Errorf("Salesforce Authenticator verification failed due an internal server error (status %d)", v.Code)
 		}
-		return fmt.Errorf("Canoe phone authentication request failed in a weird way")
+		return fmt.Errorf("Salesforce Authenticator verification failed due to an internal server error")
 	}
 	if resp.Payload.Error {
 		if resp.Payload.Message == "" {
-			return errors.New("Canoe phone authenticated failed for unknown reason")
+			return errors.New("Salesforce Authenticator verification failed for an unknown reason")
 		}
 		return errors.New(resp.Payload.Message)
 	}
