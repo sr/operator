@@ -10,8 +10,8 @@ import (
 	"github.com/go-openapi/runtime"
 	"golang.org/x/net/context"
 
-	"git.dev.pardot.com/Pardot/bread/swagger/client/canoe"
-	"git.dev.pardot.com/Pardot/bread/swagger/models"
+	"git.dev.pardot.com/Pardot/bread/generated/swagger/client/canoe"
+	"git.dev.pardot.com/Pardot/bread/generated/swagger/models"
 )
 
 const ldapTimeout = 3 * time.Second

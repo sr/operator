@@ -15,8 +15,8 @@ import (
 	"time"
 
 	"git.dev.pardot.com/Pardot/bread"
-	"git.dev.pardot.com/Pardot/bread/swagger/client/canoe"
-	"git.dev.pardot.com/Pardot/bread/swagger/models"
+	"git.dev.pardot.com/Pardot/bread/generated/swagger/client/canoe"
+	"git.dev.pardot.com/Pardot/bread/generated/swagger/models"
 )
 
 const program = "terra"

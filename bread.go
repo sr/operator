@@ -14,8 +14,8 @@ import (
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
+	"git.dev.pardot.com/Pardot/bread/generated/swagger/client/canoe"
 	"git.dev.pardot.com/Pardot/bread/pb"
-	"git.dev.pardot.com/Pardot/bread/swagger/client/canoe"
 )
 
 const (

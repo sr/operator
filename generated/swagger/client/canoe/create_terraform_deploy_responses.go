@@ -11,7 +11,7 @@ import (
 
 	strfmt "github.com/go-openapi/strfmt"
 
-	"git.dev.pardot.com/Pardot/bread/swagger/models"
+	"git.dev.pardot.com/Pardot/bread/generated/swagger/models"
 )
 
 // CreateTerraformDeployReader is a Reader for the CreateTerraformDeploy structure.

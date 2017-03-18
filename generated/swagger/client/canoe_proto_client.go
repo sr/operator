@@ -9,7 +9,7 @@ import (
 
 	strfmt "github.com/go-openapi/strfmt"
 
-	"git.dev.pardot.com/Pardot/bread/swagger/client/canoe"
+	"git.dev.pardot.com/Pardot/bread/generated/swagger/client/canoe"
 )
 
 // Default canoe proto HTTP client.

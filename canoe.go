@@ -15,8 +15,8 @@ import (
 	"golang.org/x/net/context"
 	"golang.org/x/net/context/ctxhttp"
 
-	"git.dev.pardot.com/Pardot/bread/swagger/client/canoe"
-	"git.dev.pardot.com/Pardot/bread/swagger/models"
+	"git.dev.pardot.com/Pardot/bread/generated/swagger/client/canoe"
+	"git.dev.pardot.com/Pardot/bread/generated/swagger/models"
 )
 
 type canoeDeployer struct {
