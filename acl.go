@@ -5,6 +5,14 @@ var ACL = []*ACLEntry{
 	{
 		Call: &RPC{
 			Package: "bread",
+			Service: "Pinger",
+			Method:  "Ping",
+		},
+		Group: "developers",
+	},
+	{
+		Call: &RPC{
+			Package: "bread",
 			Service: "Ping",
 			Method:  "Ping",
 		},

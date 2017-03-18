@@ -4,10 +4,14 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"net"
 	"os"
 	"strings"
 	"testing"
 	"time"
+
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 
 	"github.com/go-ldap/ldap"
 	"golang.org/x/net/context"
@@ -15,6 +19,7 @@ import (
 	"git.dev.pardot.com/Pardot/bread"
 	"git.dev.pardot.com/Pardot/bread/generated/swagger/client/canoe"
 	"git.dev.pardot.com/Pardot/bread/generated/swagger/models"
+	"git.dev.pardot.com/Pardot/bread/pb"
 )
 
 var ldapEnabled bool
@@ -173,6 +178,81 @@ func TestLDAPAuthorizer(t *testing.T) {
 			} else if !strings.Contains(err.Error(), tc.wantErr.Error()) {
 				t.Errorf("RPC %+v want error message to contain %+v, got %+v", tc.call, tc.wantErr.Error(), err.Error())
 			}
+		}
+	}
+}
+
+type fakeAuthorizer struct {
+	err error
+}
+
+func (i *fakeAuthorizer) Authorize(ctx context.Context, call *bread.RPC, email string) error {
+	if email == "" {
+		return errors.New("no email given")
+	}
+	return i.err
+}
+
+func TestInterceptor(t *testing.T) {
+	listener, err := net.Listen("tcp", "localhost:0")
+	if err != nil {
+		t.Fatalf("failed to listen: %v", err)
+	}
+	defer listener.Close()
+
+	authorizer := &fakeAuthorizer{}
+	interceptor := &bread.Interceptor{Authorizer: authorizer}
+	server := grpc.NewServer(grpc.UnaryInterceptor(interceptor.UnaryServerInterceptor))
+	defer server.GracefulStop()
+	ping := &pingServer{}
+	breadpb.RegisterPingServer(server, ping)
+	go server.Serve(listener)
+
+	conn, err := grpc.Dial(
+		listener.Addr().String(),
+		grpc.WithInsecure(),
+		grpc.WithBlock(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer conn.Close()
+
+	for _, tc := range []struct {
+		ctx     context.Context
+		req     *breadpb.PingRequest
+		authErr error
+		wantErr error
+	}{
+		{
+			metadata.NewContext(context.Background(), metadata.MD{"user_email": []string{"email"}}),
+			&breadpb.PingRequest{},
+			nil,
+			nil,
+		},
+		{
+			context.Background(),
+			&breadpb.PingRequest{},
+			nil,
+			errors.New("no email given"),
+		},
+		{
+			metadata.NewContext(context.Background(), metadata.MD{"user_email": []string{"email", "email"}}),
+			&breadpb.PingRequest{},
+			nil,
+			errors.New("no email given"),
+		},
+		{
+			metadata.NewContext(context.Background(), metadata.MD{"user_email": []string{"email"}}),
+			&breadpb.PingRequest{},
+			errors.New("authorization failed"),
+			errors.New("authorization failed"),
+		},
+	} {
+		authorizer.err = tc.authErr
+		_, err := breadpb.NewPingClient(conn).Ping(tc.ctx, tc.req)
+		if grpc.ErrorDesc(err) != grpc.ErrorDesc(tc.wantErr) {
+			t.Errorf("req %+v %+v want err %+v, got %+v", tc.ctx, tc.req, tc.wantErr, err)
 		}
 	}
 }

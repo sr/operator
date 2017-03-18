@@ -21,7 +21,7 @@ import (
 
 func TestChatCommandHandler(t *testing.T) {
 	commands := make(chan *bread.ChatCommand, 1)
-	handler := bread.ChatCommandHandler(commands)
+	handler := bread.ChatCommandHandler("package", commands)
 
 	for _, tc := range []struct {
 		message string
@@ -38,50 +38,74 @@ func TestChatCommandHandler(t *testing.T) {
 		{
 			"!ping ping",
 			&bread.ChatCommand{
-				Service: "ping",
-				Method:  "ping",
-				Args:    map[string]string{},
+				Package:   "package",
+				Service:   "Ping",
+				Method:    "Ping",
+				Args:      map[string]string{},
+				RoomID:    42,
+				UserEmail: "user@salesforce.com",
 			},
 		},
 		{
 			"!ping ping-pong",
 			&bread.ChatCommand{
-				Service: "ping",
-				Method:  "ping-pong",
-				Args:    map[string]string{},
+				Package:   "package",
+				Service:   "Ping",
+				Method:    "PingPong",
+				Args:      map[string]string{},
+				RoomID:    42,
+				UserEmail: "user@salesforce.com",
 			},
 		},
 		{
 			"!ping ping",
 			&bread.ChatCommand{
-				Service: "ping",
-				Method:  "ping",
-				Args:    map[string]string{},
+				Package:   "package",
+				Service:   "Ping",
+				Method:    "Ping",
+				Args:      map[string]string{},
+				RoomID:    42,
+				UserEmail: "user@salesforce.com",
 			},
 		},
 		{
 			"!deploy trigger app=chatbot",
 			&bread.ChatCommand{
-				Service: "deploy",
-				Method:  "trigger",
+				Package: "package",
+				Service: "Deploy",
+				Method:  "Trigger",
 				Args: map[string]string{
 					"app": "chatbot",
 				},
+				RoomID:    42,
+				UserEmail: "user@salesforce.com",
 			},
 		},
 		{
 			"!deploy trigger app=chatbot env=\"boomtown\"",
 			&bread.ChatCommand{
-				Service: "deploy",
-				Method:  "trigger",
+				Package: "package",
+				Service: "Deploy",
+				Method:  "Trigger",
 				Args: map[string]string{
 					"app": "chatbot",
 					"env": "boomtown",
 				},
+				RoomID:    42,
+				UserEmail: "user@salesforce.com",
 			},
 		},
 	} {
-		err := handler(&bread.ChatMessage{Text: tc.message})
+		msg := &bread.ChatMessage{
+			Text: tc.message,
+			Room: &bread.Room{
+				ID: 42,
+			},
+			User: &bread.User{
+				Email: "user@salesforce.com",
+			},
+		}
+		err := handler(msg)
 		if err != nil && tc.want != nil && !strings.Contains(err.Error(), "no command found") {
 			t.Fatalf("message `%s` error: %s", tc.message, err)
 		}
@@ -117,7 +141,9 @@ type pingServer struct {
 
 func (s *pingServer) Ping(ctx context.Context, req *breadpb.PingRequest) (*operator.Response, error) {
 	if md, ok := metadata.FromContext(ctx); ok {
-		s.lastRoomID = md["hipchat_room_id"][0]
+		if _, ok := md["hipchat_room_id"]; ok {
+			s.lastRoomID = md["hipchat_room_id"][0]
+		}
 	}
 	return &operator.Response{}, nil
 }

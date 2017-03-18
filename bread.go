@@ -2,6 +2,7 @@ package bread
 
 import (
 	"errors"
+	"fmt"
 	"net/url"
 	"strings"
 	"time"
@@ -64,18 +65,18 @@ func NewUnaryServerInterceptor(logger Logger, jsonpbm *jsonpb.Marshaler, authori
 		})
 		req := requester.GetRequest()
 		if !ok || req == nil {
-			return nil, errors.New("invalid RPC request")
+			return nil, errors.New("invalid RPC request: no operator.Request")
 		}
 		if req.GetSource() == nil {
-			return nil, errors.New("invalid RPC request")
+			return nil, errors.New("invalid RPC request: no source")
 		}
 		p := strings.Split(info.FullMethod, "/")
 		if len(p) != 3 || p[0] != "" || p[1] == "" || p[2] == "" {
-			return nil, errors.New("invalid RPC request")
+			return nil, fmt.Errorf("invalid RPC request: %s", info.FullMethod)
 		}
-		pp := strings.Split(p[0], ".")
-		if len(pp) != 2 || p[0] == "" || p[1] == "" {
-			return nil, errors.New("invalid RPC request")
+		pp := strings.Split(p[1], ".")
+		if len(pp) != 2 || pp[0] == "" || pp[1] == "" {
+			return nil, fmt.Errorf("invalid RPC request: %s", info.FullMethod)
 		}
 		// Authorize the request and log any error.
 		call := &RPC{Package: pp[0], Service: pp[1], Method: p[2]}

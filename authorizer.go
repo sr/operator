@@ -1,14 +1,19 @@
 package bread
 
 import (
+	"crypto/tls"
+	"crypto/x509"
 	"errors"
 	"fmt"
 	"net"
+	"strings"
 	"time"
 
 	"github.com/go-ldap/ldap"
 	"github.com/go-openapi/runtime"
 	"golang.org/x/net/context"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 
 	"git.dev.pardot.com/Pardot/bread/generated/swagger/client/canoe"
 	"git.dev.pardot.com/Pardot/bread/generated/swagger/models"
@@ -17,8 +22,9 @@ import (
 const ldapTimeout = 3 * time.Second
 
 type LDAPConfig struct {
-	Addr string
-	Base string
+	Addr   string
+	Base   string
+	CACert []byte
 }
 
 // A RPC is a Remote Procedure Call made against a gRPC service.
@@ -41,8 +47,15 @@ type Authorizer interface {
 	Authorize(context.Context, *RPC, string) error
 }
 
+// Interceptor implements gRPC interceptor functions used to authorize all RPC
+// requests.
+type Interceptor struct {
+	Authorizer
+}
+
 type ldapAuthorizer struct {
 	ldap  *LDAPConfig
+	tls   *tls.Config
 	canoe CanoeClient
 	acl   []*ACLEntry
 }
@@ -58,7 +71,19 @@ func NewAuthorizer(ldap *LDAPConfig, canoe CanoeClient, acl []*ACLEntry) (Author
 			return nil, fmt.Errorf("ACL entry is invalid: %+v", e)
 		}
 	}
-	return &ldapAuthorizer{ldap, canoe, acl}, nil
+	var cfg *tls.Config
+	if len(ldap.CACert) != 0 {
+		host, _, err := net.SplitHostPort(ldap.Addr)
+		if err != nil {
+			return nil, err
+		}
+		cfg = &tls.Config{ServerName: host}
+		cfg.RootCAs = x509.NewCertPool()
+		if !cfg.RootCAs.AppendCertsFromPEM(ldap.CACert) {
+			return nil, errors.New("could not load TLS certificate")
+		}
+	}
+	return &ldapAuthorizer{ldap, cfg, canoe, acl}, nil
 }
 
 func (a *ldapAuthorizer) Authorize(ctx context.Context, req *RPC, email string) error {
@@ -109,15 +134,19 @@ func (a *ldapAuthorizer) Authorize(ctx context.Context, req *RPC, email string) 
 }
 
 func (a *ldapAuthorizer) getLDAPUserGroups(email string) ([]string, error) {
-	var conn *ldap.Conn
 	c, err := net.DialTimeout("tcp", a.ldap.Addr, ldapTimeout)
 	if err != nil {
 		return nil, err
 	}
 	defer func() { _ = c.Close() }()
-	conn = ldap.NewConn(c, false)
+	conn := ldap.NewConn(c, false)
 	conn.SetTimeout(ldapTimeout)
 	conn.Start()
+	if a.tls != nil {
+		if err := conn.StartTLS(a.tls); err != nil {
+			return nil, err
+		}
+	}
 	defer conn.Close()
 	if err := conn.Bind("", ""); err != nil {
 		return nil, err
@@ -182,4 +211,39 @@ func authenticatePhone(canoeAPI CanoeClient, email, action string) error {
 		return errors.New(resp.Payload.Message)
 	}
 	return nil
+}
+
+func (i *Interceptor) UnaryServerInterceptor(ctx context.Context, in interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+	p := strings.Split(info.FullMethod, "/")
+	if len(p) != 3 || p[0] != "" || p[1] == "" || p[2] == "" {
+		return nil, errors.New("invalid RPC request")
+	}
+	pp := strings.Split(p[1], ".")
+	if len(pp) != 2 || pp[0] == "" || pp[1] == "" {
+		return nil, errors.New("invalid RPC request")
+	}
+	call := &RPC{Package: pp[0], Service: pp[1], Method: p[2]}
+	if err := i.Authorize(ctx, call, emailFromContext(ctx)); err != nil {
+		return nil, err
+	}
+	return handler(ctx, in)
+}
+
+// userEmailKey is the key that's injected into the gRPC metadata, containing
+// the email of the user that made the request.
+const userEmailKey = "user_email"
+
+func emailFromContext(ctx context.Context) string {
+	md, ok := metadata.FromContext(ctx)
+	if !ok {
+		return ""
+	}
+	v, ok := md[userEmailKey]
+	if !ok {
+		return ""
+	}
+	if len(v) != 1 {
+		return ""
+	}
+	return v[0]
 }

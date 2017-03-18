@@ -28,11 +28,12 @@ type ChatMessageHandler func(*ChatMessage) error
 
 // ChatCommand is a RPC request sent as a chat message
 type ChatCommand struct {
-	Package string
-	Service string
-	Method  string
-	Args    map[string]string
-	RoomID  int
+	Package   string
+	Service   string
+	Method    string
+	Args      map[string]string
+	RoomID    int
+	UserEmail string
 }
 
 // A ChatMessage is a chat message sent by a User to a Room.
@@ -64,15 +65,24 @@ func LogHandler(logger Logger) ChatMessageHandler {
 	}
 }
 
-func ChatCommandHandler(c chan<- *ChatCommand) ChatMessageHandler {
+func ChatCommandHandler(defaultPackage string, c chan<- *ChatCommand) ChatMessageHandler {
 	return func(msg *ChatMessage) error {
 		if msg == nil || msg.Text == "" {
 			return nil
+		}
+		if msg.Room == nil {
+			return errors.New("chat message does not have a room")
+		}
+		if msg.User == nil || msg.User.Email == "" {
+			return errors.New("chat message does not have a user")
 		}
 		cmd := findChatCommand(msg.Text)
 		if cmd == nil {
 			return fmt.Errorf("no command found in message: %s", msg.Text)
 		}
+		cmd.RoomID = msg.Room.ID
+		cmd.UserEmail = msg.User.Email
+		cmd.Package = defaultPackage
 		c <- cmd
 		return nil
 	}
@@ -110,9 +120,15 @@ func HandleChatRPCCommand(client operatorhipchat.Client, invoker ChatCommandInvo
 	}
 
 	ctx, cancel := context.WithTimeout(
-		// Inject the room ID into the context so that RPC handlers can send
-		// notifications to the room of origin.
-		metadata.NewContext(context.TODO(), metadata.Pairs(hipchatRoomIDKey, strconv.Itoa(cmd.RoomID))),
+		metadata.NewContext(
+			context.TODO(),
+			metadata.Pairs(
+				hipchatRoomIDKey,
+				strconv.Itoa(cmd.RoomID),
+				userEmailKey,
+				cmd.UserEmail,
+			),
+		),
 		timeout,
 	)
 	defer cancel()
@@ -174,8 +190,21 @@ func findChatCommand(msg string) *ChatCommand {
 		})
 	}
 	return &ChatCommand{
-		Service: matches[1],
-		Method:  matches[2],
+		Service: camelize(matches[1], "-"),
+		Method:  camelize(matches[2], "-"),
 		Args:    args,
 	}
+}
+
+func camelize(s string, sep string) string {
+	var result string
+	words := strings.Split(s, sep)
+	for _, word := range words {
+		if len(word) > 0 {
+			w := []rune(word)
+			w[0] = unicode.ToUpper(w[0])
+			result += string(w)
+		}
+	}
+	return result
 }
