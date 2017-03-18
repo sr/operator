@@ -6,14 +6,12 @@ import com.atlassian.bamboo.utils.ConfigUtils;
 import com.pardot.bread.bambooplugin.repository.GithubEnterpriseRepository;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.log4j.Logger;
-import org.springframework.stereotype.Component;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 @Path("/linkedrepos")
-@Component
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class LinkedRepositoryResource {

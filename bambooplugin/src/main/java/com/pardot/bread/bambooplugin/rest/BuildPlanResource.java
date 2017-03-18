@@ -31,7 +31,6 @@ import com.pardot.bread.bambooplugin.trigger.GithubWebhookTriggerConfigurator;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.springframework.stereotype.Component;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -40,7 +39,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 @Path("/buildplans")
-@Component
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class BuildPlanResource {
