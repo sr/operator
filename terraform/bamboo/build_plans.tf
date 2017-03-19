@@ -231,7 +231,7 @@ resource "bamboo_build_plan" "PDT-SPAT" {
   key                   = "PDT-SPAT"
   name                  = "Salesforce Package Automation Test"
   description           = "Automation tests of the Salesforce Package"
-  default_repository_id = "${bamboo_repository.salesforce-package.id}"
+  default_repository_id = "${bamboo_repository.pardot.id}"
 }
 
 resource "bamboo_build_plan" "PDT-SDP" {
