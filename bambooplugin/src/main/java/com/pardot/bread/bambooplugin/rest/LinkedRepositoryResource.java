@@ -54,6 +54,7 @@ public class LinkedRepositoryResource {
         public String branch;
         public String repository;
         public boolean shallowClones;
+        public boolean useSubmodules;
     }
 
     static class RepositoryResponse {
@@ -62,6 +63,7 @@ public class LinkedRepositoryResource {
         public String branch;
         public String repository;
         public boolean shallowClones;
+        public boolean useSubmodules;
 
         public static RepositoryResponse newFromRepositoryData(final PartialVcsRepositoryData data) {
             RepositoryResponse information = new RepositoryResponse();
@@ -72,6 +74,7 @@ public class LinkedRepositoryResource {
             information.branch = buildConfiguration.getString(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_BRANCH, null);
             information.repository = buildConfiguration.getString(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_REPOSITORY, null);
             information.shallowClones = buildConfiguration.getBoolean(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_USE_SHALLOW_CLONES, false);
+            information.useSubmodules = buildConfiguration.getBoolean(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_USE_SUBMODULES, false);
             return information;
         }
     }
@@ -162,8 +165,8 @@ public class LinkedRepositoryResource {
        configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_USE_SHALLOW_CLONES, request.shallowClones);
        configuration.setProperty("repository.github.useShallowClones", request.shallowClones);
        configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_USE_REMOTE_AGENT_CACHE, false);
-       configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_USE_SUBMODULES, true);
-       configuration.setProperty("repository.github.useSubmodules", true);
+       configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_USE_SUBMODULES, request.useSubmodules);
+       configuration.setProperty("repository.github.useSubmodules", request.useSubmodules);
        configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_VERBOSE_LOGS, false);
        configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_FETCH_WHOLE_REPOSITORY, false);
        configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_COMMAND_TIMEOUT, String.valueOf(GithubEnterpriseRepository.DEFAULT_COMMAND_TIMEOUT_IN_MINUTES));

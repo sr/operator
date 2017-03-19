@@ -11,6 +11,7 @@ import com.atlassian.bamboo.deletion.DeletionService;
 import com.atlassian.bamboo.event.BuildConfigurationUpdatedEvent;
 import com.atlassian.bamboo.fieldvalue.BuildDefinitionConverter;
 import com.atlassian.bamboo.plan.*;
+import com.atlassian.bamboo.plan.branch.BranchIntegrationConfiguration;
 import com.atlassian.bamboo.plan.branch.BranchIntegrationConfigurationImpl;
 import com.atlassian.bamboo.plan.branch.BranchMonitoringConfiguration;
 import com.atlassian.bamboo.plan.cache.CachedPlanManager;
@@ -126,6 +127,10 @@ public class BuildPlanResource {
         public String name;
         public String description;
         public long defaultRepositoryId;
+
+        public int removedBranchCleanupDays;
+        public int inactiveBranchCleanupDays;
+        public boolean automaticMergingEnabled;
     }
 
     static class PlanInformation {
@@ -134,7 +139,11 @@ public class BuildPlanResource {
         public String description;
         public long defaultRepositoryId;
 
-        public static PlanInformation newFromPlan(ImmutablePlan plan) {
+        public int removedBranchCleanupDays;
+        public int inactiveBranchCleanupDays;
+        public boolean automaticMergingEnabled;
+
+        public static PlanInformation newFromPlan(final ImmutablePlan plan, final BuildDefinition buildDefinition) {
             PlanInformation information = new PlanInformation();
             information.key = plan.getPlanKey().toString();
             information.name = plan.getBuildName();
@@ -150,6 +159,21 @@ public class BuildPlanResource {
                 }
             }
 
+            final BranchMonitoringConfiguration branchMonitoringConfiguration = buildDefinition.getBranchMonitoringConfiguration();
+            if (branchMonitoringConfiguration.isRemovedBranchCleanUpEnabled()) {
+                information.removedBranchCleanupDays = branchMonitoringConfiguration.getRemovedBranchCleanUpPeriodInDays();
+            } else {
+                information.removedBranchCleanupDays = -1;
+            }
+            if (branchMonitoringConfiguration.isInactiveBranchCleanUpEnabled()) {
+                information.inactiveBranchCleanupDays = branchMonitoringConfiguration.getInactiveBranchCleanUpPeriodInDays();
+            } else {
+                information.inactiveBranchCleanupDays = -1;
+            }
+
+            final BranchIntegrationConfiguration integrationConfiguration = branchMonitoringConfiguration.getDefaultBranchIntegrationConfiguration();
+            information.automaticMergingEnabled = integrationConfiguration.isEnabled();
+
             return information;
         }
     }
@@ -157,12 +181,13 @@ public class BuildPlanResource {
     @GET
     @Path("/{key}")
     public Response get(@PathParam("key") final String key) {
-        final ImmutablePlan plan = cachedPlanManager.getPlanByKey(PlanKeys.getPlanKey(key));
+        final Plan plan = planManager.getPlanByKey(PlanKeys.getPlanKey(key));
         if (plan == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
 
-        PlanInformation information = PlanInformation.newFromPlan(plan);
+        BuildDefinition buildDefinition = buildDefinitionManager.getBuildDefinition(plan);
+        PlanInformation information = PlanInformation.newFromPlan(plan, buildDefinition);
         return Response.ok(information).build();
     }
 
@@ -201,10 +226,15 @@ public class BuildPlanResource {
         createDefaultTask(planKey, jobKey);
         setupWebhookTrigger(planKey, defaultRepositoryDefinition);
         setupDailyPoll(planKey, defaultRepositoryDefinition);
-        configureBranchManagement(planKey);
+
+        BuildDefinition buildDefinition = buildDefinitionManager.getBuildDefinition(plan);
+        configureBranchManagement(buildDefinition, planRequest);
+        buildDefinitionManager.savePlanAndDefinition(plan, buildDefinition);
+
+        eventPublisher.publish(new BuildConfigurationUpdatedEvent(this, plan.getPlanKey()));
         dashboardCachingManager.updatePlanCache(PlanKeys.getPlanKey(planKey));
 
-        PlanInformation information = PlanInformation.newFromPlan(plan);
+        PlanInformation information = PlanInformation.newFromPlan(plan, buildDefinition);
         return Response.ok(information)
                 .status(Response.Status.CREATED)
                 .build();
@@ -213,7 +243,7 @@ public class BuildPlanResource {
     @PUT
     @Path("/{key}")
     public Response update(@PathParam("key") final String key, final PlanRequest planRequest) {
-        final Plan plan = planManager.getPlanByKey(PlanKeys.getPlanKey(key));
+        final Plan plan = planManager.getPlanByKey(key);
         if (plan == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
@@ -227,10 +257,14 @@ public class BuildPlanResource {
         plan.setDescription(planRequest.description);
         // TODO(alindeman): changing defaultRepositoryId is not implemented
 
-        planManager.savePlan(plan);
-        dashboardCachingManager.updatePlanCache(plan.getPlanKey());
+        BuildDefinition buildDefinition = buildDefinitionManager.getBuildDefinition(plan);
+        configureBranchManagement(buildDefinition, planRequest);
+        buildDefinitionManager.savePlanAndDefinition(plan, buildDefinition);
 
-        PlanInformation information = PlanInformation.newFromPlan(plan);
+        eventPublisher.publish(new BuildConfigurationUpdatedEvent(this, plan.getPlanKey()));
+        dashboardCachingManager.updatePlanCache(PlanKeys.getPlanKey(key));
+
+        PlanInformation information = PlanInformation.newFromPlan(plan, buildDefinition);
         return Response.ok(information).build();
     }
 
@@ -348,31 +382,37 @@ public class BuildPlanResource {
         );
     }
 
-    private void configureBranchManagement(final String planKey) {
-        Plan plan = planManager.getPlanByKey(PlanKeys.getPlanKey(planKey));
-        BuildDefinition buildDefinition = buildDefinitionManager.getBuildDefinition(plan.getPlanKey());
-
+    private void configureBranchManagement(final BuildDefinition buildDefinition, final PlanRequest request) {
         BranchMonitoringConfiguration branchMonitoringConfiguration = buildDefinition.getBranchMonitoringConfiguration();
         branchMonitoringConfiguration.setPlanBranchCreationEnabled(true);
         branchMonitoringConfiguration.setMatchingPattern(StringUtils.EMPTY);
-        branchMonitoringConfiguration.setRemovedBranchCleanUpEnabled(true);
-        branchMonitoringConfiguration.setRemovedBranchCleanUpPeriodInDays(BranchMonitoringConfiguration.DEFAULT_REMOVED_BRANCH_CLEAN_UP_PERIOD);
-        branchMonitoringConfiguration.setInactiveBranchCleanUpEnabled(true);
-        branchMonitoringConfiguration.setInactiveBranchCleanUpPeriodInDays(30);
+        if (request.removedBranchCleanupDays >= 0) {
+            branchMonitoringConfiguration.setRemovedBranchCleanUpEnabled(true);
+            branchMonitoringConfiguration.setRemovedBranchCleanUpPeriodInDays(request.removedBranchCleanupDays);
+        } else {
+            branchMonitoringConfiguration.setRemovedBranchCleanUpEnabled(false);
+        }
+        if (request.inactiveBranchCleanupDays >= 0) {
+            branchMonitoringConfiguration.setInactiveBranchCleanUpEnabled(true);
+            branchMonitoringConfiguration.setInactiveBranchCleanUpPeriodInDays(request.inactiveBranchCleanupDays);
+        } else {
+            branchMonitoringConfiguration.setInactiveBranchCleanUpEnabled(false);
+        }
 
         HierarchicalConfiguration integrationConfiguration = new HierarchicalConfiguration();
-        integrationConfiguration.setProperty("branches.defaultBranchIntegration.enabled", "true");
-        integrationConfiguration.setProperty("branches.defaultBranchIntegration.strategy", "BRANCH_UPDATER");
-        integrationConfiguration.setProperty("branches.defaultBranchIntegration.branchUpdater.mergeFromBranch", planKey);
-        integrationConfiguration.setProperty("branches.defaultBranchIntegration.branchUpdater.pushEnabled", "true");
+        if (request.automaticMergingEnabled) {
+            integrationConfiguration.setProperty("branches.defaultBranchIntegration.enabled", "true");
+            integrationConfiguration.setProperty("branches.defaultBranchIntegration.strategy", "BRANCH_UPDATER");
+            integrationConfiguration.setProperty("branches.defaultBranchIntegration.branchUpdater.mergeFromBranch", request.key);
+            integrationConfiguration.setProperty("branches.defaultBranchIntegration.branchUpdater.pushEnabled", "true");
+        } else {
+            integrationConfiguration.setProperty("branches.defaultBranchIntegration.enabled", "false");
+        }
         branchMonitoringConfiguration.setDefaultBranchIntegrationConfiguration(
                 BuildDefinitionConverter.populate(
                         integrationConfiguration,
                         new BranchIntegrationConfigurationImpl(true)
                 )
         );
-
-        buildDefinitionManager.savePlanAndDefinition(plan, buildDefinition);
-        eventPublisher.publish(new BuildConfigurationUpdatedEvent(this, plan.getPlanKey()));
     }
 }
