@@ -142,7 +142,12 @@ public class BuildPlanResource {
 
             PlanRepositoryDefinition planRepositoryDefinition = PlanHelper.getDefaultPlanRepositoryDefinition(plan);
             if (planRepositoryDefinition != null) {
-                information.defaultRepositoryId = planRepositoryDefinition.getId();
+                // Linked repositories get unique IDs, but are linked to the parent. The parent is all we care about.
+                if (planRepositoryDefinition.getParentId() != null) {
+                    information.defaultRepositoryId = planRepositoryDefinition.getParentId();
+                } else {
+                    information.defaultRepositoryId = planRepositoryDefinition.getId();
+                }
             }
 
             return information;
