@@ -131,6 +131,7 @@ public class BuildPlanResource {
         public int removedBranchCleanupDays;
         public int inactiveBranchCleanupDays;
         public boolean automaticMergingEnabled;
+        public boolean automaticBranchCreationEnabled;
     }
 
     static class PlanInformation {
@@ -142,6 +143,7 @@ public class BuildPlanResource {
         public int removedBranchCleanupDays;
         public int inactiveBranchCleanupDays;
         public boolean automaticMergingEnabled;
+        public boolean automaticBranchCreationEnabled;
 
         public static PlanInformation newFromPlan(final ImmutablePlan plan, final BuildDefinition buildDefinition) {
             PlanInformation information = new PlanInformation();
@@ -160,6 +162,7 @@ public class BuildPlanResource {
             }
 
             final BranchMonitoringConfiguration branchMonitoringConfiguration = buildDefinition.getBranchMonitoringConfiguration();
+            information.automaticBranchCreationEnabled = branchMonitoringConfiguration.isPlanBranchCreationEnabled();
             if (branchMonitoringConfiguration.isRemovedBranchCleanUpEnabled()) {
                 information.removedBranchCleanupDays = branchMonitoringConfiguration.getRemovedBranchCleanUpPeriodInDays();
             } else {
@@ -384,7 +387,7 @@ public class BuildPlanResource {
 
     private void configureBranchManagement(final BuildDefinition buildDefinition, final PlanRequest request) {
         BranchMonitoringConfiguration branchMonitoringConfiguration = buildDefinition.getBranchMonitoringConfiguration();
-        branchMonitoringConfiguration.setPlanBranchCreationEnabled(true);
+        branchMonitoringConfiguration.setPlanBranchCreationEnabled(request.automaticBranchCreationEnabled);
         branchMonitoringConfiguration.setMatchingPattern(StringUtils.EMPTY);
         if (request.removedBranchCleanupDays >= 0) {
             branchMonitoringConfiguration.setRemovedBranchCleanUpEnabled(true);
