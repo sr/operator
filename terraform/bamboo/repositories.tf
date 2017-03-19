@@ -37,6 +37,7 @@ resource "bamboo_repository" "bread" {
   password       = "${var.bamboo_git_password}"
   repository     = "Pardot/bread"
   shallow_clones = false
+  use_submodules = false
 }
 
 resource "bamboo_repository" "chef" {
@@ -229,6 +230,7 @@ resource "bamboo_repository" "vagrant-dev" {
   password       = "${var.bamboo_git_password}"
   repository     = "Pardot/vagrant-dev"
   shallow_clones = true
+  use_submodules = false
 }
 
 resource "bamboo_repository" "symfony" {
