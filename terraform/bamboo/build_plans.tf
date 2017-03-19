@@ -1,8 +1,9 @@
 resource "bamboo_build_plan" "BREAD-WAMJ" {
-  key                   = "BREAD-WAMJ"
-  name                  = "Artifactory Management Jobs"
-  description           = "The jobs that keep artifactory clean and lean"
-  default_repository_id = "${bamboo_repository.bamboo-configuration.id}"
+  key                       = "BREAD-WAMJ"
+  name                      = "Artifactory Management Jobs"
+  description               = "The jobs that keep artifactory clean and lean"
+  default_repository_id     = "${bamboo_repository.bamboo-configuration.id}"
+  automatic_merging_enabled = false
 }
 
 resource "bamboo_build_plan" "BREAD-BREAD" {
@@ -18,9 +19,10 @@ resource "bamboo_build_plan" "BREAD-CHEF" {
 }
 
 resource "bamboo_build_plan" "BREAD-DJ" {
-  key                   = "BREAD-DJ"
-  name                  = "dailyjob"
-  default_repository_id = "${bamboo_repository.bread.id}"
+  key                       = "BREAD-DJ"
+  name                      = "dailyjob"
+  default_repository_id     = "${bamboo_repository.bread.id}"
+  automatic_merging_enabled = false
 }
 
 resource "bamboo_build_plan" "BREAD-DBI" {
@@ -30,9 +32,10 @@ resource "bamboo_build_plan" "BREAD-DBI" {
 }
 
 resource "bamboo_build_plan" "BREAD-GITCLEAN" {
-  key                   = "BREAD-GITCLEAN"
-  name                  = "Git Cleanup"
-  default_repository_id = "${bamboo_repository.bamboo-configuration.id}"
+  key                       = "BREAD-GITCLEAN"
+  name                      = "Git Cleanup"
+  default_repository_id     = "${bamboo_repository.bamboo-configuration.id}"
+  automatic_merging_enabled = false
 }
 
 resource "bamboo_build_plan" "BREAD-INTAPI" {
@@ -54,9 +57,10 @@ resource "bamboo_build_plan" "BREAD-REPFIX" {
 }
 
 resource "bamboo_build_plan" "PDT-PPANTCLONE666" {
-  key                   = "PDT-PPANTCLONE666"
-  name                  = "AB Email Combinatorial Tests"
-  default_repository_id = "${bamboo_repository.pardot.id}"
+  key                       = "PDT-PPANTCLONE666"
+  name                      = "AB Email Combinatorial Tests"
+  default_repository_id     = "${bamboo_repository.pardot.id}"
+  automatic_merging_enabled = false
 }
 
 resource "bamboo_build_plan" "PDT-BLUMSH" {
@@ -78,37 +82,42 @@ resource "bamboo_build_plan" "PDT-EHT" {
 }
 
 resource "bamboo_build_plan" "PDT-ESF" {
-  key                   = "PDT-ESF"
-  name                  = "Engagement Studio Frontend"
-  description           = "Frontend build for Engagement Studio"
-  default_repository_id = "${bamboo_repository.engagement-studio.id}"
+  key                       = "PDT-ESF"
+  name                      = "Engagement Studio Frontend"
+  description               = "Frontend build for Engagement Studio"
+  default_repository_id     = "${bamboo_repository.engagement-studio.id}"
+  automatic_merging_enabled = false
 }
 
 resource "bamboo_build_plan" "PDT-PPANTCLONE6666" {
-  key                   = "PDT-PPANTCLONE6666"
-  name                  = "List Email Combinatorial Tests"
-  default_repository_id = "${bamboo_repository.pardot.id}"
+  key                       = "PDT-PPANTCLONE6666"
+  name                      = "List Email Combinatorial Tests"
+  default_repository_id     = "${bamboo_repository.pardot.id}"
+  automatic_merging_enabled = false
 }
 
 resource "bamboo_build_plan" "PDT-JOS" {
-  key                   = "PDT-JOS"
-  name                  = "Merge Master (Team Athena)"
-  description           = "Merges master branch changes into team Athenas integration branch"
-  default_repository_id = "${bamboo_repository.pardot.id}"
+  key                       = "PDT-JOS"
+  name                      = "Merge Master (Team Athena)"
+  description               = "Merges master branch changes into team Athenas integration branch"
+  default_repository_id     = "${bamboo_repository.pardot.id}"
+  automatic_merging_enabled = false
 }
 
 resource "bamboo_build_plan" "PDT-TH" {
-  key                   = "PDT-TH"
-  name                  = "Merge Master (Team Hephaestus)"
-  description           = "Merges master branch changes into team Hephaestus integration branch"
-  default_repository_id = "${bamboo_repository.pardot.id}"
+  key                       = "PDT-TH"
+  name                      = "Merge Master (Team Hephaestus)"
+  description               = "Merges master branch changes into team Hephaestus integration branch"
+  default_repository_id     = "${bamboo_repository.pardot.id}"
+  automatic_merging_enabled = false
 }
 
 resource "bamboo_build_plan" "PDT-MMTP" {
-  key                   = "PDT-MMTP"
-  name                  = "Merge Master (Team Poseidon)"
-  description           = "Auto merges Salesforce Managed Package into Team Poseidon Integration Branch"
-  default_repository_id = "${bamboo_repository.salesforce-package.id}"
+  key                       = "PDT-MMTP"
+  name                      = "Merge Master (Team Poseidon)"
+  description               = "Auto merges Salesforce Managed Package into Team Poseidon Integration Branch"
+  default_repository_id     = "${bamboo_repository.salesforce-package.id}"
+  automatic_merging_enabled = false
 }
 
 resource "bamboo_build_plan" "PDT-MDOC" {
@@ -137,16 +146,18 @@ resource "bamboo_build_plan" "PDTS-SEHP" {
 }
 
 resource "bamboo_build_plan" "PDTS-SMP" {
-  key                   = "PDTS-SMP"
-  name                  = "Salesforce Managed Package"
-  default_repository_id = "${bamboo_repository.salesforce-package.id}"
+  key                       = "PDTS-SMP"
+  name                      = "Salesforce Managed Package"
+  default_repository_id     = "${bamboo_repository.salesforce-package.id}"
+  automatic_merging_enabled = false
 }
 
 resource "bamboo_build_plan" "PDTS-SDODP" {
-  key                   = "PDTS-SDODP"
-  name                  = "SDO Demo PKG"
-  description           = "BUILD the GMP or SDO Demo package"
-  default_repository_id = "${bamboo_repository.pardot-demo-org-visualforce.id}"
+  key                       = "PDTS-SDODP"
+  name                      = "SDO Demo PKG"
+  description               = "BUILD the GMP or SDO Demo package"
+  default_repository_id     = "${bamboo_repository.pardot-demo-org-visualforce.id}"
+  automatic_merging_enabled = false
 }
 
 resource "bamboo_build_plan" "SRE-ANSBL" {
@@ -214,23 +225,26 @@ resource "bamboo_build_plan" "PDT-RMUX" {
 }
 
 resource "bamboo_build_plan" "PDT-TSIT" {
-  key                   = "PDT-TSIT"
-  name                  = "Salesforce Integration Tests"
-  description           = "This runs full end to end integration tests."
-  default_repository_id = "${bamboo_repository.pardot.id}"
+  key                       = "PDT-TSIT"
+  name                      = "Salesforce Integration Tests"
+  description               = "This runs full end to end integration tests."
+  default_repository_id     = "${bamboo_repository.pardot.id}"
+  automatic_merging_enabled = false
 }
 
 resource "bamboo_build_plan" "PDT-SPAT" {
-  key                   = "PDT-SPAT"
-  name                  = "Salesforce Package Automation Test"
-  description           = "Automation tests of the Salesforce Package"
-  default_repository_id = "${bamboo_repository.pardot.id}"
+  key                       = "PDT-SPAT"
+  name                      = "Salesforce Package Automation Test"
+  description               = "Automation tests of the Salesforce Package"
+  default_repository_id     = "${bamboo_repository.pardot.id}"
+  automatic_merging_enabled = false
 }
 
 resource "bamboo_build_plan" "PDT-SDP" {
-  key                   = "PDT-SDP"
-  name                  = "SDO Demo Package"
-  default_repository_id = "${bamboo_repository.pardot-demo-org-visualforce.id}"
+  key                       = "PDT-SDP"
+  name                      = "SDO Demo Package"
+  default_repository_id     = "${bamboo_repository.pardot-demo-org-visualforce.id}"
+  automatic_merging_enabled = false
 }
 
 resource "bamboo_build_plan" "PDT-VAGRANT" {
@@ -240,9 +254,10 @@ resource "bamboo_build_plan" "PDT-VAGRANT" {
 }
 
 resource "bamboo_build_plan" "PDT-WPMM" {
-  key                   = "PDT-WPMM"
-  name                  = "WebDriver - Testbed"
-  default_repository_id = "${bamboo_repository.pardot.id}"
+  key                       = "PDT-WPMM"
+  name                      = "WebDriver - Testbed"
+  default_repository_id     = "${bamboo_repository.pardot.id}"
+  automatic_merging_enabled = false
 }
 
 resource "bamboo_build_plan" "PDT-WFST" {
