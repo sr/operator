@@ -182,13 +182,6 @@ resource "bamboo_build_plan" "PDT-STORM" {
   default_repository_id = "${bamboo_repository.pardot-storm.id}"
 }
 
-resource "bamboo_build_plan" "PDT-PHPCS" {
-  key                   = "PDT-PHPCS"
-  name                  = "PHP 7 CodeSniffer"
-  description           = "Run the PHP_CodeSniffer report against the commit"
-  default_repository_id = "${bamboo_repository.pardot.id}"
-}
-
 resource "bamboo_build_plan" "PDT-PTHMBS" {
   key                   = "PDT-PTHMBS"
   name                  = "PiThumbs"
