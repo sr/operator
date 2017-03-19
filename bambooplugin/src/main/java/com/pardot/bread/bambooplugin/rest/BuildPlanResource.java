@@ -24,6 +24,8 @@ import com.atlassian.bamboo.trigger.TriggerDefinition;
 import com.atlassian.bamboo.trigger.TriggerModuleDescriptor;
 import com.atlassian.bamboo.trigger.TriggerTypeManager;
 import com.atlassian.bamboo.trigger.polling.PollingTriggerConfigurationConstants;
+import com.atlassian.bamboo.vcs.configuration.PartialVcsRepositoryData;
+import com.atlassian.bamboo.vcs.configuration.PlanRepositoryDefinition;
 import com.atlassian.bamboo.webwork.util.ActionParametersMapImpl;
 import com.atlassian.bamboo.ww2.actions.build.admin.create.BuildConfiguration;
 import com.atlassian.event.api.EventPublisher;
@@ -138,9 +140,9 @@ public class BuildPlanResource {
             information.name = plan.getBuildName();
             information.description = plan.getDescription();
 
-            RepositoryDefinition repositoryDefinition = PlanHelper.getDefaultRepositoryDefinition(plan);
-            if (repositoryDefinition != null) {
-                information.defaultRepositoryId = repositoryDefinition.getId();
+            PlanRepositoryDefinition planRepositoryDefinition = PlanHelper.getDefaultPlanRepositoryDefinition(plan);
+            if (planRepositoryDefinition != null) {
+                information.defaultRepositoryId = planRepositoryDefinition.getId();
             }
 
             return information;
@@ -161,15 +163,14 @@ public class BuildPlanResource {
 
     @POST
     public Response create(final PlanRequest planRequest) {
-        final RepositoryDataEntity repositoryDataEntity = repositoryDefinitionManager.getRepositoryDataEntity(planRequest.defaultRepositoryId);
-        if (repositoryDataEntity == null) {
+        final PartialVcsRepositoryData vcsRepositoryData = repositoryDefinitionManager.getVcsRepositoryDataForEditing(planRequest.defaultRepositoryId);
+        if (vcsRepositoryData == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        final RepositoryData repositoryData = new RepositoryDataImpl(repositoryDataEntity);
 
         String planKey;
         try {
-            planKey = createPlan(planRequest, repositoryData);
+            planKey = createPlan(planRequest, vcsRepositoryData);
         } catch (PlanCreationDeniedException e) {
             log.error("permission denied while creating plan", e);
             return Response.status(Response.Status.FORBIDDEN).build();
@@ -190,8 +191,8 @@ public class BuildPlanResource {
         }
 
         createDefaultTask(planKey, jobKey);
-        setupWebhookTrigger(planKey, repositoryData);
-        setupDailyPoll(planKey, repositoryData);
+        setupWebhookTrigger(planKey, vcsRepositoryData);
+        setupDailyPoll(planKey, vcsRepositoryData);
         configureBranchManagement(planKey);
         dashboardCachingManager.updatePlanCache(PlanKeys.getPlanKey(planKey));
 
@@ -210,11 +211,10 @@ public class BuildPlanResource {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
 
-        final RepositoryDataEntity repositoryDataEntity = repositoryDefinitionManager.getRepositoryDataEntity(planRequest.defaultRepositoryId);
-        if (repositoryDataEntity == null) {
+        final PartialVcsRepositoryData vcsRepositoryData = repositoryDefinitionManager.getVcsRepositoryDataForEditing(planRequest.defaultRepositoryId);
+        if (vcsRepositoryData == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        final RepositoryData repositoryData = new RepositoryDataImpl(repositoryDataEntity);
 
         plan.setBuildName(planRequest.name);
         plan.setDescription(planRequest.description);
@@ -239,17 +239,17 @@ public class BuildPlanResource {
         return Response.noContent().build();
     }
 
-    private String createPlan(final PlanRequest planRequest, final RepositoryData repositoryData) throws PlanCreationDeniedException {
+    private String createPlan(final PlanRequest planRequest, final PartialVcsRepositoryData vcsRepositoryData) throws PlanCreationDeniedException {
         HashMap<String,String> configuration = new HashMap<>();
         configuration.put("existingProjectKey", PlanKeys.getProjectKeyPart(PlanKeys.getPlanKey(planRequest.key)));
         configuration.put("chainName", planRequest.name);
         configuration.put("chainKey", PlanKeys.getPlanKeyPart(PlanKeys.getPlanKey(planRequest.key)));
         configuration.put("chainDescription", planRequest.description);
-        configuration.put("selectedRepository", Long.toString(repositoryData.getId()));
+        configuration.put("selectedRepository", Long.toString(vcsRepositoryData.getId()));
         configuration.put("repositoryTypeOption", "LINKED");
 
         BuildConfiguration buildConfiguration = new BuildConfiguration();
-        buildConfiguration.setProperty("selectedRepository", Long.toString(repositoryData.getId()));
+        buildConfiguration.setProperty("selectedRepository", Long.toString(vcsRepositoryData.getId()));
 
         return chainCreationService.createPlan(
                 buildConfiguration,
@@ -300,11 +300,11 @@ public class BuildPlanResource {
         );
     }
 
-    private TriggerDefinition setupWebhookTrigger(final String planKey, final RepositoryData repositoryData) {
+    private TriggerDefinition setupWebhookTrigger(final String planKey, final PartialVcsRepositoryData vcsRepositoryData) {
         TriggerModuleDescriptor triggerDescriptor = triggerTypeManager.getTriggerDescriptor(githubWebhookTriggerKey);
 
         HashSet<Long> triggeringRepositories = new HashSet<>();
-        triggeringRepositories.add(repositoryData.getId());
+        triggeringRepositories.add(vcsRepositoryData.getId());
 
         HashMap<String, String> configuration = new HashMap<>();
 
@@ -319,11 +319,11 @@ public class BuildPlanResource {
             );
     }
 
-    private TriggerDefinition setupDailyPoll(final String planKey, final RepositoryData repositoryData) {
+    private TriggerDefinition setupDailyPoll(final String planKey, final PartialVcsRepositoryData vcsRepositoryData) {
         TriggerModuleDescriptor triggerDescriptor = triggerTypeManager.getTriggerDescriptor(pollTriggerKey);
 
         HashSet<Long> triggeringRepositories = new HashSet<>();
-        triggeringRepositories.add(repositoryData.getId());
+        triggeringRepositories.add(vcsRepositoryData.getId());
 
         HashMap<String, String> configuration = new HashMap<>();
         configuration.put(PollingTriggerConfigurationConstants.POLLING_TYPE, "CRON");
