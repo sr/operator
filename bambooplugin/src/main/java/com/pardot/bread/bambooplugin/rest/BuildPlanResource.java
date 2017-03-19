@@ -168,14 +168,14 @@ public class BuildPlanResource {
 
     @POST
     public Response create(final PlanRequest planRequest) {
-        final PartialVcsRepositoryData vcsRepositoryData = repositoryDefinitionManager.getVcsRepositoryDataForEditing(planRequest.defaultRepositoryId);
-        if (vcsRepositoryData == null) {
+        final PartialVcsRepositoryData parentVcsRepositoryData = repositoryDefinitionManager.getVcsRepositoryDataForEditing(planRequest.defaultRepositoryId);
+        if (parentVcsRepositoryData == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
 
         String planKey;
         try {
-            planKey = createPlan(planRequest, vcsRepositoryData);
+            planKey = createPlan(planRequest, parentVcsRepositoryData);
         } catch (PlanCreationDeniedException e) {
             log.error("permission denied while creating plan", e);
             return Response.status(Response.Status.FORBIDDEN).build();
@@ -195,13 +195,15 @@ public class BuildPlanResource {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
 
+        Plan plan = planManager.getPlanByKey(PlanKeys.getPlanKey(planKey));
+        PlanRepositoryDefinition defaultRepositoryDefinition = PlanHelper.getDefaultPlanRepositoryDefinition(plan);
+
         createDefaultTask(planKey, jobKey);
-        setupWebhookTrigger(planKey, vcsRepositoryData);
-        setupDailyPoll(planKey, vcsRepositoryData);
+        setupWebhookTrigger(planKey, defaultRepositoryDefinition);
+        setupDailyPoll(planKey, defaultRepositoryDefinition);
         configureBranchManagement(planKey);
         dashboardCachingManager.updatePlanCache(PlanKeys.getPlanKey(planKey));
 
-        Plan plan = planManager.getPlanByKey(PlanKeys.getPlanKey(planKey));
         PlanInformation information = PlanInformation.newFromPlan(plan);
         return Response.ok(information)
                 .status(Response.Status.CREATED)
@@ -305,11 +307,11 @@ public class BuildPlanResource {
         );
     }
 
-    private TriggerDefinition setupWebhookTrigger(final String planKey, final PartialVcsRepositoryData vcsRepositoryData) {
+    private TriggerDefinition setupWebhookTrigger(final String planKey, final PlanRepositoryDefinition repositoryDefinition) {
         TriggerModuleDescriptor triggerDescriptor = triggerTypeManager.getTriggerDescriptor(githubWebhookTriggerKey);
 
         HashSet<Long> triggeringRepositories = new HashSet<>();
-        triggeringRepositories.add(vcsRepositoryData.getId());
+        triggeringRepositories.add(repositoryDefinition.getId());
 
         HashMap<String, String> configuration = new HashMap<>();
 
@@ -324,11 +326,11 @@ public class BuildPlanResource {
             );
     }
 
-    private TriggerDefinition setupDailyPoll(final String planKey, final PartialVcsRepositoryData vcsRepositoryData) {
+    private TriggerDefinition setupDailyPoll(final String planKey, final PlanRepositoryDefinition repositoryDefinition) {
         TriggerModuleDescriptor triggerDescriptor = triggerTypeManager.getTriggerDescriptor(pollTriggerKey);
 
         HashSet<Long> triggeringRepositories = new HashSet<>();
-        triggeringRepositories.add(vcsRepositoryData.getId());
+        triggeringRepositories.add(repositoryDefinition.getId());
 
         HashMap<String, String> configuration = new HashMap<>();
         configuration.put(PollingTriggerConfigurationConstants.POLLING_TYPE, "CRON");
@@ -354,7 +356,7 @@ public class BuildPlanResource {
         branchMonitoringConfiguration.setPlanBranchCreationEnabled(true);
         branchMonitoringConfiguration.setMatchingPattern(StringUtils.EMPTY);
         branchMonitoringConfiguration.setRemovedBranchCleanUpEnabled(true);
-        branchMonitoringConfiguration.setRemovedBranchCleanUpPeriodInDays(BranchMonitoringConfiguration.REMOVED_BRANCH_DAILY_CLEAN_UP_PERIOD);
+        branchMonitoringConfiguration.setRemovedBranchCleanUpPeriodInDays(BranchMonitoringConfiguration.DEFAULT_REMOVED_BRANCH_CLEAN_UP_PERIOD);
         branchMonitoringConfiguration.setInactiveBranchCleanUpEnabled(true);
         branchMonitoringConfiguration.setInactiveBranchCleanUpPeriodInDays(30);
 
