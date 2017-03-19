@@ -239,30 +239,10 @@ resource "bamboo_build_plan" "PDT-VAGRANT" {
   default_repository_id = "${bamboo_repository.vagrant-dev.id}"
 }
 
-resource "bamboo_build_plan" "PDT-WT" {
-  key                   = "PDT-WT"
-  name                  = "Webdriver - Full Suite"
-  description           = "This plan runs the Pardot, Engagement Studio, and Salesforce webdriver tests on every push to the ParDriver repo"
-  default_repository_id = "${bamboo_repository.pardot.id}"
-}
-
-resource "bamboo_build_plan" "PDT-WPM" {
-  key                   = "PDT-WPM"
-  name                  = "Webdriver - Grid"
-  description           = "Runs critical tests against Chrome in a local grid"
-  default_repository_id = "${bamboo_repository.pardot.id}"
-}
-
 resource "bamboo_build_plan" "PDT-WPMM" {
   key                   = "PDT-WPMM"
   name                  = "WebDriver - Testbed"
   default_repository_id = "${bamboo_repository.pardot.id}"
-}
-
-resource "bamboo_build_plan" "PDT-WES" {
-  key                   = "PDT-WES"
-  name                  = "Webdriver Engagement Studio"
-  default_repository_id = "${bamboo_repository.engagement-studio.id}"
 }
 
 resource "bamboo_build_plan" "PDT-WFST" {
