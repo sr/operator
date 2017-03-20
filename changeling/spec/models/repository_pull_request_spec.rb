@@ -9,6 +9,10 @@ RSpec.describe RepositoryPullRequest do
       owner: "heroku",
       name: "changeling"
     )
+    @repository.repository_owners_files.create!(
+      path_name: "/#{Repository::OWNERS_FILENAME}",
+      content: "@heroku/boomtown\n"
+    )
     reference_url = format("https://%s/%s/pull/32",
       Changeling.config.github_hostname,
       @repository.full_name
@@ -107,6 +111,11 @@ RSpec.describe RepositoryPullRequest do
       .to_return(body: JSON.dump(comments), headers: { "Content-Type" => "application/json" })
   end
 
+  def stub_github_pull_request_comment_creation
+    stub_request(:post, "#{Changeling.config.github_api_endpoint}/repos/#{@repository.full_name}/issues/#{@repository_pull_request.number}/comments")
+      .to_return(status: 201, body: JSON.dump(id: 1), headers: { "Content-Type": "application/json" })
+  end
+
   def stub_github_pull_request_labels(labels = [])
     stub_request(:get, "https://#{Changeling.config.github_hostname}/api/v3/repos/#{@repository.full_name}/issues/#{@multipass.pull_request_number}/labels")
       .to_return(body: JSON.dump(labels), headers: { "Content-Type" => "application/json" })
@@ -175,6 +184,7 @@ RSpec.describe RepositoryPullRequest do
       stub_github_pull_request_reviews
       stub_github_pull_request_comments
       stub_github_pull_request_labels
+      stub_github_pull_request_comment_creation
       @repository_pull_request.synchronize(create_github_status: false)
 
       expect(@multipass.reload.referenced_ticket).to_not eq(nil)
@@ -192,6 +202,7 @@ RSpec.describe RepositoryPullRequest do
       stub_github_pull_request_reviews
       stub_github_pull_request_comments
       stub_github_pull_request_labels
+      stub_github_pull_request_comment_creation
       @repository_pull_request.synchronize(create_github_status: false)
       expect(@multipass.reload.referenced_ticket).to_not eq(nil)
 
@@ -227,6 +238,7 @@ RSpec.describe RepositoryPullRequest do
       stub_github_pull_request_reviews
       stub_github_pull_request_comments
       stub_github_pull_request_labels
+      stub_github_pull_request_comment_creation
       @repository_pull_request.synchronize(create_github_status: false)
       expect(@multipass.reload.referenced_ticket).to_not eq(nil)
 
@@ -252,6 +264,7 @@ RSpec.describe RepositoryPullRequest do
       stub_github_pull_request_reviews
       stub_github_pull_request_comments
       stub_github_pull_request_labels
+      stub_github_pull_request_comment_creation
       @repository_pull_request.synchronize(create_github_status: false)
       expect(@multipass.reload.referenced_ticket).to_not eq(nil)
 
@@ -267,6 +280,7 @@ RSpec.describe RepositoryPullRequest do
       stub_github_pull_request_reviews
       stub_github_pull_request_comments
       stub_github_pull_request_labels
+      stub_github_pull_request_comment_creation
       @repository_pull_request.synchronize(create_github_status: false)
 
       ticket = @multipass.reload.referenced_ticket
@@ -280,6 +294,7 @@ RSpec.describe RepositoryPullRequest do
       stub_github_pull_request_reviews
       stub_github_pull_request_comments
       stub_github_pull_request_labels
+      stub_github_pull_request_comment_creation
       @repository_pull_request.synchronize(create_github_status: false)
 
       ticket = @multipass.reload.referenced_ticket
@@ -296,6 +311,7 @@ RSpec.describe RepositoryPullRequest do
       stub_github_pull_request_reviews
       stub_github_pull_request_comments
       stub_github_pull_request_labels
+      stub_github_pull_request_comment_creation
       @repository_pull_request.synchronize(create_github_status: false)
 
       expect(@multipass.reload.referenced_ticket).to_not eq(nil)
@@ -326,6 +342,7 @@ RSpec.describe RepositoryPullRequest do
       stub_github_pull_request_reviews
       stub_github_pull_request_comments
       stub_github_pull_request_labels
+      stub_github_pull_request_comment_creation
 
       original_release_id = @multipass.release_id
       @repository_pull_request.synchronize(create_github_status: false)
@@ -344,6 +361,7 @@ RSpec.describe RepositoryPullRequest do
       stub_github_pull_request_reviews
       stub_github_pull_request_comments
       stub_github_pull_request_labels
+      stub_github_pull_request_comment_creation
 
       original_release_id = @multipass.release_id
       @repository_pull_request.synchronize(create_github_status: false)
@@ -368,6 +386,7 @@ RSpec.describe RepositoryPullRequest do
       stub_github_pull_request_reviews
       stub_github_pull_request_comments
       stub_github_pull_request_labels
+      stub_github_pull_request_comment_creation
 
       expect(@multipass.changed_files).to eq([])
       @repository_pull_request.synchronize(create_github_status: false)
@@ -398,6 +417,7 @@ RSpec.describe RepositoryPullRequest do
       stub_github_pull_request_reviews
       stub_github_pull_request_comments
       stub_github_pull_request_labels
+      stub_github_pull_request_comment_creation
       @repository_pull_request.synchronize(create_github_status: false)
 
       expect(RepositoryCommitStatus.count).to eq(1)
@@ -421,6 +441,7 @@ RSpec.describe RepositoryPullRequest do
       stub_github_commit_status(statuses: [])
       stub_github_pull_request_comments
       stub_github_pull_request_labels
+      stub_github_pull_request_comment_creation
 
       config = Bread::RepositoryConfig.new(
         required_testing_statuses: ["ci/travis", "ci/bazel"]
@@ -465,6 +486,7 @@ RSpec.describe RepositoryPullRequest do
       stub_github_pull_request_reviews([])
       stub_github_pull_request_comments
       stub_github_pull_request_labels
+      stub_github_pull_request_comment_creation
       @repository_pull_request.synchronize(create_github_status: false)
 
       expect(@multipass.reload.peer_reviewer).to eq(nil)
@@ -480,6 +502,7 @@ RSpec.describe RepositoryPullRequest do
       ])
       stub_github_pull_request_comments
       stub_github_pull_request_labels
+      stub_github_pull_request_comment_creation
       @repository_pull_request.synchronize(create_github_status: false)
 
       expect(@multipass.reload.peer_reviewer).to eq("alindeman")
@@ -495,6 +518,7 @@ RSpec.describe RepositoryPullRequest do
       ])
       stub_github_pull_request_comments
       stub_github_pull_request_labels
+      stub_github_pull_request_comment_creation
       @repository_pull_request.synchronize(create_github_status: false)
 
       expect(@multipass.reload.peer_reviewer).to eq("sr")
@@ -509,6 +533,7 @@ RSpec.describe RepositoryPullRequest do
       ])
       stub_github_pull_request_comments
       stub_github_pull_request_labels
+      stub_github_pull_request_comment_creation
       @repository_pull_request.synchronize(create_github_status: false)
       expect(@multipass.reload.peer_reviewer).to eq("alindeman")
 
@@ -526,13 +551,14 @@ RSpec.describe RepositoryPullRequest do
       stub_github_pull_request_reviews([])
       stub_github_pull_request_comments
       stub_github_pull_request_labels
+      stub_github_pull_request_comment_creation
       expect(@multipass.reload.peer_reviews).to eq([])
 
       stub_github_pull_request_reviews([
         { github_login: "alindeman", approved: true },
         { github_login: "sr", approved: false }
       ])
-      @repository_pull_request.synchronize
+      @repository_pull_request.synchronize(create_github_status: false)
 
       expect(@multipass.reload.peer_reviews.size).to eq(2)
 
@@ -548,7 +574,7 @@ RSpec.describe RepositoryPullRequest do
         { github_login: "alindeman", approved: true },
         { github_login: "sr", approved: true }
       ])
-      @repository_pull_request.synchronize
+      @repository_pull_request.synchronize(create_github_status: false)
       review = @multipass.reload.peer_reviews.where(reviewer_github_login: "sr").first!
       expect(review.state).to eq(Clients::GitHub::REVIEW_APPROVED)
     end
@@ -562,6 +588,7 @@ RSpec.describe RepositoryPullRequest do
       stub_github_pull_request_reviews
       stub_github_pull_request_comments
       stub_github_pull_request_labels
+      stub_github_pull_request_comment_creation
 
       @repository_pull_request.synchronize(create_github_status: false)
       @multipass.reload
@@ -575,6 +602,7 @@ RSpec.describe RepositoryPullRequest do
       stub_github_pull_request_reviews
       stub_github_pull_request_comments
       stub_github_pull_request_labels
+      stub_github_pull_request_comment_creation
 
       @repository_pull_request.synchronize(create_github_status: false)
       @multipass.reload
@@ -594,6 +622,7 @@ RSpec.describe RepositoryPullRequest do
       ])
       stub_github_commit(sha: "abc123")
       stub_github_pull_request_labels
+      stub_github_pull_request_comment_creation
 
       @repository_pull_request.synchronize(create_github_status: false)
       @multipass.reload
@@ -602,10 +631,9 @@ RSpec.describe RepositoryPullRequest do
 
     it "detects emergency merges" do
       @repository.update!(compliance_enabled: true)
-      @repository.repository_owners_files.create!(
-        path_name: "/#{Repository::OWNERS_FILENAME}",
-        content: "@heroku/bread"
-      )
+      @repository.repository_owners_files
+        .find_by!(path_name: "/#{Repository::OWNERS_FILENAME}")
+        .update!(content: "@heroku/bread")
       stub_organization_teams("heroku", "bread": %w[ys])
       stub_jira_ticket("BREAD-1598")
       stub_jira_ticket_creation("BREAD-emergency")
@@ -642,10 +670,9 @@ RSpec.describe RepositoryPullRequest do
 
   it "updates the github comment describing the status of the PR" do
     @repository.update!(compliance_enabled: true)
-    @repository.repository_owners_files.create!(
-      path_name: "/#{Repository::OWNERS_FILENAME}",
-      content: "@heroku/ops"
-    )
+    @repository.repository_owners_files
+      .find_by!(path_name: "/#{Repository::OWNERS_FILENAME}")
+      .update!(content: "@heroku/ops")
     stub_organization_teams("heroku", "ops": %w[alindeman sr])
     stub_jira_ticket("BREAD-1598")
     stub_github_pull_request(title: "BREAD-1598")
@@ -666,10 +693,9 @@ RSpec.describe RepositoryPullRequest do
 
   it "does not create a github comment if the PR does not affect the default branch" do
     @repository.update!(compliance_enabled: true)
-    @repository.repository_owners_files.create!(
-      path_name: "/#{Repository::OWNERS_FILENAME}",
-      content: "@heroku/ops"
-    )
+    @repository.repository_owners_files
+      .find_by!(path_name: "/#{Repository::OWNERS_FILENAME}")
+      .update!(content: "@heroku/ops")
     stub_organization_teams("heroku", "ops": %w[alindeman sr])
     stub_jira_ticket("BREAD-1598")
     stub_github_pull_request(title: "BREAD-1598", base_ref: "feature-branch")
