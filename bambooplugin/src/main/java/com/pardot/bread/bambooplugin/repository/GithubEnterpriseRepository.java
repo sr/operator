@@ -6,6 +6,9 @@ import com.atlassian.bamboo.plugins.git.GitHubRepository;
 import com.atlassian.bamboo.plugins.git.GitHubRepositoryAccessData;
 import com.atlassian.bamboo.plugins.git.GitRepositoryAccessData;
 import com.atlassian.bamboo.repository.Repository;
+import com.atlassian.bamboo.security.EncryptionException;
+import com.atlassian.bamboo.security.EncryptionService;
+import com.atlassian.bamboo.security.EncryptionServiceImpl;
 import com.atlassian.bamboo.utils.SystemProperty;
 import com.atlassian.bamboo.utils.error.ErrorCollection;
 import com.atlassian.bamboo.utils.error.SimpleErrorCollection;
@@ -52,6 +55,8 @@ public class GithubEnterpriseRepository extends GitHubRepository {
     private String hostname;
 
     private I18nResolver i18nResolver;
+
+    private final EncryptionService legacyEncryptionService = new EncryptionServiceImpl();
 
     @Override
     public void setI18nResolver(I18nResolver i18nResolver) {
@@ -128,7 +133,7 @@ public class GithubEnterpriseRepository extends GitHubRepository {
         final GitHubRepositoryAccessData accessData = GitHubRepositoryAccessData.builder(getAccessData())
                 .repository(config.getString(REPOSITORY_GITHUBENTERPRISE_REPOSITORY))
                 .username(config.getString(REPOSITORY_GITHUBENTERPRISE_USERNAME))
-                .password(config.getString(REPOSITORY_GITHUBENTERPRISE_PASSWORD))
+                .password(decryptPassword(config.getString(REPOSITORY_GITHUBENTERPRISE_PASSWORD)))
                 .branch(new VcsBranchImpl(config.getString(REPOSITORY_GITHUBENTERPRISE_BRANCH)))
                 .useShallowClones(config.getBoolean(REPOSITORY_GITHUBENTERPRISE_USE_SHALLOW_CLONES))
                 .useRemoteAgentCache(config.getBoolean(REPOSITORY_GITHUBENTERPRISE_USE_REMOTE_AGENT_CACHE, false))
@@ -201,5 +206,13 @@ public class GithubEnterpriseRepository extends GitHubRepository {
                 .lfs(gitHubAccessData.isLfs())
                 .refSpecOverride(gitHubAccessData.getRefSpecOverride())
                 .build());
+    }
+
+    private String decryptPassword(final String possiblyEncryptedPassword) {
+        try {
+            return legacyEncryptionService.decrypt(possiblyEncryptedPassword);
+        } catch (EncryptionException e) {
+            return possiblyEncryptedPassword;
+        }
     }
 }
