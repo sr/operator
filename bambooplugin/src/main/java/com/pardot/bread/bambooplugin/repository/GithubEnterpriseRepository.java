@@ -1,5 +1,6 @@
 package com.pardot.bread.bambooplugin.repository;
 
+import com.atlassian.bamboo.crypto.instance.SecretEncryptionService;
 import com.atlassian.bamboo.plan.branch.VcsBranchImpl;
 import com.atlassian.bamboo.plugins.git.GitAuthenticationType;
 import com.atlassian.bamboo.plugins.git.GitHubRepository;
@@ -7,8 +8,8 @@ import com.atlassian.bamboo.plugins.git.GitHubRepositoryAccessData;
 import com.atlassian.bamboo.plugins.git.GitRepositoryAccessData;
 import com.atlassian.bamboo.repository.Repository;
 import com.atlassian.bamboo.security.EncryptionException;
-import com.atlassian.bamboo.security.EncryptionService;
-import com.atlassian.bamboo.security.EncryptionServiceImpl;
+import com.atlassian.bamboo.security.MigratingEncryptionService;
+import com.atlassian.bamboo.spring.ComponentAccessor;
 import com.atlassian.bamboo.utils.SystemProperty;
 import com.atlassian.bamboo.utils.error.ErrorCollection;
 import com.atlassian.bamboo.utils.error.SimpleErrorCollection;
@@ -55,8 +56,7 @@ public class GithubEnterpriseRepository extends GitHubRepository {
     private String hostname;
 
     private I18nResolver i18nResolver;
-
-    private final EncryptionService legacyEncryptionService = new EncryptionServiceImpl();
+    private MigratingEncryptionService migratingEncryptionService;
 
     @Override
     public void setI18nResolver(I18nResolver i18nResolver) {
@@ -118,7 +118,7 @@ public class GithubEnterpriseRepository extends GitHubRepository {
         buildConfiguration.setProperty(REPOSITORY_GITHUBENTERPRISE_HOSTNAME, buildConfiguration.getString(REPOSITORY_GITHUBENTERPRISE_HOSTNAME, "").trim());
         buildConfiguration.setProperty(REPOSITORY_GITHUBENTERPRISE_USERNAME, buildConfiguration.getString(REPOSITORY_GITHUBENTERPRISE_USERNAME, "").trim());
         if (buildConfiguration.getBoolean(TEMPORARY_GITHUBENTERPRISE_PASSWORD_CHANGE)) {
-            buildConfiguration.setProperty(REPOSITORY_GITHUBENTERPRISE_PASSWORD, buildConfiguration.getString(REPOSITORY_GITHUBENTERPRISE_TEMPORARY_PASSWORD));
+            buildConfiguration.setProperty(REPOSITORY_GITHUBENTERPRISE_PASSWORD, getMigratingEncryptionService().encrypt(buildConfiguration.getString(REPOSITORY_GITHUBENTERPRISE_TEMPORARY_PASSWORD)));
         }
         buildConfiguration.setProperty(REPOSITORY_GITHUBENTERPRISE_REPOSITORY, buildConfiguration.getString(REPOSITORY_GITHUBENTERPRISE_REPOSITORY, "").trim());
         buildConfiguration.setProperty(REPOSITORY_GITHUBENTERPRISE_BRANCH, buildConfiguration.getString(REPOSITORY_GITHUBENTERPRISE_BRANCH, "").trim());
@@ -154,7 +154,7 @@ public class GithubEnterpriseRepository extends GitHubRepository {
         HierarchicalConfiguration configuration = super.toConfiguration();
         configuration.setProperty(REPOSITORY_GITHUBENTERPRISE_HOSTNAME, getHostname());
         configuration.setProperty(REPOSITORY_GITHUBENTERPRISE_USERNAME, getUsername());
-        configuration.setProperty(REPOSITORY_GITHUBENTERPRISE_PASSWORD, getPassword());
+        configuration.setProperty(REPOSITORY_GITHUBENTERPRISE_PASSWORD, getMigratingEncryptionService().encrypt(getPassword()));
         configuration.setProperty(REPOSITORY_GITHUBENTERPRISE_REPOSITORY, getRepository());
         configuration.setProperty(REPOSITORY_GITHUBENTERPRISE_BRANCH, getBranch());
         configuration.setProperty(REPOSITORY_GITHUBENTERPRISE_USE_SHALLOW_CLONES, isUseShallowClones());
@@ -210,9 +210,17 @@ public class GithubEnterpriseRepository extends GitHubRepository {
 
     private String decryptPassword(final String possiblyEncryptedPassword) {
         try {
-            return legacyEncryptionService.decrypt(possiblyEncryptedPassword);
+            return getMigratingEncryptionService().decrypt(possiblyEncryptedPassword);
         } catch (EncryptionException e) {
             return possiblyEncryptedPassword;
         }
+    }
+
+    public MigratingEncryptionService getMigratingEncryptionService() {
+        if (migratingEncryptionService == null) {
+            migratingEncryptionService = new MigratingEncryptionService(ComponentAccessor.SECRET_ENCRYPTION_SERVICE.get());
+        }
+
+        return migratingEncryptionService;
     }
 }
