@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+set -euxo pipefail
+
+currentmanifest="$(mktemp)"
+git ls-files origin/master > "$currentmanifest"
+
+ORIG_GOPATH="${GOPATH}"
+
+workdir="$(mktemp -d)"
+export GOPATH="${workdir}"
+mkdir -p "${GOPATH}/src/git.dev.pardot.com/Pardot"
+
+git worktree add --checkout \
+  -b "infrastructure-repo-$(date +%s)" \
+  "${GOPATH}/src/git.dev.pardot.com/Pardot/infrastructure"
+
+cd "${GOPATH}/src/git.dev.pardot.com/Pardot/infrastructure"
+mkdir bread
+git mv -k ./* ./bread
+git mv bread/bin bin
+
+packages='
+bread
+bread/devenv
+bread/heroku
+bread/hipchat
+bread/jib
+bread/jib/github
+bread/jira
+bread/pb
+bread/pb/hal9000
+bread/privet
+bread/swagger/client
+bread/swagger/client/canoe
+bread/swagger/models
+'
+for pkg in $packages; do
+    find . -type f -name "*.go" -a -not -path "./bread/vendor/*" -a -not -path "./bread/terraform/*" -exec \
+        gofmt -w -r "\"git.dev.pardot.com/Pardot/${pkg}\" -> \"git.dev.pardot.com/Pardot/infrastructure/${pkg}\"" {} +
+done
+
+go install -v ./...
+
+git add bread
+git commit -m "Rename to git.dev.pardot.com/Pardot/infrastructure"
+
+newmanifest="$(mktemp)"
+git ls-files HEAD | sed 's/^bread\///' > "$newmanifest"
+git diff --exit-code "$currentmanifest" "$newmanifest"
+
+cp "${ORIG_GOPATH}/src/git.dev.pardot.com/Pardot/bread/tools/build/build" \
+    "${workdir}/src/git.dev.pardot.com/Pardot/infrastructure/bread/tools/build/build"
+
+echo "${GOPATH}/src/git.dev.pardot.com/Pardot/infrastructure"
