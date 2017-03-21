@@ -162,20 +162,29 @@ public class BuildPlanResource {
             }
 
             final BranchMonitoringConfiguration branchMonitoringConfiguration = buildDefinition.getBranchMonitoringConfiguration();
-            information.automaticBranchCreationEnabled = branchMonitoringConfiguration.isPlanBranchCreationEnabled();
-            if (branchMonitoringConfiguration.isRemovedBranchCleanUpEnabled()) {
-                information.removedBranchCleanupDays = branchMonitoringConfiguration.getRemovedBranchCleanUpPeriodInDays();
+            // Branch monitoring configuration will be null for branch plans themselves.
+            if (branchMonitoringConfiguration != null) {
+                information.automaticBranchCreationEnabled = branchMonitoringConfiguration.isPlanBranchCreationEnabled();
+                if (branchMonitoringConfiguration.isRemovedBranchCleanUpEnabled()) {
+                    information.removedBranchCleanupDays = branchMonitoringConfiguration.getRemovedBranchCleanUpPeriodInDays();
+                } else {
+                    information.removedBranchCleanupDays = -1;
+                }
+                if (branchMonitoringConfiguration.isInactiveBranchCleanUpEnabled()) {
+                    information.inactiveBranchCleanupDays = branchMonitoringConfiguration.getInactiveBranchCleanUpPeriodInDays();
+                } else {
+                    information.inactiveBranchCleanupDays = -1;
+                }
+
+                final BranchIntegrationConfiguration integrationConfiguration = branchMonitoringConfiguration.getDefaultBranchIntegrationConfiguration();
+                information.automaticMergingEnabled = integrationConfiguration.isEnabled();
             } else {
                 information.removedBranchCleanupDays = -1;
-            }
-            if (branchMonitoringConfiguration.isInactiveBranchCleanUpEnabled()) {
-                information.inactiveBranchCleanupDays = branchMonitoringConfiguration.getInactiveBranchCleanUpPeriodInDays();
-            } else {
                 information.inactiveBranchCleanupDays = -1;
-            }
 
-            final BranchIntegrationConfiguration integrationConfiguration = branchMonitoringConfiguration.getDefaultBranchIntegrationConfiguration();
-            information.automaticMergingEnabled = integrationConfiguration.isEnabled();
+                final BranchIntegrationConfiguration integrationConfiguration = buildDefinition.getBranchIntegrationConfiguration();
+                information.automaticMergingEnabled = integrationConfiguration.isEnabled();
+            }
 
             return information;
         }
@@ -189,7 +198,7 @@ public class BuildPlanResource {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
 
-        BuildDefinition buildDefinition = buildDefinitionManager.getBuildDefinition(plan);
+        BuildDefinition buildDefinition = buildDefinitionManager.getUnmergedBuildDefinition(plan.getPlanKey());
         PlanInformation information = PlanInformation.newFromPlan(plan, buildDefinition);
         return Response.ok(information).build();
     }
@@ -230,7 +239,7 @@ public class BuildPlanResource {
         setupWebhookTrigger(planKey, defaultRepositoryDefinition);
         setupDailyPoll(planKey, defaultRepositoryDefinition);
 
-        BuildDefinition buildDefinition = buildDefinitionManager.getBuildDefinition(plan);
+        BuildDefinition buildDefinition = buildDefinitionManager.getUnmergedBuildDefinition(plan.getPlanKey());
         configureBranchManagement(buildDefinition, planRequest);
         buildDefinitionManager.savePlanAndDefinition(plan, buildDefinition);
 
@@ -260,7 +269,7 @@ public class BuildPlanResource {
         plan.setDescription(planRequest.description);
         // TODO(alindeman): changing defaultRepositoryId is not implemented
 
-        BuildDefinition buildDefinition = buildDefinitionManager.getBuildDefinition(plan);
+        BuildDefinition buildDefinition = buildDefinitionManager.getUnmergedBuildDefinition(plan.getPlanKey());
         configureBranchManagement(buildDefinition, planRequest);
         buildDefinitionManager.savePlanAndDefinition(plan, buildDefinition);
 
@@ -387,35 +396,55 @@ public class BuildPlanResource {
 
     private void configureBranchManagement(final BuildDefinition buildDefinition, final PlanRequest request) {
         BranchMonitoringConfiguration branchMonitoringConfiguration = buildDefinition.getBranchMonitoringConfiguration();
-        branchMonitoringConfiguration.setPlanBranchCreationEnabled(request.automaticBranchCreationEnabled);
-        branchMonitoringConfiguration.setMatchingPattern(StringUtils.EMPTY);
-        if (request.removedBranchCleanupDays >= 0) {
-            branchMonitoringConfiguration.setRemovedBranchCleanUpEnabled(true);
-            branchMonitoringConfiguration.setRemovedBranchCleanUpPeriodInDays(request.removedBranchCleanupDays);
-        } else {
-            branchMonitoringConfiguration.setRemovedBranchCleanUpEnabled(false);
-        }
-        if (request.inactiveBranchCleanupDays >= 0) {
-            branchMonitoringConfiguration.setInactiveBranchCleanUpEnabled(true);
-            branchMonitoringConfiguration.setInactiveBranchCleanUpPeriodInDays(request.inactiveBranchCleanupDays);
-        } else {
-            branchMonitoringConfiguration.setInactiveBranchCleanUpEnabled(false);
-        }
+        if (branchMonitoringConfiguration != null) {
+            branchMonitoringConfiguration.setPlanBranchCreationEnabled(request.automaticBranchCreationEnabled);
+            branchMonitoringConfiguration.setMatchingPattern(StringUtils.EMPTY);
+            if (request.removedBranchCleanupDays >= 0) {
+                branchMonitoringConfiguration.setRemovedBranchCleanUpEnabled(true);
+                branchMonitoringConfiguration.setRemovedBranchCleanUpPeriodInDays(request.removedBranchCleanupDays);
+            } else {
+                branchMonitoringConfiguration.setRemovedBranchCleanUpEnabled(false);
+            }
+            if (request.inactiveBranchCleanupDays >= 0) {
+                branchMonitoringConfiguration.setInactiveBranchCleanUpEnabled(true);
+                branchMonitoringConfiguration.setInactiveBranchCleanUpPeriodInDays(request.inactiveBranchCleanupDays);
+            } else {
+                branchMonitoringConfiguration.setInactiveBranchCleanUpEnabled(false);
+            }
 
-        HierarchicalConfiguration integrationConfiguration = new HierarchicalConfiguration();
-        if (request.automaticMergingEnabled) {
-            integrationConfiguration.setProperty("branches.defaultBranchIntegration.enabled", "true");
-            integrationConfiguration.setProperty("branches.defaultBranchIntegration.strategy", "BRANCH_UPDATER");
-            integrationConfiguration.setProperty("branches.defaultBranchIntegration.branchUpdater.mergeFromBranch", request.key);
-            integrationConfiguration.setProperty("branches.defaultBranchIntegration.branchUpdater.pushEnabled", "true");
+            HierarchicalConfiguration integrationConfiguration = new HierarchicalConfiguration();
+            if (request.automaticMergingEnabled) {
+                integrationConfiguration.setProperty("branches.defaultBranchIntegration.enabled", "true");
+                integrationConfiguration.setProperty("branches.defaultBranchIntegration.strategy", "BRANCH_UPDATER");
+                integrationConfiguration.setProperty("branches.defaultBranchIntegration.branchUpdater.mergeFromBranch", request.key);
+                integrationConfiguration.setProperty("branches.defaultBranchIntegration.branchUpdater.pushEnabled", "true");
+            } else {
+                integrationConfiguration.setProperty("branches.defaultBranchIntegration.enabled", "false");
+            }
+            branchMonitoringConfiguration.setDefaultBranchIntegrationConfiguration(
+                    BuildDefinitionConverter.populate(
+                            integrationConfiguration,
+                            new BranchIntegrationConfigurationImpl(true)
+                    )
+            );
         } else {
-            integrationConfiguration.setProperty("branches.defaultBranchIntegration.enabled", "false");
+            // This is a branch plan. Instead of having a 'default' configuration that will be copied to each branch
+            // plan, we modify the configuration directly.
+            HierarchicalConfiguration integrationConfiguration = new HierarchicalConfiguration();
+            if (request.automaticMergingEnabled) {
+                integrationConfiguration.setProperty("branchIntegration.enabled", "true");
+                integrationConfiguration.setProperty("branchIntegration.strategy", "BRANCH_UPDATER");
+                integrationConfiguration.setProperty("branchIntegration.branchUpdater.mergeFromBranch", request.key);
+                integrationConfiguration.setProperty("branchIntegration.branchUpdater.pushEnabled", "true");
+            } else {
+                integrationConfiguration.setProperty("branchIntegration.enabled", "false");
+            }
+            buildDefinition.setBranchIntegrationConfiguration(
+                    BuildDefinitionConverter.populate(
+                            integrationConfiguration,
+                            new BranchIntegrationConfigurationImpl(false)
+                    )
+            );
         }
-        branchMonitoringConfiguration.setDefaultBranchIntegrationConfiguration(
-                BuildDefinitionConverter.populate(
-                        integrationConfiguration,
-                        new BranchIntegrationConfigurationImpl(true)
-                )
-        );
     }
 }
