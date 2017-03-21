@@ -10,22 +10,24 @@ import (
 )
 
 type repositoryRequest struct {
-	Name          string `json:"name"`
-	Username      string `json:"username"`
-	Password      string `json:"password"`
-	Branch        string `json:"branch"`
-	Repository    string `json:"repository"`
-	ShallowClones bool   `json:"shallowClones"`
-	UseSubmodules bool   `json:"useSubmodules"`
+	Name                 string `json:"name"`
+	Username             string `json:"username"`
+	Password             string `json:"password"`
+	Branch               string `json:"branch"`
+	Repository           string `json:"repository"`
+	ShallowClones        bool   `json:"shallowClones"`
+	UseSubmodules        bool   `json:"useSubmodules"`
+	FetchWholeRepository bool   `json:"fetchWholeRepository"`
 }
 
 type repositoryResponse struct {
-	ID            int64  `json:"id"`
-	Name          string `json:"name"`
-	Branch        string `json:"branch"`
-	Repository    string `json:"repository"`
-	ShallowClones bool   `json:"shallowClones"`
-	UseSubmodules bool   `json:"useSubmodules"`
+	ID                   int64  `json:"id"`
+	Name                 string `json:"name"`
+	Branch               string `json:"branch"`
+	Repository           string `json:"repository"`
+	ShallowClones        bool   `json:"shallowClones"`
+	UseSubmodules        bool   `json:"useSubmodules"`
+	FetchWholeRepository bool   `json:"fetchWholeRepository"`
 }
 
 func resourceBambooRepository() *schema.Resource {
@@ -72,6 +74,11 @@ func resourceBambooRepository() *schema.Resource {
 				Optional: true,
 				Default:  true,
 			},
+			"fetch_whole_repository": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
+			},
 		},
 	}
 }
@@ -80,13 +87,14 @@ func resourceBambooRepositoryCreate(d *schema.ResourceData, meta interface{}) er
 	config := meta.(*config)
 
 	createRequest := &repositoryRequest{
-		Name:          d.Get("name").(string),
-		Username:      d.Get("username").(string),
-		Password:      d.Get("password").(string),
-		Branch:        d.Get("branch").(string),
-		Repository:    d.Get("repository").(string),
-		ShallowClones: d.Get("shallow_clones").(bool),
-		UseSubmodules: d.Get("use_submodules").(bool),
+		Name:                 d.Get("name").(string),
+		Username:             d.Get("username").(string),
+		Password:             d.Get("password").(string),
+		Branch:               d.Get("branch").(string),
+		Repository:           d.Get("repository").(string),
+		ShallowClones:        d.Get("shallow_clones").(bool),
+		UseSubmodules:        d.Get("use_submodules").(bool),
+		FetchWholeRepository: d.Get("fetch_whole_repository").(bool),
 	}
 	b, err := json.Marshal(createRequest)
 	if err != nil {
@@ -125,13 +133,14 @@ func resourceBambooRepositoryUpdate(d *schema.ResourceData, meta interface{}) er
 	id := d.Id()
 
 	createRequest := &repositoryRequest{
-		Name:          d.Get("name").(string),
-		Username:      d.Get("username").(string),
-		Password:      d.Get("password").(string),
-		Branch:        d.Get("branch").(string),
-		Repository:    d.Get("repository").(string),
-		ShallowClones: d.Get("shallow_clones").(bool),
-		UseSubmodules: d.Get("use_submodules").(bool),
+		Name:                 d.Get("name").(string),
+		Username:             d.Get("username").(string),
+		Password:             d.Get("password").(string),
+		Branch:               d.Get("branch").(string),
+		Repository:           d.Get("repository").(string),
+		ShallowClones:        d.Get("shallow_clones").(bool),
+		UseSubmodules:        d.Get("use_submodules").(bool),
+		FetchWholeRepository: d.Get("fetch_whole_repository").(bool),
 	}
 	b, err := json.Marshal(createRequest)
 	if err != nil {
@@ -193,6 +202,7 @@ func resourceBambooRepositoryRead(d *schema.ResourceData, meta interface{}) erro
 	_ = d.Set("repository", response.Repository)
 	_ = d.Set("shallow_clones", response.ShallowClones)
 	_ = d.Set("use_submodules", response.UseSubmodules)
+	_ = d.Set("fetch_whole_repository", response.FetchWholeRepository)
 	return nil
 }
 

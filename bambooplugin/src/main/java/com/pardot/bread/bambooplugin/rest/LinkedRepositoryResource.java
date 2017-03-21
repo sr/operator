@@ -55,6 +55,7 @@ public class LinkedRepositoryResource {
         public String repository;
         public boolean shallowClones;
         public boolean useSubmodules;
+        public boolean fetchWholeRepository;
     }
 
     static class RepositoryResponse {
@@ -64,6 +65,7 @@ public class LinkedRepositoryResource {
         public String repository;
         public boolean shallowClones;
         public boolean useSubmodules;
+        public boolean fetchWholeRepository;
 
         public static RepositoryResponse newFromRepositoryData(final PartialVcsRepositoryData data) {
             RepositoryResponse information = new RepositoryResponse();
@@ -75,6 +77,7 @@ public class LinkedRepositoryResource {
             information.repository = buildConfiguration.getString(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_REPOSITORY, null);
             information.shallowClones = buildConfiguration.getBoolean(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_USE_SHALLOW_CLONES, false);
             information.useSubmodules = buildConfiguration.getBoolean(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_USE_SUBMODULES, false);
+            information.fetchWholeRepository = buildConfiguration.getBoolean(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_FETCH_WHOLE_REPOSITORY, false);
             return information;
         }
     }
@@ -168,7 +171,7 @@ public class LinkedRepositoryResource {
        configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_USE_SUBMODULES, request.useSubmodules);
        configuration.setProperty("repository.github.useSubmodules", request.useSubmodules);
        configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_VERBOSE_LOGS, false);
-       configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_FETCH_WHOLE_REPOSITORY, false);
+       configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_FETCH_WHOLE_REPOSITORY, request.fetchWholeRepository);
        configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_COMMAND_TIMEOUT, String.valueOf(GithubEnterpriseRepository.DEFAULT_COMMAND_TIMEOUT_IN_MINUTES));
 
        return configuration;
