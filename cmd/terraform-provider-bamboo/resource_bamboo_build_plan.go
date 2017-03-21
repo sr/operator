@@ -73,7 +73,7 @@ func resourceBambooBuildPlan() *schema.Resource {
 			"automatic_merging_enabled": {
 				Type:     schema.TypeBool,
 				Optional: true,
-				Default:  false,
+				Default:  true,
 			},
 			"automatic_branch_creation_enabled": {
 				Type:     schema.TypeBool,
