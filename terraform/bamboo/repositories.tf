@@ -41,11 +41,12 @@ resource "bamboo_repository" "bread" {
 }
 
 resource "bamboo_repository" "chef" {
-  name           = "chef"
-  username       = "${var.bamboo_git_username}"
-  password       = "${var.bamboo_git_password}"
-  repository     = "Pardot/chef"
-  shallow_clones = false
+  name                   = "chef"
+  username               = "${var.bamboo_git_username}"
+  password               = "${var.bamboo_git_password}"
+  repository             = "Pardot/chef"
+  shallow_clones         = false
+  fetch_whole_repository = true
 }
 
 resource "bamboo_repository" "cimta-topology" {
