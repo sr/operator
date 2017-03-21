@@ -21,7 +21,6 @@ import com.google.common.collect.*;
 import com.pardot.bread.bambooplugin.GithubTriggeredPlan;
 import com.pardot.bread.bambooplugin.trigger.GithubWebhookTriggerConfigurator;
 import org.apache.log4j.Logger;
-import org.springframework.stereotype.Component;
 
 import java.security.InvalidParameterException;
 import javax.ws.rs.Consumes;
@@ -33,7 +32,6 @@ import javax.ws.rs.core.Response;
 import java.util.Map;
 
 @Path("/github/events")
-@Component
 public class GithubEventResource {
     private static final Logger log = Logger.getLogger(GithubEventResource.class);
 

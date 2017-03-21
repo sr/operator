@@ -49,28 +49,29 @@
   <component-import key="administrationConfigurationAccessor" interface="com.atlassian.bamboo.configuration.AdministrationConfigurationAccessor" />
   <component-import key="authenticationContext" interface="com.atlassian.bamboo.user.BambooAuthenticationContext" />
   <component-import key="branchDetectionService" interface="com.atlassian.bamboo.plan.branch.BranchDetectionService" />
-  <component-import key="branchIntegrationHelper" interface="com.atlassian.bamboo.plan.branch.BranchIntegrationHelper" />
+  <component-import key="branchIntegrationHelper" interface="com.atlassian.bamboo.plan.branch.VcsBranchIntegrationHelper" />
   <component-import key="buildDefinitionManager" interface="com.atlassian.bamboo.build.BuildDefinitionManager" />
   <component-import key="buildDirectoryManager" interface="com.atlassian.bamboo.build.fileserver.BuildDirectoryManager" />
   <component-import key="buildLoggerManager" interface="com.atlassian.bamboo.build.BuildLoggerManager" />
   <component-import key="cachedPlanManager" interface="com.atlassian.bamboo.plan.cache.CachedPlanManager" />
   <component-import key="capabilityContext" interface="com.atlassian.bamboo.v2.build.agent.capability.CapabilityContext" />
   <component-import key="chainCreationService" interface="com.atlassian.bamboo.build.creation.ChainCreationService" />
+  <component-import key="credentialsAccessor" interface="com.atlassian.bamboo.credentials.CredentialsAccessor"/>
   <component-import key="customVariableContext" interface="com.atlassian.bamboo.variable.CustomVariableContext"/>
   <component-import key="dashboardCachingManager" interface="com.atlassian.bamboo.caching.DashboardCachingManager" />
   <component-import key="deletionService" interface="com.atlassian.bamboo.deletion.DeletionService" />
-  <component-import key="encryptionService" interface="com.atlassian.bamboo.security.EncryptionService" />
   <component-import key="eventPublisher" interface="com.atlassian.event.api.EventPublisher" />
   <component-import key="i18nResolver" interface="com.atlassian.sal.api.message.I18nResolver" />
+  <component-import key="jobCreationService" interface="com.atlassian.bamboo.build.creation.JobCreationService" />
   <component-import key="planCreationService" interface="com.atlassian.bamboo.build.creation.PlanCreationService" />
   <component-import key="planManager" interface="com.atlassian.bamboo.plan.PlanManager" />
-  <component-import key="repositoryConfigurationService" interface="com.atlassian.bamboo.repository.RepositoryConfigurationService" />
   <component-import key="repositoryDefinitionManager" interface="com.atlassian.bamboo.repository.RepositoryDefinitionManager" />
-  <component-import key="jobCreationService" interface="com.atlassian.bamboo.build.creation.JobCreationService" />
   <component-import key="sshProxyService" interface="com.atlassian.bamboo.ssh.SshProxyService" />
   <component-import key="taskConfigurationService" interface="com.atlassian.bamboo.task.TaskConfigurationService" />
   <component-import key="templateRenderer" interface="com.atlassian.bamboo.template.TemplateRenderer" />
-  <component-import key="trustedKeyHelper" interface="com.atlassian.bamboo.security.TrustedKeyHelper" />
   <component-import key="triggerConfigurationService" interface="com.atlassian.bamboo.trigger.TriggerConfigurationService" />
   <component-import key="triggerTypeManager" interface="com.atlassian.bamboo.trigger.TriggerTypeManager" />
+  <component-import key="trustedKeyHelper" interface="com.atlassian.bamboo.security.TrustedKeyHelper" />
+  <component-import key="vcsRepositoryConfigurationService" interface="com.atlassian.bamboo.vcs.configuration.service.VcsRepositoryConfigurationService" />
+  <component-import key="vcsRepositoryManager" interface="com.atlassian.bamboo.vcs.module.VcsRepositoryManager" />
 </atlassian-plugin>

@@ -1,20 +1,24 @@
 package com.pardot.bread.bambooplugin.rest;
 
+import com.atlassian.bamboo.plan.branch.VcsBranchImpl;
 import com.atlassian.bamboo.repository.*;
-import com.atlassian.bamboo.security.EncryptionService;
 import com.atlassian.bamboo.user.BambooAuthenticationContext;
-import com.atlassian.bamboo.utils.ConfigUtils;
+import com.atlassian.bamboo.vcs.configuration.PartialVcsRepositoryData;
+import com.atlassian.bamboo.vcs.configuration.PartialVcsRepositoryDataBuilder;
+import com.atlassian.bamboo.vcs.configuration.service.VcsRepositoryConfigurationService;
+import com.atlassian.bamboo.vcs.module.VcsRepositoryManager;
+import com.atlassian.bamboo.vcs.module.VcsRepositoryModuleDescriptor;
+import com.atlassian.bamboo.ww2.actions.build.admin.create.BuildConfiguration;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import com.pardot.bread.bambooplugin.repository.GithubEnterpriseRepository;
-import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.log4j.Logger;
-import org.springframework.stereotype.Component;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 @Path("/linkedrepos")
-@Component
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class LinkedRepositoryResource {
@@ -22,28 +26,25 @@ public class LinkedRepositoryResource {
 
     private static final String githubEnterpriseRepositoryKey = "com.pardot.bread.bambooplugin.pardot-bamboo-plugin:github-enterprise-repository";
 
-    // The webRepositoryKey indicating no web repository reviewer.
-    private static final String noWebRepositoryKey = "bamboo.webrepositoryviewer.provided:noRepositoryViewer";
-
     private BambooAuthenticationContext authenticationContext;
-    private RepositoryConfigurationService repositoryConfigurationService;
     private RepositoryDefinitionManager repositoryDefinitionManager;
-    private EncryptionService encryptionService;
+    private VcsRepositoryConfigurationService vcsRepositoryConfigurationService;
+    private VcsRepositoryManager vcsRepositoryManager;
 
     public void setAuthenticationContext(final BambooAuthenticationContext authenticationContext) {
         this.authenticationContext = authenticationContext;
     }
 
-    public void setRepositoryConfigurationService(RepositoryConfigurationService repositoryConfigurationService) {
-        this.repositoryConfigurationService = repositoryConfigurationService;
+    public void setVcsRepositoryConfigurationService(VcsRepositoryConfigurationService vcsRepositoryConfigurationService) {
+        this.vcsRepositoryConfigurationService = vcsRepositoryConfigurationService;
     }
 
     public void setRepositoryDefinitionManager(RepositoryDefinitionManager repositoryDefinitionManager) {
         this.repositoryDefinitionManager = repositoryDefinitionManager;
     }
 
-    public void setEncryptionService(EncryptionService encryptionService) {
-        this.encryptionService = encryptionService;
+    public void setVcsRepositoryManager(VcsRepositoryManager vcsRepositoryManager) {
+        this.vcsRepositoryManager = vcsRepositoryManager;
     }
 
     static class RepositoryRequest {
@@ -53,6 +54,7 @@ public class LinkedRepositoryResource {
         public String branch;
         public String repository;
         public boolean shallowClones;
+        public boolean useSubmodules;
     }
 
     static class RepositoryResponse {
@@ -61,55 +63,65 @@ public class LinkedRepositoryResource {
         public String branch;
         public String repository;
         public boolean shallowClones;
+        public boolean useSubmodules;
 
-        public static RepositoryResponse newFromRepositoryData(final RepositoryData data) {
+        public static RepositoryResponse newFromRepositoryData(final PartialVcsRepositoryData data) {
             RepositoryResponse information = new RepositoryResponse();
             information.id = data.getId();
             information.name = data.getName();
-            information.branch = data.getConfiguration().getString(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_BRANCH, null);
-            information.repository = data.getConfiguration().getString(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_REPOSITORY, null);
-            information.shallowClones = data.getConfiguration().getBoolean(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_USE_SHALLOW_CLONES, false);
+
+            BuildConfiguration buildConfiguration = new BuildConfiguration(data.getVcsLocation().getLegacyConfigurationXml());
+            information.branch = buildConfiguration.getString(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_BRANCH, null);
+            information.repository = buildConfiguration.getString(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_REPOSITORY, null);
+            information.shallowClones = buildConfiguration.getBoolean(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_USE_SHALLOW_CLONES, false);
+            information.useSubmodules = buildConfiguration.getBoolean(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_USE_SUBMODULES, false);
             return information;
         }
     }
 
-
     @GET
     @Path("/{id}")
     public Response get(@PathParam("id") final long id) {
-        RepositoryDataEntity repositoryDataEntity = repositoryDefinitionManager.getRepositoryDataEntity(id);
-        if (repositoryDataEntity == null) {
+        final PartialVcsRepositoryData vcsRepositoryData = repositoryDefinitionManager.getVcsRepositoryDataForEditing(id);
+        if (vcsRepositoryData == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
 
-        RepositoryResponse information = RepositoryResponse.newFromRepositoryData(new RepositoryDataImpl(repositoryDataEntity));
+        RepositoryResponse information = RepositoryResponse.newFromRepositoryData(vcsRepositoryData);
         return Response.ok(information).build();
     }
 
     @DELETE
     @Path("/{id}")
     public Response delete(@PathParam("id") final long id) {
-        RepositoryDataEntity repositoryDataEntity = repositoryDefinitionManager.getRepositoryDataEntity(id);
-        if (repositoryDataEntity == null) {
+        final PartialVcsRepositoryData vcsRepositoryData = repositoryDefinitionManager.getVcsRepositoryDataForEditing(id);
+        if (vcsRepositoryData == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
 
-        repositoryConfigurationService.deleteGlobalRepository(id);
+        vcsRepositoryConfigurationService.deleteLinkedRepository(id);
         return Response.noContent().build();
     }
 
     @POST
     public Response create(final RepositoryRequest repositoryRequest) {
-        RepositoryData data = repositoryConfigurationService.createGlobalRepository(
-                repositoryRequest.name,
-                githubEnterpriseRepositoryKey,
-                noWebRepositoryKey,
-                buildConfiguration(repositoryRequest),
-                true,
-                authenticationContext.getUser()
+        final VcsRepositoryModuleDescriptor vcsDescriptor = vcsRepositoryManager.getVcsRepositoryModuleDescriptor(githubEnterpriseRepositoryKey);
+        PartialVcsRepositoryData repositoryData = PartialVcsRepositoryDataBuilder.newBuilder()
+                .pluginKey(vcsDescriptor.getCompleteKey())
+                .name(repositoryRequest.name)
+                .legacyXml(buildConfiguration(repositoryRequest).asXml())
+                .serverConfiguration(ImmutableMap.of())
+                .vcsBranch(new VcsBranchImpl(repositoryRequest.branch))
+                .branchConfiguration(Maps.newHashMap())
+                .build();
+
+        repositoryData = vcsRepositoryConfigurationService.createLinkedRepository(
+                repositoryData,
+                authenticationContext.getUser(),
+                RepositoryConfigurationService.LinkedRepositoryAccess.ALL_USERS
         );
 
-        RepositoryResponse information = RepositoryResponse.newFromRepositoryData(data);
+        RepositoryResponse information = RepositoryResponse.newFromRepositoryData(repositoryData);
         return Response.ok(information)
                 .status(Response.Status.CREATED)
                 .build();
@@ -118,37 +130,43 @@ public class LinkedRepositoryResource {
     @PUT
     @Path("/{id}")
     public Response update(@PathParam("id") final long id, final RepositoryRequest repositoryRequest) {
-        RepositoryDataEntity repositoryDataEntity = repositoryDefinitionManager.getRepositoryDataEntity(id);
-        if (repositoryDataEntity == null) {
+        final PartialVcsRepositoryData vcsRepositoryData = repositoryDefinitionManager.getVcsRepositoryDataForEditing(id);
+        if (vcsRepositoryData == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        RepositoryData data = new RepositoryDataImpl(repositoryDataEntity);
 
-        data = repositoryConfigurationService.editGlobalRepository(
-                repositoryRequest.name,
-                githubEnterpriseRepositoryKey,
-                noWebRepositoryKey,
-                data,
-                buildConfiguration(repositoryRequest)
+        final VcsRepositoryModuleDescriptor vcsDescriptor = vcsRepositoryManager.getVcsRepositoryModuleDescriptor(githubEnterpriseRepositoryKey);
+        PartialVcsRepositoryData repositoryData = PartialVcsRepositoryDataBuilder.newBuilder()
+                .pluginKey(vcsDescriptor.getCompleteKey())
+                .name(repositoryRequest.name)
+                .legacyXml(buildConfiguration(repositoryRequest).asXml())
+                .serverConfiguration(ImmutableMap.of())
+                .vcsBranch(new VcsBranchImpl(repositoryRequest.branch))
+                .branchConfiguration(Maps.newHashMap())
+                .build();
+
+        repositoryData = vcsRepositoryConfigurationService.editLinkedRepository(
+                id,
+                repositoryData
         );
 
-        RepositoryResponse information = RepositoryResponse.newFromRepositoryData(data);
+        RepositoryResponse information = RepositoryResponse.newFromRepositoryData(repositoryData);
         return Response.ok(information)
                 .build();
     }
 
-   private HierarchicalConfiguration buildConfiguration(final RepositoryRequest request) {
-       final HierarchicalConfiguration configuration = ConfigUtils.newConfiguration();
+   private BuildConfiguration buildConfiguration(final RepositoryRequest request) {
+       final BuildConfiguration configuration = new BuildConfiguration();
        configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_HOSTNAME, GithubEnterpriseRepository.getDefaultHostname());
        configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_USERNAME, request.username);
-       configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_PASSWORD, encryptionService.encrypt(request.password));
+       configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_PASSWORD, request.password);
        configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_REPOSITORY, request.repository);
        configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_BRANCH, request.branch);
        configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_USE_SHALLOW_CLONES, request.shallowClones);
        configuration.setProperty("repository.github.useShallowClones", request.shallowClones);
        configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_USE_REMOTE_AGENT_CACHE, false);
-       configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_USE_SUBMODULES, true);
-       configuration.setProperty("repository.github.useSubmodules", true);
+       configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_USE_SUBMODULES, request.useSubmodules);
+       configuration.setProperty("repository.github.useSubmodules", request.useSubmodules);
        configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_VERBOSE_LOGS, false);
        configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_FETCH_WHOLE_REPOSITORY, false);
        configuration.setProperty(GithubEnterpriseRepository.REPOSITORY_GITHUBENTERPRISE_COMMAND_TIMEOUT, String.valueOf(GithubEnterpriseRepository.DEFAULT_COMMAND_TIMEOUT_IN_MINUTES));

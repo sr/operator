@@ -16,6 +16,7 @@ type repositoryRequest struct {
 	Branch        string `json:"branch"`
 	Repository    string `json:"repository"`
 	ShallowClones bool   `json:"shallowClones"`
+	UseSubmodules bool   `json:"useSubmodules"`
 }
 
 type repositoryResponse struct {
@@ -24,6 +25,7 @@ type repositoryResponse struct {
 	Branch        string `json:"branch"`
 	Repository    string `json:"repository"`
 	ShallowClones bool   `json:"shallowClones"`
+	UseSubmodules bool   `json:"useSubmodules"`
 }
 
 func resourceBambooRepository() *schema.Resource {
@@ -65,6 +67,11 @@ func resourceBambooRepository() *schema.Resource {
 				Optional: true,
 				Default:  true,
 			},
+			"use_submodules": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  true,
+			},
 		},
 	}
 }
@@ -79,6 +86,7 @@ func resourceBambooRepositoryCreate(d *schema.ResourceData, meta interface{}) er
 		Branch:        d.Get("branch").(string),
 		Repository:    d.Get("repository").(string),
 		ShallowClones: d.Get("shallow_clones").(bool),
+		UseSubmodules: d.Get("use_submodules").(bool),
 	}
 	b, err := json.Marshal(createRequest)
 	if err != nil {
@@ -123,6 +131,7 @@ func resourceBambooRepositoryUpdate(d *schema.ResourceData, meta interface{}) er
 		Branch:        d.Get("branch").(string),
 		Repository:    d.Get("repository").(string),
 		ShallowClones: d.Get("shallow_clones").(bool),
+		UseSubmodules: d.Get("use_submodules").(bool),
 	}
 	b, err := json.Marshal(createRequest)
 	if err != nil {
@@ -183,6 +192,7 @@ func resourceBambooRepositoryRead(d *schema.ResourceData, meta interface{}) erro
 	_ = d.Set("branch", response.Branch)
 	_ = d.Set("repository", response.Repository)
 	_ = d.Set("shallow_clones", response.ShallowClones)
+	_ = d.Set("use_submodules", response.UseSubmodules)
 	return nil
 }
 

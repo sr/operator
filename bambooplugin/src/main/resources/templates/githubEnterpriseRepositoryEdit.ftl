@@ -13,14 +13,15 @@
     [@ww.password labelKey='repository.githubenterprise.password' name='repository.githubenterprise.temporary.password' /]
 [/#if]
 
-[@ww.select labelKey='repository.githubenterprise.repository' name='repository.githubenterprise.repository' descriptionKey='repository.githubenterprise.repository.description' fieldClass='github-repository']
-    [@ww.param name='disabled' value=!(buildConfiguration.getString('repository.githubenterprise.repository')?has_content) /]
-    [@ww.param name='extraUtility'][@ui.displayButton id='repository-githubenterprise-load-repositories' valueKey='repository.githubenterprise.loadRepositories'/][/@ww.param]
+[@s.select labelKey='repository.githubenterprise.repository' name='repository.githubenterprise.repository' descriptionKey='repository.githubenterprise.repository.description' fieldClass='github-repository'
+    cssClass='select2-container aui-select2-container']
+    [@s.param name='disabled' value=!(buildConfiguration.getString('repository.githubenterprise.repository')?has_content) /]
+    [@s.param name='extraUtility'][@ui.displayButton id='repository-githubenterprise-load-repositories' valueKey='repository.githubenterprise.loadRepositories'/][/@s.param]
     [#if buildConfiguration.getString('repository.githubenterprise.repository')?has_content]
-        [@ww.param name='headerKey2' value=buildConfiguration.getString('repository.githubenterprise.repository') /]
-        [@ww.param name='headerValue2' value=buildConfiguration.getString('repository.githubenterprise.repository') /]
+        [@s.param name='headerKey2' value=buildConfiguration.getString('repository.githubenterprise.repository') /]
+        [@s.param name='headerValue2' value=buildConfiguration.getString('repository.githubenterprise.repository') /]
     [/#if]
-[/@ww.select]
+[/@s.select]
 
 [@ww.select labelKey='repository.githubenterprise.branch' name='repository.githubenterprise.branch' descriptionKey='repository.githubenterprise.branch.description' fieldClass='github-branch']
     [@ww.param name='hidden' value=!(buildConfiguration.getString('repository.githubenterprise.branch')?has_content) /]
@@ -41,6 +42,7 @@
 
 <script type="text/javascript">
 (function () {
+    BAMBOO = window.BAMBOO || window.parent.BAMBOO;
     var rf = new BAMBOO.GITHUBENTERPRISE.RepositoryForm({
         repositoryKey: '${repository.key?js_string}',
         repositoryId: ${(repositoryId)!0},

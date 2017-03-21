@@ -14,7 +14,6 @@ import com.atlassian.bamboo.plan.cache.ImmutablePlan;
 import com.atlassian.bamboo.plugins.git.GitHubRepository;
 import com.atlassian.bamboo.repository.Repository;
 import com.atlassian.bamboo.repository.RepositoryData;
-import com.atlassian.bamboo.security.EncryptionService;
 import com.atlassian.bamboo.utils.BambooUrl;
 import com.pardot.bread.bambooplugin.GithubStatusBuildConfiguration;
 import com.pardot.bread.bambooplugin.GithubStatus;
@@ -29,7 +28,6 @@ public class PostStage implements PostStageAction {
 
     private AdministrationConfigurationAccessor administrationConfigurationAccessor;
     private CachedPlanManager cachedPlanManager;
-    private EncryptionService encryptionService;
 
     public void setAdministrationConfigurationAccessor(AdministrationConfigurationAccessor administrationConfigurationAccessor) {
         this.administrationConfigurationAccessor = administrationConfigurationAccessor;
@@ -37,10 +35,6 @@ public class PostStage implements PostStageAction {
 
     public void setCachedPlanManager(CachedPlanManager cachedPlanManager) {
         this.cachedPlanManager = cachedPlanManager;
-    }
-
-    public void setEncryptionService(EncryptionService encryptionService) {
-        this.encryptionService = encryptionService;
     }
 
     @Override
@@ -81,7 +75,6 @@ public class PostStage implements PostStageAction {
                 log.info("Setting GitHub commit status for '" + planKey + "'/'" + stageExecution.getName() + "' to " + state);
                 GithubStatus.create(
                         gitHubRepository,
-                        encryptionService,
                         sha,
                         state,
                         url,

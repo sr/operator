@@ -6,7 +6,9 @@ import com.atlassian.bamboo.plugins.git.GitHubRepository;
 import com.atlassian.bamboo.plugins.git.GitHubRepositoryAccessData;
 import com.atlassian.bamboo.plugins.git.GitRepositoryAccessData;
 import com.atlassian.bamboo.repository.Repository;
+import com.atlassian.bamboo.security.EncryptionException;
 import com.atlassian.bamboo.security.EncryptionService;
+import com.atlassian.bamboo.security.EncryptionServiceImpl;
 import com.atlassian.bamboo.utils.SystemProperty;
 import com.atlassian.bamboo.utils.error.ErrorCollection;
 import com.atlassian.bamboo.utils.error.SimpleErrorCollection;
@@ -37,6 +39,7 @@ public class GithubEnterpriseRepository extends GitHubRepository {
     public static final String REPOSITORY_GITHUBENTERPRISE_COMMAND_TIMEOUT = "repository.githubenterprise.commandTimeout";
     public static final String REPOSITORY_GITHUBENTERPRISE_VERBOSE_LOGS = "repository.githubenterprise.verbose.logs";
     public static final String REPOSITORY_GITHUBENTERPRISE_FETCH_WHOLE_REPOSITORY = "repository.githubenterprise.fetch.whole.repository";
+    public static final String REPOSITORY_GITHUBENTERPRISE_LFS_REPOSITORY = "repository.githubenterprise.lfs";
 
     private static final String REPOSITORY_GITHUBENTERPRISE_TEMPORARY_PASSWORD = "repository.githubenterprise.temporary.password";
     private static final String TEMPORARY_GITHUBENTERPRISE_PASSWORD_CHANGE = "temporary.githubenterprise.password.change";
@@ -52,18 +55,12 @@ public class GithubEnterpriseRepository extends GitHubRepository {
     private String hostname;
 
     private I18nResolver i18nResolver;
-    private EncryptionService encryptionService;
+    private EncryptionService legacyEncryptionService = new EncryptionServiceImpl();
 
     @Override
     public void setI18nResolver(I18nResolver i18nResolver) {
         super.setI18nResolver(i18nResolver);
         this.i18nResolver = i18nResolver;
-    }
-
-    @Override
-    public void setEncryptionService(EncryptionService encryptionService) {
-        super.setEncryptionService(encryptionService);
-        this.encryptionService = encryptionService;
     }
 
     @NotNull
@@ -108,6 +105,7 @@ public class GithubEnterpriseRepository extends GitHubRepository {
         buildConfiguration.setProperty(REPOSITORY_GITHUBENTERPRISE_COMMAND_TIMEOUT, String.valueOf(DEFAULT_COMMAND_TIMEOUT_IN_MINUTES));
         buildConfiguration.clearTree(REPOSITORY_GITHUBENTERPRISE_VERBOSE_LOGS);
         buildConfiguration.clearTree(REPOSITORY_GITHUBENTERPRISE_FETCH_WHOLE_REPOSITORY);
+        buildConfiguration.clearTree(REPOSITORY_GITHUBENTERPRISE_LFS_REPOSITORY);
         buildConfiguration.setProperty(REPOSITORY_GITHUBENTERPRISE_USE_SHALLOW_CLONES, true);
         buildConfiguration.setProperty(REPOSITORY_GITHUBENTERPRISE_USE_REMOTE_AGENT_CACHE, false);
         buildConfiguration.clearTree(REPOSITORY_GITHUBENTERPRISE_USE_SUBMODULES);
@@ -119,7 +117,7 @@ public class GithubEnterpriseRepository extends GitHubRepository {
         buildConfiguration.setProperty(REPOSITORY_GITHUBENTERPRISE_HOSTNAME, buildConfiguration.getString(REPOSITORY_GITHUBENTERPRISE_HOSTNAME, "").trim());
         buildConfiguration.setProperty(REPOSITORY_GITHUBENTERPRISE_USERNAME, buildConfiguration.getString(REPOSITORY_GITHUBENTERPRISE_USERNAME, "").trim());
         if (buildConfiguration.getBoolean(TEMPORARY_GITHUBENTERPRISE_PASSWORD_CHANGE)) {
-            buildConfiguration.setProperty(REPOSITORY_GITHUBENTERPRISE_PASSWORD, encryptionService.encrypt(buildConfiguration.getString(REPOSITORY_GITHUBENTERPRISE_TEMPORARY_PASSWORD)));
+            buildConfiguration.setProperty(REPOSITORY_GITHUBENTERPRISE_PASSWORD, buildConfiguration.getString(REPOSITORY_GITHUBENTERPRISE_TEMPORARY_PASSWORD));
         }
         buildConfiguration.setProperty(REPOSITORY_GITHUBENTERPRISE_REPOSITORY, buildConfiguration.getString(REPOSITORY_GITHUBENTERPRISE_REPOSITORY, "").trim());
         buildConfiguration.setProperty(REPOSITORY_GITHUBENTERPRISE_BRANCH, buildConfiguration.getString(REPOSITORY_GITHUBENTERPRISE_BRANCH, "").trim());
@@ -134,7 +132,7 @@ public class GithubEnterpriseRepository extends GitHubRepository {
         final GitHubRepositoryAccessData accessData = GitHubRepositoryAccessData.builder(getAccessData())
                 .repository(config.getString(REPOSITORY_GITHUBENTERPRISE_REPOSITORY))
                 .username(config.getString(REPOSITORY_GITHUBENTERPRISE_USERNAME))
-                .password(config.getString(REPOSITORY_GITHUBENTERPRISE_PASSWORD))
+                .password(decryptPassword(config.getString(REPOSITORY_GITHUBENTERPRISE_PASSWORD)))
                 .branch(new VcsBranchImpl(config.getString(REPOSITORY_GITHUBENTERPRISE_BRANCH)))
                 .useShallowClones(config.getBoolean(REPOSITORY_GITHUBENTERPRISE_USE_SHALLOW_CLONES))
                 .useRemoteAgentCache(config.getBoolean(REPOSITORY_GITHUBENTERPRISE_USE_REMOTE_AGENT_CACHE, false))
@@ -142,6 +140,7 @@ public class GithubEnterpriseRepository extends GitHubRepository {
                 .commandTimeout(config.getInt(REPOSITORY_GITHUBENTERPRISE_COMMAND_TIMEOUT, DEFAULT_COMMAND_TIMEOUT_IN_MINUTES))
                 .verboseLogs(config.getBoolean(REPOSITORY_GITHUBENTERPRISE_VERBOSE_LOGS, false))
                 .refSpecOverride(config.getBoolean(REPOSITORY_GITHUBENTERPRISE_FETCH_WHOLE_REPOSITORY, false) ? Constants.R_HEADS + "*" : null)
+                .lfs(config.getBoolean(REPOSITORY_GITHUBENTERPRISE_LFS_REPOSITORY, false))
                 .build();
 
         setAccessData(accessData);
@@ -154,7 +153,7 @@ public class GithubEnterpriseRepository extends GitHubRepository {
         HierarchicalConfiguration configuration = super.toConfiguration();
         configuration.setProperty(REPOSITORY_GITHUBENTERPRISE_HOSTNAME, getHostname());
         configuration.setProperty(REPOSITORY_GITHUBENTERPRISE_USERNAME, getUsername());
-        configuration.setProperty(REPOSITORY_GITHUBENTERPRISE_PASSWORD, getEncryptedPassword());
+        configuration.setProperty(REPOSITORY_GITHUBENTERPRISE_PASSWORD, getPassword());
         configuration.setProperty(REPOSITORY_GITHUBENTERPRISE_REPOSITORY, getRepository());
         configuration.setProperty(REPOSITORY_GITHUBENTERPRISE_BRANCH, getBranch());
         configuration.setProperty(REPOSITORY_GITHUBENTERPRISE_USE_SHALLOW_CLONES, isUseShallowClones());
@@ -163,6 +162,7 @@ public class GithubEnterpriseRepository extends GitHubRepository {
         configuration.setProperty(REPOSITORY_GITHUBENTERPRISE_COMMAND_TIMEOUT, getCommandTimeout());
         configuration.setProperty(REPOSITORY_GITHUBENTERPRISE_VERBOSE_LOGS, getVerboseLogs());
         configuration.setProperty(REPOSITORY_GITHUBENTERPRISE_FETCH_WHOLE_REPOSITORY, getAccessData().getRefSpecOverride() != null);
+        configuration.setProperty(REPOSITORY_GITHUBENTERPRISE_LFS_REPOSITORY, getAccessData().isLfs());
 
         return configuration;
     }
@@ -202,7 +202,16 @@ public class GithubEnterpriseRepository extends GitHubRepository {
                 .useRemoteAgentCache(gitHubAccessData.isUseRemoteAgentCache())
                 .commandTimeout(gitHubAccessData.getCommandTimeout())
                 .verboseLogs(gitHubAccessData.isVerboseLogs())
+                .lfs(gitHubAccessData.isLfs())
                 .refSpecOverride(gitHubAccessData.getRefSpecOverride())
                 .build());
+    }
+
+    private String decryptPassword(final String possiblyEncryptedPassword) {
+        try {
+            return legacyEncryptionService.decrypt(possiblyEncryptedPassword);
+        } catch (EncryptionException e) {
+            return possiblyEncryptedPassword;
+        }
     }
 }

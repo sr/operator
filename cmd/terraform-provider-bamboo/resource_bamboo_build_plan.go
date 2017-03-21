@@ -10,17 +10,25 @@ import (
 )
 
 type buildPlanRequest struct {
-	Key                 string `json:"key"`
-	Name                string `json:"name"`
-	Description         string `json:"description"`
-	DefaultRepositoryID int64  `json:"defaultRepositoryId"`
+	Key                            string `json:"key"`
+	Name                           string `json:"name"`
+	Description                    string `json:"description"`
+	DefaultRepositoryID            int64  `json:"defaultRepositoryId"`
+	RemovedBranchCleanupDays       int    `json:"removedBranchCleanupDays"`
+	InactiveBranchCleanupDays      int    `json:"inactiveBranchCleanupDays"`
+	AutomaticMergingEnabled        bool   `json:"automaticMergingEnabled"`
+	AutomaticBranchCreationEnabled bool   `json:"automaticBranchCreationEnabled"`
 }
 
 type buildPlanResponse struct {
-	Key                 string `json:"key"`
-	Name                string `json:"name"`
-	Description         string `json:"description"`
-	DefaultRepositoryID int64  `json:"defaultRepositoryId"`
+	Key                            string `json:"key"`
+	Name                           string `json:"name"`
+	Description                    string `json:"description"`
+	DefaultRepositoryID            int64  `json:"defaultRepositoryId"`
+	RemovedBranchCleanupDays       int    `json:"removedBranchCleanupDays"`
+	InactiveBranchCleanupDays      int    `json:"inactiveBranchCleanupDays"`
+	AutomaticMergingEnabled        bool   `json:"automaticMergingEnabled"`
+	AutomaticBranchCreationEnabled bool   `json:"automaticBranchCreationEnabled"`
 }
 
 func resourceBambooBuildPlan() *schema.Resource {
@@ -52,6 +60,26 @@ func resourceBambooBuildPlan() *schema.Resource {
 				Required: true,
 				ForceNew: true,
 			},
+			"removed_branch_cleanup_days": {
+				Type:     schema.TypeInt,
+				Optional: true,
+				Default:  7,
+			},
+			"inactive_branch_cleanup_days": {
+				Type:     schema.TypeInt,
+				Optional: true,
+				Default:  30,
+			},
+			"automatic_merging_enabled": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  true,
+			},
+			"automatic_branch_creation_enabled": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  true,
+			},
 		},
 	}
 }
@@ -61,10 +89,14 @@ func resourceBambooBuildPlanCreate(d *schema.ResourceData, meta interface{}) err
 	key := d.Get("key").(string)
 
 	createRequest := &buildPlanRequest{
-		Key:                 d.Get("key").(string),
-		Name:                d.Get("name").(string),
-		Description:         d.Get("description").(string),
-		DefaultRepositoryID: int64(d.Get("default_repository_id").(int)),
+		Key:                            d.Get("key").(string),
+		Name:                           d.Get("name").(string),
+		Description:                    d.Get("description").(string),
+		DefaultRepositoryID:            int64(d.Get("default_repository_id").(int)),
+		RemovedBranchCleanupDays:       d.Get("removed_branch_cleanup_days").(int),
+		InactiveBranchCleanupDays:      d.Get("inactive_branch_cleanup_days").(int),
+		AutomaticMergingEnabled:        d.Get("automatic_merging_enabled").(bool),
+		AutomaticBranchCreationEnabled: d.Get("automatic_branch_creation_enabled").(bool),
 	}
 	b, err := json.Marshal(createRequest)
 	if err != nil {
@@ -97,10 +129,14 @@ func resourceBambooBuildPlanUpdate(d *schema.ResourceData, meta interface{}) err
 	key := d.Id()
 
 	createRequest := &buildPlanRequest{
-		Key:                 d.Get("key").(string),
-		Name:                d.Get("name").(string),
-		Description:         d.Get("description").(string),
-		DefaultRepositoryID: int64(d.Get("default_repository_id").(int)),
+		Key:                            d.Get("key").(string),
+		Name:                           d.Get("name").(string),
+		Description:                    d.Get("description").(string),
+		DefaultRepositoryID:            int64(d.Get("default_repository_id").(int)),
+		RemovedBranchCleanupDays:       d.Get("removed_branch_cleanup_days").(int),
+		InactiveBranchCleanupDays:      d.Get("inactive_branch_cleanup_days").(int),
+		AutomaticMergingEnabled:        d.Get("automatic_merging_enabled").(bool),
+		AutomaticBranchCreationEnabled: d.Get("automatic_branch_creation_enabled").(bool),
 	}
 	b, err := json.Marshal(createRequest)
 	if err != nil {
@@ -161,6 +197,10 @@ func resourceBambooBuildPlanRead(d *schema.ResourceData, meta interface{}) error
 	_ = d.Set("name", response.Name)
 	_ = d.Set("description", response.Description)
 	_ = d.Set("default_repository_id", response.DefaultRepositoryID)
+	_ = d.Set("removed_branch_cleanup_days", response.RemovedBranchCleanupDays)
+	_ = d.Set("inactive_branch_cleanup_days", response.InactiveBranchCleanupDays)
+	_ = d.Set("automatic_merging_enabled", response.AutomaticMergingEnabled)
+	_ = d.Set("automatic_branch_creation_enabled", response.AutomaticBranchCreationEnabled)
 	return nil
 }
 

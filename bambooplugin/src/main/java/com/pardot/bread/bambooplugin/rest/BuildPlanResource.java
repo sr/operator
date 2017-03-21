@@ -11,6 +11,7 @@ import com.atlassian.bamboo.deletion.DeletionService;
 import com.atlassian.bamboo.event.BuildConfigurationUpdatedEvent;
 import com.atlassian.bamboo.fieldvalue.BuildDefinitionConverter;
 import com.atlassian.bamboo.plan.*;
+import com.atlassian.bamboo.plan.branch.BranchIntegrationConfiguration;
 import com.atlassian.bamboo.plan.branch.BranchIntegrationConfigurationImpl;
 import com.atlassian.bamboo.plan.branch.BranchMonitoringConfiguration;
 import com.atlassian.bamboo.plan.cache.CachedPlanManager;
@@ -24,6 +25,8 @@ import com.atlassian.bamboo.trigger.TriggerDefinition;
 import com.atlassian.bamboo.trigger.TriggerModuleDescriptor;
 import com.atlassian.bamboo.trigger.TriggerTypeManager;
 import com.atlassian.bamboo.trigger.polling.PollingTriggerConfigurationConstants;
+import com.atlassian.bamboo.vcs.configuration.PartialVcsRepositoryData;
+import com.atlassian.bamboo.vcs.configuration.PlanRepositoryDefinition;
 import com.atlassian.bamboo.webwork.util.ActionParametersMapImpl;
 import com.atlassian.bamboo.ww2.actions.build.admin.create.BuildConfiguration;
 import com.atlassian.event.api.EventPublisher;
@@ -31,7 +34,6 @@ import com.pardot.bread.bambooplugin.trigger.GithubWebhookTriggerConfigurator;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.springframework.stereotype.Component;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -40,7 +42,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 @Path("/buildplans")
-@Component
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class BuildPlanResource {
@@ -126,6 +127,11 @@ public class BuildPlanResource {
         public String name;
         public String description;
         public long defaultRepositoryId;
+
+        public int removedBranchCleanupDays;
+        public int inactiveBranchCleanupDays;
+        public boolean automaticMergingEnabled;
+        public boolean automaticBranchCreationEnabled;
     }
 
     static class PlanInformation {
@@ -134,16 +140,42 @@ public class BuildPlanResource {
         public String description;
         public long defaultRepositoryId;
 
-        public static PlanInformation newFromPlan(ImmutablePlan plan) {
+        public int removedBranchCleanupDays;
+        public int inactiveBranchCleanupDays;
+        public boolean automaticMergingEnabled;
+        public boolean automaticBranchCreationEnabled;
+
+        public static PlanInformation newFromPlan(final ImmutablePlan plan, final BuildDefinition buildDefinition) {
             PlanInformation information = new PlanInformation();
             information.key = plan.getPlanKey().toString();
             information.name = plan.getBuildName();
             information.description = plan.getDescription();
 
-            RepositoryDefinition repositoryDefinition = PlanHelper.getDefaultRepositoryDefinition(plan);
-            if (repositoryDefinition != null) {
-                information.defaultRepositoryId = repositoryDefinition.getId();
+            PlanRepositoryDefinition planRepositoryDefinition = PlanHelper.getDefaultPlanRepositoryDefinition(plan);
+            if (planRepositoryDefinition != null) {
+                // Linked repositories get unique IDs, but are linked to the parent. The parent is all we care about.
+                if (planRepositoryDefinition.getParentId() != null) {
+                    information.defaultRepositoryId = planRepositoryDefinition.getParentId();
+                } else {
+                    information.defaultRepositoryId = planRepositoryDefinition.getId();
+                }
             }
+
+            final BranchMonitoringConfiguration branchMonitoringConfiguration = buildDefinition.getBranchMonitoringConfiguration();
+            information.automaticBranchCreationEnabled = branchMonitoringConfiguration.isPlanBranchCreationEnabled();
+            if (branchMonitoringConfiguration.isRemovedBranchCleanUpEnabled()) {
+                information.removedBranchCleanupDays = branchMonitoringConfiguration.getRemovedBranchCleanUpPeriodInDays();
+            } else {
+                information.removedBranchCleanupDays = -1;
+            }
+            if (branchMonitoringConfiguration.isInactiveBranchCleanUpEnabled()) {
+                information.inactiveBranchCleanupDays = branchMonitoringConfiguration.getInactiveBranchCleanUpPeriodInDays();
+            } else {
+                information.inactiveBranchCleanupDays = -1;
+            }
+
+            final BranchIntegrationConfiguration integrationConfiguration = branchMonitoringConfiguration.getDefaultBranchIntegrationConfiguration();
+            information.automaticMergingEnabled = integrationConfiguration.isEnabled();
 
             return information;
         }
@@ -152,26 +184,26 @@ public class BuildPlanResource {
     @GET
     @Path("/{key}")
     public Response get(@PathParam("key") final String key) {
-        final ImmutablePlan plan = cachedPlanManager.getPlanByKey(PlanKeys.getPlanKey(key));
+        final Plan plan = planManager.getPlanByKey(PlanKeys.getPlanKey(key));
         if (plan == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
 
-        PlanInformation information = PlanInformation.newFromPlan(plan);
+        BuildDefinition buildDefinition = buildDefinitionManager.getBuildDefinition(plan);
+        PlanInformation information = PlanInformation.newFromPlan(plan, buildDefinition);
         return Response.ok(information).build();
     }
 
     @POST
     public Response create(final PlanRequest planRequest) {
-        final RepositoryDataEntity repositoryDataEntity = repositoryDefinitionManager.getRepositoryDataEntity(planRequest.defaultRepositoryId);
-        if (repositoryDataEntity == null) {
+        final PartialVcsRepositoryData parentVcsRepositoryData = repositoryDefinitionManager.getVcsRepositoryDataForEditing(planRequest.defaultRepositoryId);
+        if (parentVcsRepositoryData == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        final RepositoryData repositoryData = new RepositoryDataImpl(repositoryDataEntity);
 
         String planKey;
         try {
-            planKey = createPlan(planRequest, repositoryData);
+            planKey = createPlan(planRequest, parentVcsRepositoryData);
         } catch (PlanCreationDeniedException e) {
             log.error("permission denied while creating plan", e);
             return Response.status(Response.Status.FORBIDDEN).build();
@@ -191,14 +223,21 @@ public class BuildPlanResource {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
 
+        Plan plan = planManager.getPlanByKey(PlanKeys.getPlanKey(planKey));
+        PlanRepositoryDefinition defaultRepositoryDefinition = PlanHelper.getDefaultPlanRepositoryDefinition(plan);
+
         createDefaultTask(planKey, jobKey);
-        setupWebhookTrigger(planKey, repositoryData);
-        setupDailyPoll(planKey, repositoryData);
-        configureBranchManagement(planKey);
+        setupWebhookTrigger(planKey, defaultRepositoryDefinition);
+        setupDailyPoll(planKey, defaultRepositoryDefinition);
+
+        BuildDefinition buildDefinition = buildDefinitionManager.getBuildDefinition(plan);
+        configureBranchManagement(buildDefinition, planRequest);
+        buildDefinitionManager.savePlanAndDefinition(plan, buildDefinition);
+
+        eventPublisher.publish(new BuildConfigurationUpdatedEvent(this, plan.getPlanKey()));
         dashboardCachingManager.updatePlanCache(PlanKeys.getPlanKey(planKey));
 
-        Plan plan = planManager.getPlanByKey(PlanKeys.getPlanKey(planKey));
-        PlanInformation information = PlanInformation.newFromPlan(plan);
+        PlanInformation information = PlanInformation.newFromPlan(plan, buildDefinition);
         return Response.ok(information)
                 .status(Response.Status.CREATED)
                 .build();
@@ -207,25 +246,28 @@ public class BuildPlanResource {
     @PUT
     @Path("/{key}")
     public Response update(@PathParam("key") final String key, final PlanRequest planRequest) {
-        final Plan plan = planManager.getPlanByKey(PlanKeys.getPlanKey(key));
+        final Plan plan = planManager.getPlanByKey(key);
         if (plan == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
 
-        final RepositoryDataEntity repositoryDataEntity = repositoryDefinitionManager.getRepositoryDataEntity(planRequest.defaultRepositoryId);
-        if (repositoryDataEntity == null) {
+        final PartialVcsRepositoryData vcsRepositoryData = repositoryDefinitionManager.getVcsRepositoryDataForEditing(planRequest.defaultRepositoryId);
+        if (vcsRepositoryData == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        final RepositoryData repositoryData = new RepositoryDataImpl(repositoryDataEntity);
 
         plan.setBuildName(planRequest.name);
         plan.setDescription(planRequest.description);
         // TODO(alindeman): changing defaultRepositoryId is not implemented
 
-        planManager.savePlan(plan);
-        dashboardCachingManager.updatePlanCache(plan.getPlanKey());
+        BuildDefinition buildDefinition = buildDefinitionManager.getBuildDefinition(plan);
+        configureBranchManagement(buildDefinition, planRequest);
+        buildDefinitionManager.savePlanAndDefinition(plan, buildDefinition);
 
-        PlanInformation information = PlanInformation.newFromPlan(plan);
+        eventPublisher.publish(new BuildConfigurationUpdatedEvent(this, plan.getPlanKey()));
+        dashboardCachingManager.updatePlanCache(PlanKeys.getPlanKey(key));
+
+        PlanInformation information = PlanInformation.newFromPlan(plan, buildDefinition);
         return Response.ok(information).build();
     }
 
@@ -241,17 +283,17 @@ public class BuildPlanResource {
         return Response.noContent().build();
     }
 
-    private String createPlan(final PlanRequest planRequest, final RepositoryData repositoryData) throws PlanCreationDeniedException {
+    private String createPlan(final PlanRequest planRequest, final PartialVcsRepositoryData vcsRepositoryData) throws PlanCreationDeniedException {
         HashMap<String,String> configuration = new HashMap<>();
         configuration.put("existingProjectKey", PlanKeys.getProjectKeyPart(PlanKeys.getPlanKey(planRequest.key)));
         configuration.put("chainName", planRequest.name);
         configuration.put("chainKey", PlanKeys.getPlanKeyPart(PlanKeys.getPlanKey(planRequest.key)));
         configuration.put("chainDescription", planRequest.description);
-        configuration.put("selectedRepository", Long.toString(repositoryData.getId()));
+        configuration.put("selectedRepository", Long.toString(vcsRepositoryData.getId()));
         configuration.put("repositoryTypeOption", "LINKED");
 
         BuildConfiguration buildConfiguration = new BuildConfiguration();
-        buildConfiguration.setProperty("selectedRepository", Long.toString(repositoryData.getId()));
+        buildConfiguration.setProperty("selectedRepository", Long.toString(vcsRepositoryData.getId()));
 
         return chainCreationService.createPlan(
                 buildConfiguration,
@@ -302,11 +344,11 @@ public class BuildPlanResource {
         );
     }
 
-    private TriggerDefinition setupWebhookTrigger(final String planKey, final RepositoryData repositoryData) {
+    private TriggerDefinition setupWebhookTrigger(final String planKey, final PlanRepositoryDefinition repositoryDefinition) {
         TriggerModuleDescriptor triggerDescriptor = triggerTypeManager.getTriggerDescriptor(githubWebhookTriggerKey);
 
         HashSet<Long> triggeringRepositories = new HashSet<>();
-        triggeringRepositories.add(repositoryData.getId());
+        triggeringRepositories.add(repositoryDefinition.getId());
 
         HashMap<String, String> configuration = new HashMap<>();
 
@@ -321,11 +363,11 @@ public class BuildPlanResource {
             );
     }
 
-    private TriggerDefinition setupDailyPoll(final String planKey, final RepositoryData repositoryData) {
+    private TriggerDefinition setupDailyPoll(final String planKey, final PlanRepositoryDefinition repositoryDefinition) {
         TriggerModuleDescriptor triggerDescriptor = triggerTypeManager.getTriggerDescriptor(pollTriggerKey);
 
         HashSet<Long> triggeringRepositories = new HashSet<>();
-        triggeringRepositories.add(repositoryData.getId());
+        triggeringRepositories.add(repositoryDefinition.getId());
 
         HashMap<String, String> configuration = new HashMap<>();
         configuration.put(PollingTriggerConfigurationConstants.POLLING_TYPE, "CRON");
@@ -343,31 +385,37 @@ public class BuildPlanResource {
         );
     }
 
-    private void configureBranchManagement(final String planKey) {
-        Plan plan = planManager.getPlanByKey(PlanKeys.getPlanKey(planKey));
-        BuildDefinition buildDefinition = buildDefinitionManager.getBuildDefinition(plan.getPlanKey());
-
+    private void configureBranchManagement(final BuildDefinition buildDefinition, final PlanRequest request) {
         BranchMonitoringConfiguration branchMonitoringConfiguration = buildDefinition.getBranchMonitoringConfiguration();
-        branchMonitoringConfiguration.setPlanBranchCreationEnabled(true);
+        branchMonitoringConfiguration.setPlanBranchCreationEnabled(request.automaticBranchCreationEnabled);
         branchMonitoringConfiguration.setMatchingPattern(StringUtils.EMPTY);
-        branchMonitoringConfiguration.setRemovedBranchCleanUpEnabled(true);
-        branchMonitoringConfiguration.setRemovedBranchCleanUpPeriodInDays(BranchMonitoringConfiguration.REMOVED_BRANCH_DAILY_CLEAN_UP_PERIOD);
-        branchMonitoringConfiguration.setInactiveBranchCleanUpEnabled(true);
-        branchMonitoringConfiguration.setInactiveBranchCleanUpPeriodInDays(30);
+        if (request.removedBranchCleanupDays >= 0) {
+            branchMonitoringConfiguration.setRemovedBranchCleanUpEnabled(true);
+            branchMonitoringConfiguration.setRemovedBranchCleanUpPeriodInDays(request.removedBranchCleanupDays);
+        } else {
+            branchMonitoringConfiguration.setRemovedBranchCleanUpEnabled(false);
+        }
+        if (request.inactiveBranchCleanupDays >= 0) {
+            branchMonitoringConfiguration.setInactiveBranchCleanUpEnabled(true);
+            branchMonitoringConfiguration.setInactiveBranchCleanUpPeriodInDays(request.inactiveBranchCleanupDays);
+        } else {
+            branchMonitoringConfiguration.setInactiveBranchCleanUpEnabled(false);
+        }
 
         HierarchicalConfiguration integrationConfiguration = new HierarchicalConfiguration();
-        integrationConfiguration.setProperty("branches.defaultBranchIntegration.enabled", "true");
-        integrationConfiguration.setProperty("branches.defaultBranchIntegration.strategy", "BRANCH_UPDATER");
-        integrationConfiguration.setProperty("branches.defaultBranchIntegration.branchUpdater.mergeFromBranch", planKey);
-        integrationConfiguration.setProperty("branches.defaultBranchIntegration.branchUpdater.pushEnabled", "true");
+        if (request.automaticMergingEnabled) {
+            integrationConfiguration.setProperty("branches.defaultBranchIntegration.enabled", "true");
+            integrationConfiguration.setProperty("branches.defaultBranchIntegration.strategy", "BRANCH_UPDATER");
+            integrationConfiguration.setProperty("branches.defaultBranchIntegration.branchUpdater.mergeFromBranch", request.key);
+            integrationConfiguration.setProperty("branches.defaultBranchIntegration.branchUpdater.pushEnabled", "true");
+        } else {
+            integrationConfiguration.setProperty("branches.defaultBranchIntegration.enabled", "false");
+        }
         branchMonitoringConfiguration.setDefaultBranchIntegrationConfiguration(
                 BuildDefinitionConverter.populate(
                         integrationConfiguration,
                         new BranchIntegrationConfigurationImpl(true)
                 )
         );
-
-        buildDefinitionManager.savePlanAndDefinition(plan, buildDefinition);
-        eventPublisher.publish(new BuildConfigurationUpdatedEvent(this, plan.getPlanKey()));
     }
 }
