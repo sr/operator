@@ -40,6 +40,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.regex.Pattern;
 
 @Path("/buildplans")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -434,7 +435,7 @@ public class BuildPlanResource {
             if (request.automaticMergingEnabled) {
                 integrationConfiguration.setProperty("branchIntegration.enabled", "true");
                 integrationConfiguration.setProperty("branchIntegration.strategy", "BRANCH_UPDATER");
-                integrationConfiguration.setProperty("branchIntegration.branchUpdater.mergeFromBranch", request.key);
+                integrationConfiguration.setProperty("branchIntegration.branchUpdater.mergeFromBranch", topLevelPlanFromKey(request.key));
                 integrationConfiguration.setProperty("branchIntegration.branchUpdater.pushEnabled", "true");
             } else {
                 integrationConfiguration.setProperty("branchIntegration.enabled", "false");
@@ -446,5 +447,11 @@ public class BuildPlanResource {
                     )
             );
         }
+    }
+
+    // Finds the top level plan key from a child plan key
+    private String topLevelPlanFromKey(final String key) {
+        // Remove any numbers at the end of the plan key
+        return key.replaceFirst("[0-9]+$", "");
     }
 }
