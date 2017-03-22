@@ -95,7 +95,7 @@ EOS
       incident_key: ["ebf", ticket.external_id].join(":"),
       description: summary,
       contexts: [
-        Clients::Pagerduty::Link.new("Ticket (#{ticket.external_id})", ticket.url)
+        Clients::Pagerduty::Link.new(ticket.url, "Ticket (#{ticket.external_id})")
       ]
     )
   rescue => e
