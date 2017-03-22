@@ -145,7 +145,7 @@ func HandleChatRPCCommand(client operatorhipchat.Client, invoker ChatCommandInvo
 	case err = <-errC:
 	}
 
-	if err != nil && !strings.Contains(err.Error(), "no such service:") {
+	if err != nil && !strings.Contains(err.Error(), "unhandleable command:") {
 		_ = client.SendRoomNotification(
 			context.TODO(),
 			&operatorhipchat.RoomNotification{
