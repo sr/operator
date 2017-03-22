@@ -10,6 +10,7 @@ import (
 	"os"
 	"regexp"
 	"strings"
+	"sync"
 	"time"
 
 	"git.dev.pardot.com/Pardot/bread/jib"
@@ -44,6 +45,7 @@ type config struct {
 	githubAPIToken string
 	githubOrg      string
 	pollDuration   time.Duration
+	parallelism    int
 	jib            *jib.Config
 }
 
@@ -80,6 +82,7 @@ func run() error {
 	flags.StringVar(&config.githubUser, "github-user", "", "GitHub username")
 	flags.StringVar(&config.githubAPIToken, "github-api-token", "", "GitHub API token")
 	flags.StringVar(&config.githubOrg, "github-org", "", "GitHub organization name")
+	flags.IntVar(&config.parallelism, "parallelism", 15, "Number of parallel threads of execution")
 	flags.DurationVar(&config.pollDuration, "poll-duration", 30*time.Second, "Duration between polls of open pull requests")
 	flags.DurationVar(&config.jib.StaleMaxAge, "stale-max-age", config.jib.StaleMaxAge, "Duration without an update after which pull requests are considered stale")
 	// Allow setting flags via environment variables
@@ -127,15 +130,29 @@ func run() error {
 			// TODO(alindeman): report to sentry
 			fmt.Fprintf(os.Stderr, "error fetching open PRs, will retry: %v\n", err)
 		} else {
-			for _, pr := range openPRs {
-				for _, handler := range handlers {
-					if err := handler(pr); err != nil {
-						// An error in a handler is worrisome, but not fatal
-						// TODO(alindeman): report to sentry
-						fmt.Fprintf(os.Stderr, "error in %v handler: %v\n", handler, err)
+			prC := make(chan *github.PullRequest)
+			var wg sync.WaitGroup
+			for i := 0; i < config.parallelism; i++ {
+				wg.Add(1)
+				go func() {
+					for pr := range prC {
+						for _, handler := range handlers {
+							if err := handler(pr); err != nil {
+								// An error in a handler is worrisome, but not fatal
+								// TODO(alindeman): report to sentry
+								fmt.Fprintf(os.Stderr, "error in %v handler: %v\n", handler, err)
+							}
+						}
 					}
-				}
+					wg.Done()
+				}()
 			}
+
+			for _, pr := range openPRs {
+				prC <- pr
+			}
+			close(prC)
+			wg.Wait()
 		}
 
 		<-time.After(config.pollDuration)
