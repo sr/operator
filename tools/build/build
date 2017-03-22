@@ -1,17 +1,16 @@
 #!/usr/bin/env bash
 #/ Usage: build [--help] [<project>]
-#/ Build program for the BREAD team repository.
 set -euo pipefail
-cd "$(dirname "$0")/../.."
 
-: "${BREAD:="$(pwd)"}"
-export BREAD
+: "${REPO_ROOT_DIR:="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"}"
+: "${BREAD_DIR:="${REPO_ROOT_DIR}"}"
+export REPO_ROOT_DIR BREAD_DIR
 
-PATH="$BREAD/bin:$PATH"
+PATH="$BREAD_DIR/bin:$PATH"
 export PATH
 
 # Bring in configuration settings
-. "$BREAD/etc/buildenv"
+. "${BREAD_DIR}/etc/buildenv"
 
 # Enable tracing output if DEBUG is set
 : "${DEBUG:=""}"
@@ -27,7 +26,7 @@ if [ -z "${GOBIN:-""}" ]; then
 fi
 
 : "${GO_PREFIX:="git.dev.pardot.com/Pardot/bread"}"
-export GO_PREFIX
+: "${GO_PREFIX_BREAD:="git.dev.pardot.com/Pardot/bread"}"
 
 project=""
 while [ $# -gt 0 ]; do
@@ -63,20 +62,20 @@ pullopts=""
 if [ -z "$NOPULL" ]; then
   pullopts="--pull"
 fi
-docker build $pullopts -f etc/docker/Dockerfile.build -t build/build .
+docker build $pullopts -f "${BREAD_DIR}/etc/docker/Dockerfile.build" -t build/build .
 
 # Build citool utility program
 docker run --rm -w /go \
-   -v "$GOBIN:/go/bin" \
-   -v "$BREAD:/go/src/${GO_PREFIX}" \
+   -v "${GOBIN}:/go/bin" \
+   -v "${REPO_ROOT_DIR}:/go/src/${GO_PREFIX}" \
    build/build \
-   go install -v "${GO_PREFIX}/cmd/citool"
+   go install -v "${GO_PREFIX_BREAD}/cmd/citool"
 
 build_rubygem() {
     local gemname="$1"
     local gemspec="$2"
     docker run --rm \
-        -v "$BREAD:/data" \
+        -v "${BREAD_DIR}:/data" \
         -v /etc/env/artifactoryenv:/etc/env/artifactoryenv \
         -e "ARTIFACTORY_HOST=$ARTIFACTORY_HOST" \
         -e "CI_BRANCH=$CI_BRANCH" \
@@ -153,7 +152,7 @@ tarball_upload() {
     local sha1="$(git rev-parse HEAD)"
 
     docker run --rm \
-        -v "$BREAD:/data" \
+        -v "${BREAD_DIR}:/data" \
         -v "${tarball}:/data/tarball.tar" \
         -w "/data" \
         -e "ARTIFACTORY_HOST=$ARTIFACTORY_HOST" \
@@ -181,12 +180,12 @@ case "$project" in
     canoe)
         build-ruby "$project" "canoe"
 
-        file="${BREAD}/terraform/_vendor/src/github.com/hashicorp/terraform/terraform/version.go"
+        file="${BREAD_DIR}/terraform/_vendor/src/github.com/hashicorp/terraform/terraform/version.go"
         vendored="$(
           grep "const Version " "$file" |
           sed -e 's/^.*"\(.*\)".*$/\1/'
         )"
-        canoe="$(cat canoe/config/terraform-version)"
+        canoe="$(cat "${BREAD_DIR}/canoe/config/terraform-version")"
 
         if [ "$vendored" != "$canoe" ]; then
           printf "Vendored Terraform version (%s) does not match version required by Canoe: %s\n" \
@@ -219,15 +218,15 @@ case "$project" in
         fi
         ;;
     devenv)
-        mkdir -p "${BREAD}/bin/darwin_amd64"
+        mkdir -p "${BREAD_DIR}/bin/darwin_amd64"
         docker run --rm -w /go \
             -v "${GOBIN}:/go/bin" \
-            -v "${BREAD}:/go/src/${GO_PREFIX}" \
-            -v "${BREAD}/bin/darwin_amd64:/go/bin/darwin_amd64" \
+            -v "${REPO_ROOT_DIR}:/go/src/${GO_PREFIX}" \
+            -v "${BREAD_DIR}/bin/darwin_amd64:/go/bin/darwin_amd64" \
             -e "GOOS=darwin" \
             -e "GOARCH=amd64" \
             build/build \
-            go install -v "${GO_PREFIX}/cmd/devenv"
+            go install -v "${GO_PREFIX_BREAD}/cmd/devenv"
         ;;
     explorer)
         build-ruby "$project" "explorer"
@@ -243,19 +242,20 @@ case "$project" in
         ;;
     golang)
         # Start a test LDAP server. This is used by test suite of the "bread" package
-        docker build $pullopts -f etc/docker/Dockerfile.ldap -t bread/ldap "$BREAD"
-        ldapcontainer="$(docker run -d -v "${BREAD}/etc/ldap.ldif:/data/ldap.ldif" bread/ldap)"
+        docker build $pullopts -f "${BREAD_DIR}/etc/docker/Dockerfile.ldap" -t bread/ldap "$BREAD_DIR"
+        ldapcontainer="$(docker run -d -v "${BREAD_DIR}/etc/ldap.ldif:/data/ldap.ldif" bread/ldap)"
         trap 'docker stop -t3 $ldapcontainer >/dev/null 2>&1' EXIT
 
         # Lint (first-party only) then build all Go code
         docker run --rm -w /go \
             -v "${GOBIN}:/go/bin" \
-            -v "$BREAD:/go/src/${GO_PREFIX}" \
+            -v "${REPO_ROOT_DIR}:/go/src/${GO_PREFIX}" \
             --link "$ldapcontainer:ldap" \
             build/build \
-            make -f "/go/src/${GO_PREFIX}/etc/mk/golang.mk"
+            make -f "/go/src/${GO_PREFIX_BREAD}/etc/mk/golang.mk"
 
         if [ -n "$CI" ]; then
+          set -x
           pushd "$GOBIN"
           tarball="$(tarball-build "jiracleaner")"
           tarball_upload "$tarball" "true"
@@ -272,15 +272,17 @@ case "$project" in
           # Build static operatord binary for Linux
           docker run --rm -w /go \
               -v "/tmp:/tmp" \
-              -v "$BREAD:/go/src/${GO_PREFIX}" \
+              -v "${REPO_ROOT_DIR}:/go/src/${GO_PREFIX}" \
               -e "TMPDIR=/tmp" \
+              -e "CGO_ENABLED=0" \
+              -e "GOOS=linux" \
               build/build \
-              make -f "/go/src/${GO_PREFIX}/etc/mk/operator.mk" build-operatord
+	          go build -a -tags netgo -ldflags "-w" -o /tmp/operatord_linux "${GO_PREFIX_BREAD}/cmd/operatord"
 
           # Build operatord container for deployment
-          trap 'rm -f $BREAD/operatord' EXIT
-          cp /tmp/operatord_linux "$BREAD/operatord"
-          make -f etc/mk/operator.mk docker-build-operatord
+          trap 'rm -f ${BREAD_DIR}/operatord' EXIT
+          cp /tmp/operatord_linux "$BREAD_DIR/operatord"
+          docker build -f "${BREAD_DIR}/etc/docker/Dockerfile.operatord" -t operatord_app "${BREAD_DIR}"
 
           # Push operatord Docker container and tarball to Artifactory
           export CI_JOB="OP"
@@ -302,7 +304,7 @@ case "$project" in
         true
         ;;
     parbot)
-        docker build $pullopts -f "$BREAD/parbot/Dockerfile" -t parbot_app "$BREAD/parbot"
+        docker build $pullopts -f "${BREAD_DIR}/parbot/Dockerfile" -t parbot_app "${BREAD_DIR}/parbot"
         docker run parbot_app script/lint
 
         if [ -n "$CI" ]; then
@@ -341,15 +343,15 @@ case "$project" in
         # Unfortunately installing shellcheck on CentOS is non-trivial so this
         # an Ubuntu image.
         docker build $pullopts \
-            -f etc/docker/Dockerfile.shellcheck -t build/shellcheck .
+            -f "${BREAD_DIR}/etc/docker/Dockerfile.shellcheck" -t build/shellcheck "${BREAD_DIR}"
 
         # Lint all shell scripts
-        docker run --rm -v "$BREAD:/data" \
+        docker run --rm -v "${BREAD_DIR}:/data" \
             -e "PATH=/data/tools/build:$PATH" build/shellcheck lint-shell
         ;;
     teampass)
         docker build $pullopts \
-            -f teampass/Dockerfile -t teampass_app teampass
+            -f "${BREAD_DIR}/teampass/Dockerfile" -t teampass_app "${BREAD_DIR}/teampass"
 
         if [ -n "$CI" ]; then
             docker_push "$project"
@@ -358,19 +360,10 @@ case "$project" in
     terraform)
         docker run --rm -w /go \
             -v "${GOBIN}:/go/bin" \
-            -v "$BREAD:/go/src/${GO_PREFIX}" \
+            -v "${REPO_ROOT_DIR}:/go/src/${GO_PREFIX}" \
             -e "GOBIN=/go/bin" \
             build/build \
             "/go/src/${GO_PREFIX}/bin/terra" validate
-
-        tarball="$(mktemp -t "bread-terraformXXXXX").tar"
-        trap 'rm $tarball' EXIT
-        docker run --rm -v "$BREAD:/data" -w "/data" build/build \
-          git archive "$(git rev-parse HEAD)" terraform > "$tarball"
-
-        if [ -n "$CI" ]; then
-          tarball_upload "$tarball" "true"
-        fi
         ;;
     *)
         echo "Unknown project: $project" 2>&1
