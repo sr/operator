@@ -189,4 +189,12 @@ class ChangelingConfig
     }
     @jira_client = JIRA::Client.new(options)
   end
+
+  # The Pagerduty Service Key that is notified when an emergency breakfix change
+  # is merged
+  def emergency_pagerduty_service_key
+    return @emergency_pagerduty_service_key if defined?(@emergency_pagerduty_service_key)
+    @emergency_pagerduty_service_key = ENV["EMERGENCY_PAGERDUTY_SERVICE_KEY"]
+  end
+  attr_writer :emergency_pagerduty_service_key
 end

@@ -2,9 +2,10 @@ class EmergencyMergeTicket
   class Error < StandardError
   end
 
-  def initialize(jira_client, github_client, project_key, multipass)
+  def initialize(jira_client, github_client, pagerduty_service_key, project_key, multipass)
     @jira_client = jira_client
     @github_client = github_client
+    @pagerduty_service_key = pagerduty_service_key
     @project_key = project_key
     @multipass = multipass
   end
@@ -23,6 +24,7 @@ class EmergencyMergeTicket
 
     if !@multipass.emergency_ticket_reference
       @multipass.create_emergency_ticket_reference!(ticket: ticket)
+      notify_pager(ticket)
     end
   end
 
@@ -83,5 +85,20 @@ EOS
       else
         @jira_client.Issue.build
       end
+  end
+
+  def notify_pager(ticket)
+    return unless @pagerduty_service_key
+
+    Clients::Pagerduty.new.trigger(
+      service_key: @pagerduty_service_key,
+      incident_key: ["ebf", ticket.external_id].join(":"),
+      description: summary,
+      contexts: [
+        Clients::Pagerduty::Link.new("Ticket (#{ticket.external_id})", ticket.url)
+      ]
+    )
+  rescue => e
+    Raven.capture_exception(e)
   end
 end

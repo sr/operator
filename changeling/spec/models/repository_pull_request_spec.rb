@@ -3,6 +3,7 @@ require "rails_helper"
 RSpec.describe RepositoryPullRequest do
   before(:each) do
     Changeling.config.pardot = true
+    Changeling.config.emergency_pagerduty_service_key = "fake123"
     @repository = GithubInstallation.current.repositories.create!(
       github_id: 1,
       github_owner_id: 1,
@@ -28,6 +29,10 @@ RSpec.describe RepositoryPullRequest do
       repository_id: @repository.id
     )
     @repository_pull_request = RepositoryPullRequest.new(@multipass)
+  end
+
+  after(:each) do
+    Changeling.config.emergency_pagerduty_service_key = nil
   end
 
   def stub_jira_ticket(external_id, exists: true, resolved: false)
@@ -172,6 +177,11 @@ RSpec.describe RepositoryPullRequest do
       stub_request(:get, "#{Changeling.config.github_api_endpoint}/teams/#{index}/members")
         .to_return(body: JSON.dump(data), headers: { "Content-Type" => "application/json" })
     end
+  end
+
+  def stub_pagerduty_event_trigger
+    stub_request(:post, "https://#{Clients::Pagerduty::EVENTS_HOSTNAME}/generic/2010-04-15/create_event.json")
+      .to_return(status: 200, headers: { "Content-Type": "application/json" }, body: JSON.dump(status: "success"))
   end
 
   describe "synchronizing ticket references" do
@@ -343,6 +353,7 @@ RSpec.describe RepositoryPullRequest do
       stub_github_pull_request_comments
       stub_github_pull_request_labels
       stub_github_pull_request_comment_creation
+      stub_pagerduty_event_trigger
 
       original_release_id = @multipass.release_id
       @repository_pull_request.synchronize(create_github_status: false)
@@ -362,6 +373,7 @@ RSpec.describe RepositoryPullRequest do
       stub_github_pull_request_comments
       stub_github_pull_request_labels
       stub_github_pull_request_comment_creation
+      stub_pagerduty_event_trigger
 
       original_release_id = @multipass.release_id
       @repository_pull_request.synchronize(create_github_status: false)
@@ -387,6 +399,7 @@ RSpec.describe RepositoryPullRequest do
       stub_github_pull_request_comments
       stub_github_pull_request_labels
       stub_github_pull_request_comment_creation
+      stub_pagerduty_event_trigger
 
       expect(@multipass.changed_files).to eq([])
       @repository_pull_request.synchronize(create_github_status: false)
@@ -645,6 +658,7 @@ RSpec.describe RepositoryPullRequest do
       stub_github_pull_request_labels
       stub_request(:post, "#{Changeling.config.github_api_endpoint}/repos/#{@repository.full_name}/issues/#{@repository_pull_request.number}/comments")
         .to_return(status: 201, headers: { "Content-Type": "application/json" }, body: JSON.dump(id: 1))
+      pd_request = stub_pagerduty_event_trigger
 
       @repository_pull_request.synchronize(create_github_status: false)
       @multipass.reload
@@ -665,6 +679,8 @@ RSpec.describe RepositoryPullRequest do
       stub_jira_ticket("BREAD-emergency", resolved: true)
       @repository_pull_request.reload.synchronize(create_github_status: false)
       expect(@multipass.emergency_ticket_reference.ticket.reload.open?).to eq(false)
+
+      expect(pd_request).to have_been_made.once
     end
   end
 
