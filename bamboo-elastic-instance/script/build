@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+set -x
+
+cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/.."; pwd)"
+
+readonly DOCKER_IMAGE_NAME="bread/bamboo-elastic-instance"
+
+docker build -t "$DOCKER_IMAGE_NAME" -f "Dockerfile.build" .
+docker run -v "$(pwd):/bamboo-elastic-instance" \
+  -w "/bamboo-elastic-instance" \
+  -it \
+  "$DOCKER_IMAGE_NAME" \
+  /usr/bin/packer build "$@" instance.json
