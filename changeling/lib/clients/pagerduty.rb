@@ -20,6 +20,7 @@ module Clients
     def trigger(service_key:, incident_key:, description:, contexts: [])
       req = Net::HTTP::Post.new("/generic/2010-04-15/create_event.json")
       req.body = JSON.dump(
+        event_type: "trigger",
         service_key: service_key,
         incident_key: incident_key,
         description: description,
