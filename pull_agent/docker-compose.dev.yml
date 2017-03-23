@@ -3,3 +3,6 @@ services:
   app:
     volumes:
       - ".:/pull-agent"
+  canoe:
+    volumes:
+      - "../canoe:/app"

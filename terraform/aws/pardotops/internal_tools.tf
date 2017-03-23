@@ -41,7 +41,6 @@ resource "aws_security_group" "hipchat_server_xmpp" {
       "${var.confluence_server_instance_ip}/32",
       "${var.pardot_ci_nat_gw_public_ip}/32",
       "${var.jira_server_instance_ip}/32",
-      "${var.tools_egress_proxy_ip}/32",
       "${aws_instance.github_enterprise_server_1.public_ip}/32",
       "${aws_instance.github_enterprise_server_2.public_ip}/32",
       "52.0.199.236/32",                                               # bots.dev.pardot.com
@@ -75,7 +74,6 @@ resource "aws_security_group" "hipchat_server_http" {
       "${var.confluence_server_instance_ip}/32",
       "${var.pardot_ci_nat_gw_public_ip}/32",
       "${var.jira_server_instance_ip}/32",
-      "${var.tools_egress_proxy_ip}/32",
       "${aws_instance.github_enterprise_server_1.public_ip}/32",
       "${aws_instance.github_enterprise_server_2.public_ip}/32",
       "52.0.199.236/32",                                               # bots.dev.pardot.com
@@ -109,7 +107,6 @@ resource "aws_security_group" "hipchat_server_https" {
       "${var.confluence_server_instance_ip}/32",
       "${var.pardot_ci_nat_gw_public_ip}/32",
       "${var.jira_server_instance_ip}/32",
-      "${var.tools_egress_proxy_ip}/32",
       "${aws_instance.github_enterprise_server_1.public_ip}/32",
       "${aws_instance.github_enterprise_server_2.public_ip}/32",
       "52.0.199.236/32",                                               # bots.dev.pardot.com

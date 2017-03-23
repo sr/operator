@@ -14,8 +14,6 @@ services:
       BIND: "0.0.0.0"
       DATABASE_HOST: "mysql"
       DATABASE_PORT: 3306
-    volumes:
-      - .:/app
     ports:
       - "4001:4000"
     links:

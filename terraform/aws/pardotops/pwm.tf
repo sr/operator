@@ -18,7 +18,7 @@ resource "aws_elb" "pwm_production" {
     lb_protocol        = "https"
     instance_port      = 80
     instance_protocol  = "http"
-    ssl_certificate_id = "arn:aws:iam::364709603225:server-certificate/ops.pardot.com"
+    ssl_certificate_id = "arn:aws:iam::364709603225:server-certificate/ops.pardot.com-2017"
   }
 
   listener {

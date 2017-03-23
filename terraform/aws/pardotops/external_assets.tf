@@ -26,10 +26,6 @@ variable "pardot_ci_vpc_id" {
   default = "vpc-6d80c40a"
 }
 
-variable "tools_egress_proxy_ip" {
-  default = "52.3.71.92"
-}
-
 variable "bamboo_server_instance_ip" {
   default = "52.0.51.79"
 }
