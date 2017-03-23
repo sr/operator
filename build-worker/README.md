@@ -1,4 +1,4 @@
-# Bamboo Elastic Instance
+# Build Worker
 
 The scripts in this directory build the 'base box' we use as our continuous integration (CI) worker machines.
 
