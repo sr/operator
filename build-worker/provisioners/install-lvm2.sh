@@ -53,7 +53,7 @@ if ! pvs /dev/xvd[bc] &>/dev/null; then
 
   lvcreate --stripes 2 --stripesize 256 \
     --zero n \
-    -L 10G \
+    -L 20G \
     --name home \
     ephemeral
 
