@@ -309,13 +309,6 @@ resource "bamboo_build_plan" "PDT-SYM" {
   automatic_merging_enabled = false
 }
 
-resource "bamboo_build_plan" "BREAD-BEI" {
-  key                       = "BREAD-BEI"
-  name                      = "bamboo-elastic-instance"
-  default_repository_id     = "${bamboo_repository.bamboo-elastic-instance.id}"
-  automatic_merging_enabled = false
-}
-
 resource "bamboo_build_plan" "BREAD-BC" {
   key                       = "BREAD-BC"
   name                      = "bamboo-configuration"
