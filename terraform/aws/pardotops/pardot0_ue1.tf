@@ -216,20 +216,6 @@ resource "aws_db_subnet_group" "pardot0_ue1" {
   ]
 }
 
-# VPC Peering with tools_egress
-
-resource "aws_vpc_peering_connection" "pardot0_ue1_peer_tools_egress" {
-  peer_owner_id = "010094454891"              # pardot-atlassian
-  peer_vpc_id   = "vpc-b64769d2"              # tools_egress
-  vpc_id        = "${aws_vpc.pardot0_ue1.id}"
-}
-
-resource "aws_route" "pardot0_ue1_route_tools_egress" {
-  route_table_id            = "${aws_vpc.pardot0_ue1.main_route_table_id}"
-  destination_cidr_block    = "172.29.0.0/16"
-  vpc_peering_connection_id = "${aws_vpc_peering_connection.pardot0_ue1_peer_tools_egress.id}"
-}
-
 # Bastion host
 
 resource "aws_security_group" "pardot0_ue1_bastion" {
