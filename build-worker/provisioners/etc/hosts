@@ -1,0 +1,5 @@
+127.0.0.1     localhost localhost.localdomain
+127.0.0.1     pi.localhost.com go.localhost.com preview.localhost.com testdata.localhost.com
+127.0.0.1     cdev.localhost.com
+172.28.0.132  git.dev.pardot.com
+172.31.8.244  bamboo.dev.pardot.com bamboo-internal.dev.pardot.com

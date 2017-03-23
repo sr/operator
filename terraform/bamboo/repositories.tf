@@ -242,14 +242,6 @@ resource "bamboo_repository" "symfony" {
   shallow_clones = true
 }
 
-resource "bamboo_repository" "bamboo-elastic-instance" {
-  name           = "bamboo-elastic-instance"
-  username       = "${var.bamboo_git_username}"
-  password       = "${var.bamboo_git_password}"
-  repository     = "Pardot/bamboo-elastic-instance"
-  shallow_clones = true
-}
-
 resource "bamboo_repository" "symfony-dic" {
   name           = "symfony-dic"
   username       = "${var.bamboo_git_username}"
