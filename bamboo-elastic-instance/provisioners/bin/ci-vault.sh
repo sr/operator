@@ -3,9 +3,6 @@ set -euo pipefail
 
 readonly VAULT_SERVER="https://vault.dev.pardot.com"
 readonly ARTIFACTORY_ENV_FILE="/etc/env/artifactoryenv"
-readonly BAMBOO_ENV_FILE="/etc/env/bambooenv"
-readonly SA_BREAD_ENV_FILE="/etc/env/sa_bread"
-readonly AWS_CRED_FILE="/etc/aws/credentials"
 readonly HIPCHAT_FILE="/etc/hipchat"
 readonly MVN_SETTINGS_FILE="/etc/mvn/settings_xmls/sa_bamboo.xml"
 readonly CLOVER_FILE="/etc/clover/clover.license"
@@ -48,11 +45,6 @@ done
   echo "PASSWORD=\"$(echo "$ci_secrets" | jq -r .data.artifactory.password)\""
 } >"$ARTIFACTORY_ENV_FILE"
 
-{
-  echo "BAMBOO_USERNAME='$(echo "$ci_secrets" | jq -r .data.bamboo.username)'"
-  echo "BAMBOO_PASSWORD='$(echo "$ci_secrets" | jq -r .data.bamboo.password)'"
-} >"$BAMBOO_ENV_FILE"
-
 mkdir -p "$BAMBOO_HOME/.ssh"
 echo "$ci_secrets" | jq -r .data.bamboo.rsa | base64 --decode > "$BAMBOO_HOME/.ssh/id_rsa"
 chown bamboo: "$BAMBOO_HOME/.ssh" "$BAMBOO_HOME/.ssh/id_rsa"
@@ -64,18 +56,6 @@ echo "$ci_secrets" | jq -r .data.bamboo.rsa | base64 --decode > "$ROOT_HOME/.ssh
 chown bamboo: "$ROOT_HOME/.ssh" "$ROOT_HOME/.ssh/id_rsa"
 chmod 0700 "$ROOT_HOME/.ssh"
 chmod 0600 "$ROOT_HOME/.ssh/id_rsa"
-
-{
-  echo "[default]"
-  echo "aws_access_key_id = $(echo "$ci_secrets" | jq -r .data.aws_sa_bread.access_key)"
-  echo "aws_secret_access_key = $(echo "$ci_secrets" | jq -r .data.aws_sa_bread.secret_key)"
-} >"$SA_BREAD_ENV_FILE"
-
-{
-  echo "[pardotops]"
-  echo "aws_access_key_id = $(echo "$ci_secrets" | jq -r .data.aws_pardotops.access_key)"
-  echo "aws_secret_access_key = $(echo "$ci_secrets" | jq -r .data.aws_pardotops.secret_key)"
-} >"$AWS_CRED_FILE"
 
 {
   echo "HIPCHAT_TOKEN=\"$(echo "$ci_secrets" | jq -r .data.hipchat.token)\""
