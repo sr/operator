@@ -70,7 +70,7 @@ EOF
 
 resource "aws_iam_instance_profile" "bamboo_worker" {
   name  = "bamboo_worker"
-  roles = ["${aws_iam_role.bamboo_worker.name}"]
+  roles = ["${aws_iam_role.bamboo_worker.id}"]
 }
 
 # Bamboo workers may spin up additional EC2 machines in the pardot-ci account
@@ -78,12 +78,19 @@ resource "aws_iam_instance_profile" "bamboo_worker" {
 resource "aws_iam_role" "bamboo_worker" {
   name = "bamboo_worker"
 
-  assume_role_policy = <<EOF
+  assume_role_policy = "${file("ec2_instance_trust_relationship.json")}"
+}
+
+resource "aws_iam_role_policy" "bamboo_worker" {
+  name = "bamboo_worker"
+  role = "${aws_iam_role.bamboo_worker.id}"
+
+  policy = <<EOF
 {
   "Version": "2012-10-17",
   "Statement": [{
       "Effect": "Allow",
-      "Action" : [
+      "Action": [
         "ec2:AttachVolume",
         "ec2:AuthorizeSecurityGroupIngress",
         "ec2:CopyImage",
@@ -119,5 +126,6 @@ resource "aws_iam_role" "bamboo_worker" {
       ],
       "Resource" : "*"
   }]
+}
 EOF
 }
