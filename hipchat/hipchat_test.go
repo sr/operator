@@ -2,6 +2,7 @@ package breadhipchat_test
 
 import (
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -28,7 +29,10 @@ func TestEventHandler(t *testing.T) {
 		"event": "room_message",
 		"item": {
 			"message": {
-				"message": "hello world"
+				"message": "hello world",
+				"from": {
+					"id": 42
+				}
 			}
 		}
 	}`
@@ -36,7 +40,7 @@ func TestEventHandler(t *testing.T) {
 	t.Run("successful request", func(t *testing.T) {
 		creds := &clientcredentials.Config{ClientID: "client ID", ClientSecret: "client secret"}
 		handler := &testMessageHandler{}
-		eventHandler, err := breadhipchat.EventHandler(creds, handler.Handle)
+		eventHandler, err := breadhipchat.EventHandler(nil, creds, handler.Handle)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -63,7 +67,11 @@ func TestEventHandler(t *testing.T) {
 			t.Fatal(err)
 		}
 		if resp.StatusCode != http.StatusAccepted {
-			t.Errorf("want status code %d, got %d", http.StatusAccepted, resp.StatusCode)
+			v, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				t.Fatal(err)
+			}
+			t.Errorf("want status code %d, got %d (body: %s)", http.StatusAccepted, resp.StatusCode, string(v))
 		}
 		if handler.lastMessage != "hello world" {
 			t.Errorf(`want message "hello world", got "%s"`, handler.lastMessage)
@@ -73,7 +81,7 @@ func TestEventHandler(t *testing.T) {
 	t.Run("invalid JWT signature", func(t *testing.T) {
 		creds := &clientcredentials.Config{ClientID: "client ID", ClientSecret: "client secret"}
 		handler := &testMessageHandler{}
-		eventHandler, err := breadhipchat.EventHandler(creds, handler.Handle)
+		eventHandler, err := breadhipchat.EventHandler(nil, creds, handler.Handle)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -101,7 +109,11 @@ func TestEventHandler(t *testing.T) {
 			t.Fatal(err)
 		}
 		if resp.StatusCode != http.StatusBadRequest {
-			t.Errorf("want status code %d, got %d", http.StatusBadRequest, resp.StatusCode)
+			v, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				t.Fatal(err)
+			}
+			t.Errorf("want status code %d, got %d (body: %s)", http.StatusAccepted, resp.StatusCode, string(v))
 		}
 		if handler.lastMessage != "" {
 			t.Errorf(`want message "", got "%s"`, handler.lastMessage)

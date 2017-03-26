@@ -3,6 +3,7 @@ syntax = "proto3";
 package bread;
 
 import "github.com/sr/operator/operator.proto";
+import "google/protobuf/empty.proto";
 
 option go_package = "breadpb";
 
@@ -13,6 +14,10 @@ service Ping {
 	rpc Ping(PingRequest) returns (operator.Response);
 	// Trigger a slow request, for testing timeout handling
 	rpc SlowLoris(SlowLorisRequest) returns (operator.Response);
+}
+
+service Pinger {
+	rpc Ping(google.protobuf.Empty) returns (google.protobuf.Empty);
 }
 
 message PingRequest {

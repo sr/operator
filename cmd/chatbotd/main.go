@@ -11,21 +11,29 @@ import (
 	"net/url"
 	"os"
 	"os/signal"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
 
 	heroku "github.com/cyberdelia/heroku-go/v3"
+	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/sr/operator/hipchat"
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2/clientcredentials"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 
 	"git.dev.pardot.com/Pardot/bread"
 	"git.dev.pardot.com/Pardot/bread/hipchat"
+	"git.dev.pardot.com/Pardot/bread/pb"
 )
 
-const grpcDialTimeout = 2 * time.Second
+const (
+	grpcAddress         = ":8443"
+	grpcDialTimeout     = 10 * time.Second
+	defaultProtoPackage = "bread"
+)
 
 var (
 	port               = flag.String("port", "", "Listening port of the HTTP server. Defaults to $PORT.")
@@ -34,8 +42,11 @@ var (
 	hipchatOAuthSecret = flag.String("hipchat-oauth-secret", "", "")
 	herokuAPIUsername  = flag.String("heroku-api-username", "", "")
 	herokuAPIPassword  = flag.String("heroku-api-password", "", "")
+	canoeAPIURL        = flag.String("canoe-api-url", "https://canoe.dev.pardot.com", "")
+	canoeAPIKey        = flag.String("canoe-api-key", "", "Canoe API key")
 
 	hipchatAddonConfig = &breadhipchat.AddonConfig{}
+	ldapConfig         = &bread.LDAPConfig{}
 )
 
 func init() {
@@ -46,6 +57,8 @@ func init() {
 	flag.StringVar(&hipchatAddonConfig.WebhookURL, "hipchat-addon-webhook-url", "", "")
 	flag.StringVar(&hipchatAddonConfig.AvatarURL, "hipchat-addon-avatar-url", "", "")
 	flag.StringVar(&hipchatAddonConfig.HerokuApp, "hipchat-addon-heroku-app", "", "")
+	flag.StringVar(&ldapConfig.Addr, "ldap-address", "localhost:389", "Address of the LDAP server used to authenticate and authorize commands")
+	flag.StringVar(&ldapConfig.Base, "ldap-base", bread.LDAPBase, "LDAP Base DN")
 }
 
 func main() {
@@ -68,6 +81,19 @@ func run() error {
 	if *port == "" {
 		return errors.New("required flag missing: port")
 	}
+	if *canoeAPIURL == "" {
+		return errors.New("required flag missing: canoe-api-url")
+	}
+	parsedCanoeAPIURL, err := url.Parse(*canoeAPIURL)
+	if err != nil {
+		return fmt.Errorf("required flag canoe-url is invalid: %s", err)
+	}
+	if *canoeAPIKey == "" {
+		return errors.New("required flag missing: canoe-api-key")
+	}
+	if v, ok := os.LookupEnv("LDAP_CA_CERT"); ok {
+		ldapConfig.CACert = []byte(v)
+	}
 
 	logger := log.New(os.Stderr, "chatbotd: ", 0)
 
@@ -86,19 +112,31 @@ func run() error {
 		return err
 	}
 
-	errC := make(chan error, 1)
-
-	// Start the gRPC server and establish a client connection to it.
-	grpcListener, err := net.Listen("tcp", ":0")
+	authorizer, err := bread.NewAuthorizer(
+		ldapConfig,
+		bread.NewCanoeClient(parsedCanoeAPIURL, *canoeAPIKey),
+		bread.ACL,
+	)
 	if err != nil {
 		return err
 	}
-	grpcServer := grpc.NewServer()
+	interceptor := &bread.Interceptor{Authorizer: authorizer}
+
+	errC := make(chan error, 1)
+	// Start the gRPC server and establish a client connection to it.
+	grpcListener, err := net.Listen("tcp", grpcAddress)
+	if err != nil {
+		return err
+	}
+
+	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(interceptor.UnaryServerInterceptor))
+	breadpb.RegisterPingerServer(grpcServer, &pingerServer{client})
 	go func() {
 		errC <- grpcServer.Serve(grpcListener)
 	}()
+
 	conn, err := grpc.Dial(
-		grpcListener.Addr().String(),
+		grpcAddress,
 		grpc.WithBlock(),
 		grpc.WithTimeout(grpcDialTimeout),
 		grpc.WithInsecure(),
@@ -113,7 +151,7 @@ func run() error {
 	// All chat messages are processed through these functions
 	messageHandlers := []bread.ChatMessageHandler{
 		bread.LogHandler(logger),
-		bread.ChatCommandHandler(chatCommands),
+		bread.ChatCommandHandler(defaultProtoPackage, chatCommands),
 	}
 
 	mux := http.NewServeMux()
@@ -149,6 +187,7 @@ func run() error {
 		}
 
 		handler, err := breadhipchat.EventHandler(
+			client,
 			&clientcredentials.Config{
 				ClientID:     *hipchatOAuthID,
 				ClientSecret: *hipchatOAuthSecret,
@@ -228,6 +267,57 @@ func run() error {
 }
 
 // Invoker is a generated function TODO(sr)
-func Invoker(context.Context, *grpc.ClientConn, *bread.ChatCommand) error {
-	return nil
+func Invoker(ctx context.Context, conn *grpc.ClientConn, cmd *bread.ChatCommand) error {
+	if cmd.Package == "bread" {
+		if cmd.Service == "Pinger" {
+			if cmd.Method == "Ping" {
+				_, err := breadpb.NewPingerClient(conn).Ping(ctx, &empty.Empty{})
+				return err
+			}
+		}
+	}
+	return fmt.Errorf("unhandleable command: %+v", cmd)
+}
+
+// TODO(sr) Move this out of the main.
+type pingerServer struct {
+	hipchat operatorhipchat.Client
+}
+
+func (s *pingerServer) Ping(ctx context.Context, req *empty.Empty) (*empty.Empty, error) {
+	var (
+		email  string
+		roomID int64
+	)
+	// TODO(sr) Abstract this into a chatbot.Reply(context.Context) function or similar
+	if md, ok := metadata.FromContext(ctx); ok {
+		if val, ok := md["user_email"]; ok {
+			if len(val) == 1 {
+				email = val[0]
+			}
+		}
+		if val, ok := md["hipchat_room_id"]; ok {
+			if len(val) == 1 {
+				if i, err := strconv.Atoi(val[0]); err == nil {
+					roomID = int64(i)
+				}
+			}
+		}
+	}
+	if email == "" {
+		return nil, errors.New("no user email found in request")
+	}
+	if roomID == 0 {
+		return nil, errors.New("no hipchat room ID found in request")
+	}
+	return &empty.Empty{},
+		s.hipchat.SendRoomNotification(ctx, &operatorhipchat.RoomNotification{
+			Message:       fmt.Sprintf(`PONG <a href="mailto:%s">%s</a>`, email, email),
+			RoomID:        roomID,
+			MessageFormat: "html",
+			MessageOptions: &operatorhipchat.MessageOptions{
+				Color: "gray",
+				From:  "pinger.Ping",
+			},
+		})
 }

@@ -4,18 +4,22 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"net"
 	"os"
 	"strings"
 	"testing"
 	"time"
 
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
+
 	"github.com/go-ldap/ldap"
-	"github.com/sr/operator"
 	"golang.org/x/net/context"
 
 	"git.dev.pardot.com/Pardot/bread"
-	"git.dev.pardot.com/Pardot/bread/swagger/client/canoe"
-	"git.dev.pardot.com/Pardot/bread/swagger/models"
+	"git.dev.pardot.com/Pardot/bread/generated/swagger/client/canoe"
+	"git.dev.pardot.com/Pardot/bread/generated/swagger/models"
+	"git.dev.pardot.com/Pardot/bread/pb"
 )
 
 var ldapEnabled bool
@@ -87,63 +91,168 @@ func TestLDAPAuthorizer(t *testing.T) {
 	}
 	defer conn.Close()
 	canoeClient := &fakeCanoeClient{}
-	auth, err := bread.NewAuthorizer(&bread.LDAPConfig{Addr: ldapAddr}, canoeClient, bread.ACL)
+	auth, err := bread.NewAuthorizer(
+		&bread.LDAPConfig{Addr: ldapAddr},
+		canoeClient,
+		[]*bread.ACLEntry{
+			{
+				Call: &bread.RPC{
+					Package: "bread",
+					Service: "Ping",
+					Method:  "ping",
+				},
+				Group: "developers",
+			},
+		},
+	)
 	if err != nil {
 		t.Fatal(err)
 	}
-	swe := "srozet@salesforce.com"
-	unknown := "boom@gmail.com"
-	authOK := &canoe.PhoneAuthenticationOK{
-		Payload: &models.BreadPhoneAuthenticationResponse{
-			Error: false,
-		},
-	}
+	const validUserEmail = "srozet@salesforce.com"
 	for _, tc := range []struct {
-		user     string
-		service  string
-		method   string
-		authResp *canoe.PhoneAuthenticationOK
-		authErr  error
-		err      error
+		userEmail string
+		call      *bread.RPC
+		authResp  *canoe.PhoneAuthenticationOK
+		authErr   error
+		wantErr   error
 	}{
-		{swe, "bread.Ping", "Ping", authOK, nil, nil},
-		{"", "bread.Ping", "Ping", authOK, nil, errors.New("unable to authorize request without an user email")},
-		{swe, "bread.Ping", "Pong", authOK, nil, errors.New("no ACL entry found for service `bread.Ping Pong`")},
-		{unknown, "bread.Ping", "Ping", authOK, nil, errors.New("no user matching email `boom@gmail.com`")},
-		{swe, "bread.Ping", "Ping", nil, errors.New("panic"), errors.New("Canoe phone authentication request failed")},
-		{swe, "bread.Ping", "Ping", &canoe.PhoneAuthenticationOK{
-			Payload: &models.BreadPhoneAuthenticationResponse{
-				Error:   true,
-				Message: "denied",
-			},
-		}, nil, errors.New("denied")},
+		{
+			validUserEmail,
+			&bread.RPC{Package: "bread", Service: "Ping", Method: "ping"},
+			&canoe.PhoneAuthenticationOK{Payload: &models.BreadPhoneAuthenticationResponse{Error: false}},
+			nil,
+			nil,
+		},
+		{
+			"",
+			&bread.RPC{Package: "bread", Service: "Ping", Method: "ping"},
+			&canoe.PhoneAuthenticationOK{Payload: &models.BreadPhoneAuthenticationResponse{Error: false}},
+			nil,
+			errors.New("unable to authorize request without an user email"),
+		},
+		{
+			"unknown@salesforce.com",
+			&bread.RPC{Package: "bread", Service: "Ping", Method: "ping"},
+			&canoe.PhoneAuthenticationOK{Payload: &models.BreadPhoneAuthenticationResponse{Error: false}},
+			nil,
+			errors.New("no user matching email `unknown@salesforce.com`"),
+		},
+		{
+			validUserEmail,
+			&bread.RPC{Package: "bread", Service: "Ping", Method: "not-found-method"},
+			&canoe.PhoneAuthenticationOK{Payload: &models.BreadPhoneAuthenticationResponse{Error: false}},
+			nil,
+			errors.New("no ACL entry found for service `bread.Ping not-found-method`"),
+		},
+		{
+			validUserEmail,
+			&bread.RPC{Package: "bread", Service: "Ping", Method: "ping"},
+			&canoe.PhoneAuthenticationOK{Payload: &models.BreadPhoneAuthenticationResponse{Error: true}},
+			nil,
+			errors.New("Salesforce Authenticator verification failed"),
+		},
+		{
+			validUserEmail,
+			&bread.RPC{Package: "bread", Service: "Ping", Method: "ping"},
+			&canoe.PhoneAuthenticationOK{Payload: &models.BreadPhoneAuthenticationResponse{Error: true, Message: "boomtown"}},
+			nil,
+			errors.New("boomtown"),
+		},
+		{
+			validUserEmail,
+			&bread.RPC{Package: "bread", Service: "Ping", Method: "ping"},
+			nil,
+			errors.New("canoe RPC error"),
+			errors.New("Salesforce Authenticator verification failed due to an internal server error"),
+		},
 	} {
-		t.Run(fmt.Sprintf("%s %s", tc.service, tc.method), func(t *testing.T) {
-			canoeClient.authErr = tc.authErr
-			canoeClient.authResp = tc.authResp
-			err := auth.Authorize(context.Background(), &operator.Request{
-				Call: &operator.Call{
-					Service: tc.service,
-					Method:  tc.method,
-				},
-				Source: &operator.Source{
-					Type: operator.SourceType_HUBOT,
-					User: &operator.User{
-						Email: tc.user,
-					},
-				},
-			})
-			if err == nil {
-				if tc.err != nil {
-					t.Errorf("user %#v should not be authorized", tc.user)
-				}
-			} else {
-				if tc.err == nil {
-					t.Errorf("unexpected error: %s", err)
-				} else if !strings.Contains(err.Error(), tc.err.Error()) {
-					t.Errorf("expected error message to contain %#v, got %#v", tc.err.Error(), err.Error())
-				}
+		canoeClient.authErr = tc.authErr
+		canoeClient.authResp = tc.authResp
+		if err := auth.Authorize(context.Background(), tc.call, tc.userEmail); err == nil {
+			if tc.wantErr != nil {
+				t.Errorf("RPC %+v by user %+v should not be authorized", tc.call, tc.userEmail)
 			}
-		})
+		} else {
+			if tc.wantErr == nil {
+				t.Errorf("RPC %+v want error: %s, got %+v", tc.call, tc.wantErr, err)
+			} else if !strings.Contains(err.Error(), tc.wantErr.Error()) {
+				t.Errorf("RPC %+v want error message to contain %+v, got %+v", tc.call, tc.wantErr.Error(), err.Error())
+			}
+		}
+	}
+}
+
+type fakeAuthorizer struct {
+	err error
+}
+
+func (i *fakeAuthorizer) Authorize(ctx context.Context, call *bread.RPC, email string) error {
+	if email == "" {
+		return errors.New("no email given")
+	}
+	return i.err
+}
+
+func TestInterceptor(t *testing.T) {
+	listener, err := net.Listen("tcp", "localhost:0")
+	if err != nil {
+		t.Fatalf("failed to listen: %v", err)
+	}
+	defer listener.Close()
+
+	authorizer := &fakeAuthorizer{}
+	interceptor := &bread.Interceptor{Authorizer: authorizer}
+	server := grpc.NewServer(grpc.UnaryInterceptor(interceptor.UnaryServerInterceptor))
+	defer server.GracefulStop()
+	ping := &pingServer{}
+	breadpb.RegisterPingServer(server, ping)
+	go server.Serve(listener)
+
+	conn, err := grpc.Dial(
+		listener.Addr().String(),
+		grpc.WithInsecure(),
+		grpc.WithBlock(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer conn.Close()
+
+	for _, tc := range []struct {
+		ctx     context.Context
+		req     *breadpb.PingRequest
+		authErr error
+		wantErr error
+	}{
+		{
+			metadata.NewContext(context.Background(), metadata.MD{"user_email": []string{"email"}}),
+			&breadpb.PingRequest{},
+			nil,
+			nil,
+		},
+		{
+			context.Background(),
+			&breadpb.PingRequest{},
+			nil,
+			errors.New("no email given"),
+		},
+		{
+			metadata.NewContext(context.Background(), metadata.MD{"user_email": []string{"email", "email"}}),
+			&breadpb.PingRequest{},
+			nil,
+			errors.New("no email given"),
+		},
+		{
+			metadata.NewContext(context.Background(), metadata.MD{"user_email": []string{"email"}}),
+			&breadpb.PingRequest{},
+			errors.New("authorization failed"),
+			errors.New("authorization failed"),
+		},
+	} {
+		authorizer.err = tc.authErr
+		_, err := breadpb.NewPingClient(conn).Ping(tc.ctx, tc.req)
+		if grpc.ErrorDesc(err) != grpc.ErrorDesc(tc.wantErr) {
+			t.Errorf("req %+v %+v want err %+v, got %+v", tc.ctx, tc.req, tc.wantErr, err)
+		}
 	}
 }

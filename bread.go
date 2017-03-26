@@ -1,6 +1,8 @@
 package bread
 
 import (
+	"errors"
+	"fmt"
 	"net/url"
 	"strings"
 	"time"
@@ -13,8 +15,8 @@ import (
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
+	"git.dev.pardot.com/Pardot/bread/generated/swagger/client/canoe"
 	"git.dev.pardot.com/Pardot/bread/pb"
-	"git.dev.pardot.com/Pardot/bread/swagger/client/canoe"
 )
 
 const (
@@ -51,7 +53,7 @@ func NewCanoeClient(url *url.URL, token string) CanoeClient {
 }
 
 // NewUnaryServerInterceptor returns a gRPC server interceptor that logs requests and authorizes requests.
-func NewUnaryServerInterceptor(logger Logger, jsonpbm *jsonpb.Marshaler, authorizer operator.Authorizer) grpc.UnaryServerInterceptor {
+func NewUnaryServerInterceptor(logger Logger, jsonpbm *jsonpb.Marshaler, authorizer Authorizer) grpc.UnaryServerInterceptor {
 	return func(
 		ctx context.Context,
 		in interface{},
@@ -63,19 +65,22 @@ func NewUnaryServerInterceptor(logger Logger, jsonpbm *jsonpb.Marshaler, authori
 		})
 		req := requester.GetRequest()
 		if !ok || req == nil {
-			return nil, operator.ErrInvalidRequest
+			return nil, errors.New("invalid RPC request: no operator.Request")
 		}
 		if req.GetSource() == nil {
-			return nil, operator.ErrInvalidRequest
+			return nil, errors.New("invalid RPC request: no source")
 		}
-		s := strings.Split(info.FullMethod, "/")
-		if len(s) != 3 || s[0] != "" || s[1] == "" || s[2] == "" {
-			return nil, operator.ErrInvalidRequest
+		p := strings.Split(info.FullMethod, "/")
+		if len(p) != 3 || p[0] != "" || p[1] == "" || p[2] == "" {
+			return nil, fmt.Errorf("invalid RPC request: %s", info.FullMethod)
 		}
-		req.Call = &operator.Call{Service: s[1], Method: s[2]}
-
+		pp := strings.Split(p[1], ".")
+		if len(pp) != 2 || pp[0] == "" || pp[1] == "" {
+			return nil, fmt.Errorf("invalid RPC request: %s", info.FullMethod)
+		}
 		// Authorize the request and log any error.
-		if err := authorizer.Authorize(ctx, req); err != nil {
+		call := &RPC{Package: pp[0], Service: pp[1], Method: p[2]}
+		if err := authorizer.Authorize(ctx, call, req.GetUserEmail()); err != nil {
 			req.Call.Error = err.Error()
 			logRequest(logger, jsonpbm, req.Call)
 			return nil, err
