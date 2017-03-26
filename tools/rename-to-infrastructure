@@ -6,12 +6,7 @@ git ls-files origin/master > "$currentmanifest"
 
 ORIG_GOPATH="${GOPATH}"
 
-workdir="$(mktemp -d)"
-export GOPATH="${workdir}"
-mkdir -p "${GOPATH}/src/git.dev.pardot.com/Pardot"
-
-git worktree add --checkout \
-  -b "infrastructure-repo-$(date +%s)" \
+git clone -b infra-repo-prep https://git.dev.pardot.com/Pardot/bread \
   "${GOPATH}/src/git.dev.pardot.com/Pardot/infrastructure"
 
 cd "${GOPATH}/src/git.dev.pardot.com/Pardot/infrastructure"
@@ -30,9 +25,9 @@ bread/jira
 bread/pb
 bread/pb/hal9000
 bread/privet
-bread/swagger/client
-bread/swagger/client/canoe
-bread/swagger/models
+bread/generated/swagger/client
+bread/generated/swagger/client/canoe
+bread/generated/swagger/models
 '
 for pkg in $packages; do
     find . -type f -name "*.go" -a -not -path "./bread/vendor/*" -a -not -path "./bread/terraform/*" -exec \
@@ -47,8 +42,5 @@ git commit -m "Rename to git.dev.pardot.com/Pardot/infrastructure"
 newmanifest="$(mktemp)"
 git ls-files HEAD | sed 's/^bread\///' > "$newmanifest"
 git diff --exit-code "$currentmanifest" "$newmanifest"
-
-cp "${ORIG_GOPATH}/src/git.dev.pardot.com/Pardot/bread/tools/build/build" \
-    "${workdir}/src/git.dev.pardot.com/Pardot/infrastructure/bread/tools/build/build"
 
 echo "${GOPATH}/src/git.dev.pardot.com/Pardot/infrastructure"
