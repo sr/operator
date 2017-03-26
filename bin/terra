@@ -16,11 +16,13 @@ unset CDPATH
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+BREAD="${ROOT_DIR}/bread"
+export BREAD
+
 : "${PROGRAM:="$(basename "$0")"}"
 : "${HIPCHAT_TOKEN:=""}"
 : "${USER:="$(whoami)"}"
-: "${BREAD:="$(pwd)"}"
-export BREAD
 
 # Prevent Terraform from making a remote API call to HashiCorp's servers.
 # See https://github.com/hashicorp/go-checkpoint for details.
@@ -46,14 +48,14 @@ GIT_COMMIT="$(git rev-parse HEAD)"
 
 TERRAFORM_PROJECT="$arg1"
 TERRAFORM_OPTS="${@:3}"
-TERRAFORM_BASEDIR="$(pwd)/terraform"
+TERRAFORM_BASEDIR="${BREAD}/terraform"
 TERRAFORM_VENDORDIR="${TERRAFORM_BASEDIR}/_vendor"
 TERRAFORM_DIR="${TERRAFORM_BASEDIR}/${TERRAFORM_PROJECT}"
 TERRAFORM_PLAN="${TERRAFORM_DIR}/plan.out"
 TERRAFORM_VAR_FILE="${TERRAFORM_BASEDIR}/terraform.tfvars"
 export TERRAFORM_DIR TERRAFORM_PLAN TERRAFORM_PROJECT TERRAFORM_VAR_FILE TERRAFORM_OPTS
 
-if test -z "${GOPATH:-""}" || test "$BREAD" != "${GOPATH}/src/git.dev.pardot.com/Pardot/bread"; then
+if test -z "${GOPATH:-""}" || test "$BREAD" != "${GOPATH}/src/git.dev.pardot.com/Pardot/infrastructure/bread"; then
     echo "Deploying Terraform changes requires a working Go environment:"
     echo
     echo "- Go must be installed. On macOS, 'brew install go' should just work"
@@ -73,14 +75,14 @@ if test -z "${GOPATH:-""}" || test "$BREAD" != "${GOPATH}/src/git.dev.pardot.com
     exit 1
 fi
 
-GOBIN="${TERRAFORM_VENDORDIR}/bin" go install -v ./cmd/terraform-provider-*
+GOBIN="${TERRAFORM_VENDORDIR}/bin" go install -v ./bread/cmd/terraform-provider-*
 GOPATH="${TERRAFORM_VENDORDIR}" GOBIN="${TERRAFORM_VENDORDIR}/bin" go install -v github.com/hashicorp/terraform
 
 case "$action" in
   apply|unlock|plan)
-    go install -v ./cmd/terra2
+    go install -v ./bread/cmd/terra2
 
-    artifactoryenv="terraform/artifactory.env"
+    artifactoryenv="bread/terraform/artifactory.env"
     if ! test -f "$artifactoryenv"; then
       printf "%s: file %s is required. Please see %s.sample for an example.\n" \
         "$PROGRAM" "$artifactoryenv" "$artifactoryenv" 2>&1
@@ -101,9 +103,9 @@ case "$action" in
       -terraform-var-file "$TERRAFORM_VAR_FILE"
     ;;
   pull|push|import)
-    go install -v ./cmd/breadsignal
+    go install -v ./bread/cmd/breadsignal
 
-    artifactoryenv="terraform/artifactory.env"
+    artifactoryenv="bread/terraform/artifactory.env"
     if ! test -f "$artifactoryenv"; then
       printf "%s: file %s is required. Please see %s.sample for an example.\n" \
         "$PROGRAM" "$artifactoryenv" "$artifactoryenv" 2>&1
@@ -142,19 +144,18 @@ case "$action" in
         -testing=false
     fi
 
-    cd terraform &&
+    cd "${TERRAFORM_BASEDIR}" &&
     make -f ../etc/mk/terraform.mk "$action" |
     grep -vi password
     ;;
   fmt)
-    find terraform -type d -mindepth 1 -not -path "terraform/_vendor*" -print0 | xargs -0 -n1 "${TERRAFORM_VENDORDIR}/bin/terraform" fmt -write=true -list=false
+    find "${TERRAFORM_BASEDIR}" -type d -mindepth 1 -not -path "*/terraform/_vendor*" -print0 | xargs -0 -n1 "${TERRAFORM_VENDORDIR}/bin/terraform" fmt -write=true -list=false
     exit "$?"
     ;;
   validate)
-    cd terraform && GOBIN="${BREAD}/bin" make -s -f ../etc/mk/terraform.mk validate
-    cd ..
+    cd "${TERRAFORM_BASEDIR}" && GOBIN="${BREAD}/bin" make -s -f ../etc/mk/terraform.mk validate
 
-    out="$(find terraform -type d -mindepth 1 -not -path "terraform/_vendor*" -print0 | xargs -0 -n1 "${TERRAFORM_VENDORDIR}/bin/terraform" fmt -write=false -list=true)"
+    out="$(find "${TERRAFORM_BASEDIR}" -type d -mindepth 1 -not -path "*/terraform/_vendor*" -print0 | xargs -0 -n1 "${TERRAFORM_VENDORDIR}/bin/terraform" fmt -write=false -list=true)"
     if [ -z "$out" ]; then
       exit 0
     else

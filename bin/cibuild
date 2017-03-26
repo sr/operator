@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
-PATH="$(dirname "$0")/../tools/build:$PATH"
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+PATH="${ROOT_DIR}/bread/tools/build:$PATH"
 export PATH
 exec build "$@"
