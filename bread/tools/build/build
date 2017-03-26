@@ -2,8 +2,8 @@
 #/ Usage: build [--help] [<project>]
 set -euo pipefail
 
-: "${REPO_ROOT_DIR:="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"}"
-: "${BREAD_DIR:="${REPO_ROOT_DIR}"}"
+: "${REPO_ROOT_DIR:="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"}"
+: "${BREAD_DIR:="${REPO_ROOT_DIR}/bread"}"
 export REPO_ROOT_DIR BREAD_DIR
 
 PATH="$BREAD_DIR/bin:$PATH"
@@ -25,8 +25,8 @@ if [ -z "${GOBIN:-""}" ]; then
     export PATH
 fi
 
-: "${GO_PREFIX:="git.dev.pardot.com/Pardot/bread"}"
-: "${GO_PREFIX_BREAD:="git.dev.pardot.com/Pardot/bread"}"
+: "${GO_PREFIX:="git.dev.pardot.com/Pardot/infrastructure"}"
+: "${GO_PREFIX_BREAD:="git.dev.pardot.com/Pardot/infrastructure/bread"}"
 
 project=""
 while [ $# -gt 0 ]; do
