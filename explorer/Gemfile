@@ -4,6 +4,7 @@ gem "coffee-rails", "~> 4.0", group: [:development, :test]
 gem "foreman", "0.78.0"
 gem "jquery-rails"
 gem "mysql2", "0.4.4"
+gem "nokogiri", "~>1.7"
 gem "omniauth", "1.3.1"
 gem "omniauth-ldap", "~>1.0"
 gem "pardot-rubylib", path: "vendor/cache/rubylib"
