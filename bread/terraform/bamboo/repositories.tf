@@ -40,6 +40,15 @@ resource "bamboo_repository" "bread" {
   use_submodules = false
 }
 
+resource "bamboo_repository" "infrastructure" {
+  name           = "infrastructure"
+  username       = "${var.bamboo_git_username}"
+  password       = "${var.bamboo_git_password}"
+  repository     = "Pardot/infrastructure"
+  shallow_clones = false
+  use_submodules = false
+}
+
 resource "bamboo_repository" "chef" {
   name                   = "chef"
   username               = "${var.bamboo_git_username}"
