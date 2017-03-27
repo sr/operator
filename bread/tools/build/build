@@ -255,7 +255,6 @@ case "$project" in
             make -f "/go/src/${GO_PREFIX_BREAD}/etc/mk/golang.mk"
 
         if [ -n "$CI" ]; then
-          set -x
           pushd "$GOBIN"
           tarball="$(tarball-build "jiracleaner")"
           tarball_upload "$tarball" "true"
