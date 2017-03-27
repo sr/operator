@@ -9,6 +9,10 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
+// UserEmailKey is the gRPC metadata key containing the email of the user that
+// made the request.
+const UserEmailKey = "user_email"
+
 // GRPCServerInterceptor returns a grpc.UnaryServerInterceptor that enables the
 // authentication and authorization of gRPC calls using the bread.Authorizer
 // interface.
@@ -33,10 +37,6 @@ func GRPCServerInterceptor(auth Authorizer) grpc.UnaryServerInterceptor {
 	}
 }
 
-// userEmailKey is the key that's injected into the gRPC metadata, containing
-// the email of the user that made the request.
-const userEmailKey = "user_email"
-
 // emailFromContexts extracts the requester's email address out of the gRPC
 // call metadata.
 func emailFromContext(ctx context.Context) string {
@@ -44,7 +44,7 @@ func emailFromContext(ctx context.Context) string {
 	if !ok {
 		return ""
 	}
-	v, ok := md[userEmailKey]
+	v, ok := md[UserEmailKey]
 	if !ok {
 		return ""
 	}
