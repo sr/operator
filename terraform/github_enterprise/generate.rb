@@ -58,9 +58,11 @@ resource "github_branch_protection" "#{safe_name}_#{repo.default_branch}" {
   repository = "\${github_repository.#{safe_name}.name}"
   branch     = "#{repo.default_branch}"
 
-  include_admins = false
-  strict         = false
-  contexts       = ["compliance"]
+  required_status_checks {
+    include_admins = false
+    strict         = false
+    contexts       = ["compliance"]
+  }
 }
 EOS
       end

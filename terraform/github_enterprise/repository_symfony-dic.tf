@@ -12,9 +12,11 @@ resource "github_branch_protection" "symfony-dic_master" {
   repository = "${github_repository.symfony-dic.name}"
   branch     = "master"
 
-  include_admins = false
-  strict         = false
-  contexts       = ["compliance"]
+  required_status_checks {
+    include_admins = false
+    strict         = false
+    contexts       = ["compliance"]
+  }
 }
 
 resource "github_team_repository" "symfony-dic_developers" {

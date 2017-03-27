@@ -12,9 +12,11 @@ resource "github_branch_protection" "gmail-chrome_master" {
   repository = "${github_repository.gmail-chrome.name}"
   branch     = "master"
 
-  include_admins = false
-  strict         = false
-  contexts       = ["compliance"]
+  required_status_checks {
+    include_admins = false
+    strict         = false
+    contexts       = ["compliance"]
+  }
 }
 
 resource "github_team_repository" "gmail-chrome_developers" {

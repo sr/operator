@@ -12,9 +12,11 @@ resource "github_branch_protection" "symfony_master" {
   repository = "${github_repository.symfony.name}"
   branch     = "master"
 
-  include_admins = false
-  strict         = false
-  contexts       = ["compliance"]
+  required_status_checks {
+    include_admins = false
+    strict         = false
+    contexts       = ["compliance"]
+  }
 }
 
 resource "github_team_repository" "symfony_service-accounts-read-only" {

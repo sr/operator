@@ -12,9 +12,11 @@ resource "github_branch_protection" "ansible_master" {
   repository = "${github_repository.ansible.name}"
   branch     = "master"
 
-  include_admins = false
-  strict         = false
-  contexts       = ["compliance"]
+  required_status_checks {
+    include_admins = false
+    strict         = false
+    contexts       = ["compliance"]
+  }
 }
 
 resource "github_team_repository" "ansible_service-accounts-read-only" {

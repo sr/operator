@@ -12,9 +12,11 @@ resource "github_branch_protection" "salesforce-demo-package_master" {
   repository = "${github_repository.salesforce-demo-package.name}"
   branch     = "master"
 
-  include_admins = false
-  strict         = false
-  contexts       = ["compliance"]
+  required_status_checks {
+    include_admins = false
+    strict         = false
+    contexts       = ["compliance"]
+  }
 }
 
 resource "github_team_repository" "salesforce-demo-package_developers" {

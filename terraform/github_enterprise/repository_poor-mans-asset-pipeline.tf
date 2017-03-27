@@ -12,9 +12,11 @@ resource "github_branch_protection" "poor-mans-asset-pipeline_master" {
   repository = "${github_repository.poor-mans-asset-pipeline.name}"
   branch     = "master"
 
-  include_admins = false
-  strict         = false
-  contexts       = ["compliance"]
+  required_status_checks {
+    include_admins = false
+    strict         = false
+    contexts       = ["compliance"]
+  }
 }
 
 resource "github_team_repository" "poor-mans-asset-pipeline_developers" {
