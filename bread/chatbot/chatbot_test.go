@@ -16,7 +16,7 @@ import (
 
 	"git.dev.pardot.com/Pardot/infrastructure/bread"
 	"git.dev.pardot.com/Pardot/infrastructure/bread/chatbot"
-	"git.dev.pardot.com/Pardot/infrastructure/bread/pb"
+	"git.dev.pardot.com/Pardot/infrastructure/bread/generated/pb"
 )
 
 func TestGRPCMessageHandler(t *testing.T) {

@@ -21,9 +21,9 @@ import (
 	"google.golang.org/grpc"
 
 	"git.dev.pardot.com/Pardot/infrastructure/bread"
+	"git.dev.pardot.com/Pardot/infrastructure/bread/generated/pb"
+	"git.dev.pardot.com/Pardot/infrastructure/bread/generated/pb/hal9000"
 	"git.dev.pardot.com/Pardot/infrastructure/bread/jira"
-	"git.dev.pardot.com/Pardot/infrastructure/bread/pb"
-	"git.dev.pardot.com/Pardot/infrastructure/bread/pb/hal9000"
 )
 
 const (

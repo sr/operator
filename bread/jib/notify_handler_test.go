@@ -4,8 +4,8 @@ import (
 	"reflect"
 	"testing"
 
+	"git.dev.pardot.com/Pardot/infrastructure/bread/generated/pb"
 	"git.dev.pardot.com/Pardot/infrastructure/bread/jib"
-	"git.dev.pardot.com/Pardot/infrastructure/bread/pb"
 )
 
 func TestNotifyCommandHandler(t *testing.T) {

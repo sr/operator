@@ -10,7 +10,7 @@ import (
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/ptypes"
 
-	"git.dev.pardot.com/Pardot/infrastructure/bread/pb"
+	"git.dev.pardot.com/Pardot/infrastructure/bread/generated/pb"
 )
 
 // NewHandler returns an http.Handler that logs all requests, inlude those that

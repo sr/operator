@@ -8,12 +8,12 @@ set -euo pipefail
 : "${BREAD_CANOE_DIR:="${BREAD}/canoe"}"
 : "${BREAD_CHANGELING_DIR:="${BREAD}/changeling"}"
 
-: "${BREAD_GO_PROTO_DIR:="${BREAD}/pb"}"
+: "${BREAD_GO_PROTO_DIR:="${BREAD}/generated/pb"}"
 : "${BREAD_GO_VENDOR_DIR:="${BREAD}/vendor"}"
 : "${BREAD_GO_SWAGGER_RELDIR:="bread/generated/swagger"}"
 
 : "${BREAD_GO_IMPORT_PATH:="git.dev.pardot.com/Pardot/infrastructure/bread"}"
-: "${BREAD_GO_PROTO_IMPORT_PATH:="${BREAD_GO_IMPORT_PATH}/pb"}"
+: "${BREAD_GO_PROTO_IMPORT_PATH:="${BREAD_GO_IMPORT_PATH}/generated/pb"}"
 : "${BREAD_GO_VENDOR_PATH:="${BREAD_GO_IMPORT_PATH}/vendor"}"
 
 if ! command -v protoc >/dev/null; then

@@ -14,7 +14,7 @@ import (
 	"strings"
 	"time"
 
-	"git.dev.pardot.com/Pardot/infrastructure/bread/pb"
+	"git.dev.pardot.com/Pardot/infrastructure/bread/generated/pb"
 	"github.com/golang/protobuf/jsonpb"
 )
 

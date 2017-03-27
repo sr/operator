@@ -8,7 +8,7 @@ import (
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
-	breadpb "git.dev.pardot.com/Pardot/infrastructure/bread/pb"
+	breadpb "git.dev.pardot.com/Pardot/infrastructure/bread/generated/pb"
 )
 
 func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, pkg string) error {

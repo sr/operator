@@ -26,8 +26,8 @@ import (
 
 	"git.dev.pardot.com/Pardot/infrastructure/bread"
 	"git.dev.pardot.com/Pardot/infrastructure/bread/chatbot"
+	"git.dev.pardot.com/Pardot/infrastructure/bread/generated/pb"
 	"git.dev.pardot.com/Pardot/infrastructure/bread/hipchat"
-	"git.dev.pardot.com/Pardot/infrastructure/bread/pb"
 )
 
 const (

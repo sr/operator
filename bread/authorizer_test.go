@@ -18,9 +18,9 @@ import (
 	"golang.org/x/net/context"
 
 	"git.dev.pardot.com/Pardot/infrastructure/bread"
+	"git.dev.pardot.com/Pardot/infrastructure/bread/generated/pb"
 	"git.dev.pardot.com/Pardot/infrastructure/bread/generated/swagger/client/canoe"
 	"git.dev.pardot.com/Pardot/infrastructure/bread/generated/swagger/models"
-	"git.dev.pardot.com/Pardot/infrastructure/bread/pb"
 )
 
 var ldapRequired bool

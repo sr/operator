@@ -14,7 +14,7 @@ import (
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
-	"git.dev.pardot.com/Pardot/infrastructure/bread/pb/hal9000"
+	"git.dev.pardot.com/Pardot/infrastructure/bread/generated/pb/hal9000"
 )
 
 // A chatCommand is a RPC request received via chat.

@@ -9,7 +9,7 @@ import (
 	"github.com/sr/operator"
 	"golang.org/x/net/context"
 
-	"git.dev.pardot.com/Pardot/infrastructure/bread/pb"
+	"git.dev.pardot.com/Pardot/infrastructure/bread/generated/pb"
 )
 
 type ticketsServer struct {

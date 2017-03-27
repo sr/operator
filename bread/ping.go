@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"time"
 
-	"git.dev.pardot.com/Pardot/infrastructure/bread/pb"
+	"git.dev.pardot.com/Pardot/infrastructure/bread/generated/pb"
 	"github.com/sr/operator"
 	"github.com/sr/operator/hipchat"
 	"golang.org/x/net/context"

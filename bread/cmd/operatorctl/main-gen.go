@@ -10,7 +10,7 @@ import (
 	"github.com/sr/operator"
 	"golang.org/x/net/context"
 
-	breadpb "git.dev.pardot.com/Pardot/infrastructure/bread/pb"
+	breadpb "git.dev.pardot.com/Pardot/infrastructure/bread/generated/pb"
 )
 
 const program = "operatorctl"
