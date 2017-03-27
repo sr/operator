@@ -782,7 +782,7 @@
 			"importpath": "github.com/hashicorp/terraform/config",
 			"repository": "https://github.com/hashicorp/terraform",
 			"vcs": "git",
-			"revision": "142dd256ad48ab17b6019fe9cd18712167fcf4b4",
+			"revision": "7c25ef851bd26f720e749983597b36b17061e3ca",
 			"branch": "HEAD",
 			"path": "config",
 			"notests": true
@@ -791,7 +791,7 @@
 			"importpath": "github.com/hashicorp/terraform/dag",
 			"repository": "https://github.com/hashicorp/terraform",
 			"vcs": "git",
-			"revision": "142dd256ad48ab17b6019fe9cd18712167fcf4b4",
+			"revision": "7c25ef851bd26f720e749983597b36b17061e3ca",
 			"branch": "HEAD",
 			"path": "dag",
 			"notests": true
@@ -800,7 +800,7 @@
 			"importpath": "github.com/hashicorp/terraform/flatmap",
 			"repository": "https://github.com/hashicorp/terraform",
 			"vcs": "git",
-			"revision": "142dd256ad48ab17b6019fe9cd18712167fcf4b4",
+			"revision": "7c25ef851bd26f720e749983597b36b17061e3ca",
 			"branch": "HEAD",
 			"path": "flatmap",
 			"notests": true
@@ -809,7 +809,7 @@
 			"importpath": "github.com/hashicorp/terraform/helper/experiment",
 			"repository": "https://github.com/hashicorp/terraform",
 			"vcs": "git",
-			"revision": "142dd256ad48ab17b6019fe9cd18712167fcf4b4",
+			"revision": "7c25ef851bd26f720e749983597b36b17061e3ca",
 			"branch": "HEAD",
 			"path": "helper/experiment",
 			"notests": true
@@ -818,7 +818,7 @@
 			"importpath": "github.com/hashicorp/terraform/helper/hashcode",
 			"repository": "https://github.com/hashicorp/terraform",
 			"vcs": "git",
-			"revision": "142dd256ad48ab17b6019fe9cd18712167fcf4b4",
+			"revision": "7c25ef851bd26f720e749983597b36b17061e3ca",
 			"branch": "HEAD",
 			"path": "helper/hashcode",
 			"notests": true
@@ -827,7 +827,7 @@
 			"importpath": "github.com/hashicorp/terraform/helper/hilmapstructure",
 			"repository": "https://github.com/hashicorp/terraform",
 			"vcs": "git",
-			"revision": "142dd256ad48ab17b6019fe9cd18712167fcf4b4",
+			"revision": "7c25ef851bd26f720e749983597b36b17061e3ca",
 			"branch": "HEAD",
 			"path": "helper/hilmapstructure",
 			"notests": true
@@ -836,7 +836,7 @@
 			"importpath": "github.com/hashicorp/terraform/helper/schema",
 			"repository": "https://github.com/hashicorp/terraform",
 			"vcs": "git",
-			"revision": "142dd256ad48ab17b6019fe9cd18712167fcf4b4",
+			"revision": "7c25ef851bd26f720e749983597b36b17061e3ca",
 			"branch": "HEAD",
 			"path": "/helper/schema",
 			"notests": true
@@ -845,7 +845,7 @@
 			"importpath": "github.com/hashicorp/terraform/helper/shadow",
 			"repository": "https://github.com/hashicorp/terraform",
 			"vcs": "git",
-			"revision": "142dd256ad48ab17b6019fe9cd18712167fcf4b4",
+			"revision": "7c25ef851bd26f720e749983597b36b17061e3ca",
 			"branch": "HEAD",
 			"path": "helper/shadow",
 			"notests": true
@@ -854,7 +854,7 @@
 			"importpath": "github.com/hashicorp/terraform/plugin",
 			"repository": "https://github.com/hashicorp/terraform",
 			"vcs": "git",
-			"revision": "142dd256ad48ab17b6019fe9cd18712167fcf4b4",
+			"revision": "7c25ef851bd26f720e749983597b36b17061e3ca",
 			"branch": "HEAD",
 			"path": "/plugin",
 			"notests": true
@@ -863,7 +863,7 @@
 			"importpath": "github.com/hashicorp/terraform/terraform",
 			"repository": "https://github.com/hashicorp/terraform",
 			"vcs": "git",
-			"revision": "142dd256ad48ab17b6019fe9cd18712167fcf4b4",
+			"revision": "7c25ef851bd26f720e749983597b36b17061e3ca",
 			"branch": "HEAD",
 			"path": "terraform",
 			"notests": true
@@ -872,7 +872,7 @@
 			"importpath": "github.com/hashicorp/terraform/vendor/github.com/apparentlymart/go-cidr/cidr",
 			"repository": "https://github.com/hashicorp/terraform",
 			"vcs": "git",
-			"revision": "142dd256ad48ab17b6019fe9cd18712167fcf4b4",
+			"revision": "7c25ef851bd26f720e749983597b36b17061e3ca",
 			"branch": "HEAD",
 			"path": "vendor/github.com/apparentlymart/go-cidr/cidr",
 			"notests": true
@@ -881,25 +881,16 @@
 			"importpath": "github.com/hashicorp/terraform/vendor/github.com/aws/aws-sdk-go/aws",
 			"repository": "https://github.com/hashicorp/terraform",
 			"vcs": "git",
-			"revision": "142dd256ad48ab17b6019fe9cd18712167fcf4b4",
+			"revision": "7c25ef851bd26f720e749983597b36b17061e3ca",
 			"branch": "HEAD",
 			"path": "vendor/github.com/aws/aws-sdk-go/aws",
-			"notests": true
-		},
-		{
-			"importpath": "github.com/hashicorp/terraform/vendor/github.com/aws/aws-sdk-go/private/endpoints",
-			"repository": "https://github.com/hashicorp/terraform",
-			"vcs": "git",
-			"revision": "142dd256ad48ab17b6019fe9cd18712167fcf4b4",
-			"branch": "HEAD",
-			"path": "vendor/github.com/aws/aws-sdk-go/private/endpoints",
 			"notests": true
 		},
 		{
 			"importpath": "github.com/hashicorp/terraform/vendor/github.com/aws/aws-sdk-go/private/protocol",
 			"repository": "https://github.com/hashicorp/terraform",
 			"vcs": "git",
-			"revision": "142dd256ad48ab17b6019fe9cd18712167fcf4b4",
+			"revision": "7c25ef851bd26f720e749983597b36b17061e3ca",
 			"branch": "HEAD",
 			"path": "vendor/github.com/aws/aws-sdk-go/private/protocol",
 			"notests": true
@@ -908,7 +899,7 @@
 			"importpath": "github.com/hashicorp/terraform/vendor/github.com/aws/aws-sdk-go/private/waiter",
 			"repository": "https://github.com/hashicorp/terraform",
 			"vcs": "git",
-			"revision": "142dd256ad48ab17b6019fe9cd18712167fcf4b4",
+			"revision": "7c25ef851bd26f720e749983597b36b17061e3ca",
 			"branch": "HEAD",
 			"path": "vendor/github.com/aws/aws-sdk-go/private/waiter",
 			"notests": true
@@ -917,7 +908,7 @@
 			"importpath": "github.com/hashicorp/terraform/vendor/github.com/aws/aws-sdk-go/service/s3",
 			"repository": "https://github.com/hashicorp/terraform",
 			"vcs": "git",
-			"revision": "142dd256ad48ab17b6019fe9cd18712167fcf4b4",
+			"revision": "7c25ef851bd26f720e749983597b36b17061e3ca",
 			"branch": "HEAD",
 			"path": "vendor/github.com/aws/aws-sdk-go/service/s3",
 			"notests": true
@@ -926,7 +917,7 @@
 			"importpath": "github.com/hashicorp/terraform/vendor/github.com/aws/aws-sdk-go/service/sts",
 			"repository": "https://github.com/hashicorp/terraform",
 			"vcs": "git",
-			"revision": "142dd256ad48ab17b6019fe9cd18712167fcf4b4",
+			"revision": "7c25ef851bd26f720e749983597b36b17061e3ca",
 			"branch": "HEAD",
 			"path": "vendor/github.com/aws/aws-sdk-go/service/sts",
 			"notests": true
@@ -935,7 +926,7 @@
 			"importpath": "github.com/hashicorp/terraform/vendor/github.com/bgentry/go-netrc/netrc",
 			"repository": "https://github.com/hashicorp/terraform",
 			"vcs": "git",
-			"revision": "142dd256ad48ab17b6019fe9cd18712167fcf4b4",
+			"revision": "7c25ef851bd26f720e749983597b36b17061e3ca",
 			"branch": "HEAD",
 			"path": "vendor/github.com/bgentry/go-netrc/netrc",
 			"notests": true
@@ -944,7 +935,7 @@
 			"importpath": "github.com/hashicorp/terraform/vendor/github.com/go-ini/ini",
 			"repository": "https://github.com/hashicorp/terraform",
 			"vcs": "git",
-			"revision": "142dd256ad48ab17b6019fe9cd18712167fcf4b4",
+			"revision": "7c25ef851bd26f720e749983597b36b17061e3ca",
 			"branch": "HEAD",
 			"path": "vendor/github.com/go-ini/ini",
 			"notests": true
@@ -953,7 +944,7 @@
 			"importpath": "github.com/hashicorp/terraform/vendor/github.com/hashicorp/errwrap",
 			"repository": "https://github.com/hashicorp/terraform",
 			"vcs": "git",
-			"revision": "142dd256ad48ab17b6019fe9cd18712167fcf4b4",
+			"revision": "7c25ef851bd26f720e749983597b36b17061e3ca",
 			"branch": "HEAD",
 			"path": "vendor/github.com/hashicorp/errwrap",
 			"notests": true
@@ -962,7 +953,7 @@
 			"importpath": "github.com/hashicorp/terraform/vendor/github.com/hashicorp/go-getter",
 			"repository": "https://github.com/hashicorp/terraform",
 			"vcs": "git",
-			"revision": "142dd256ad48ab17b6019fe9cd18712167fcf4b4",
+			"revision": "7c25ef851bd26f720e749983597b36b17061e3ca",
 			"branch": "HEAD",
 			"path": "vendor/github.com/hashicorp/go-getter",
 			"notests": true
@@ -971,7 +962,7 @@
 			"importpath": "github.com/hashicorp/terraform/vendor/github.com/hashicorp/go-multierror",
 			"repository": "https://github.com/hashicorp/terraform",
 			"vcs": "git",
-			"revision": "142dd256ad48ab17b6019fe9cd18712167fcf4b4",
+			"revision": "7c25ef851bd26f720e749983597b36b17061e3ca",
 			"branch": "HEAD",
 			"path": "vendor/github.com/hashicorp/go-multierror",
 			"notests": true
@@ -980,7 +971,7 @@
 			"importpath": "github.com/hashicorp/terraform/vendor/github.com/hashicorp/go-plugin",
 			"repository": "https://github.com/hashicorp/terraform",
 			"vcs": "git",
-			"revision": "142dd256ad48ab17b6019fe9cd18712167fcf4b4",
+			"revision": "7c25ef851bd26f720e749983597b36b17061e3ca",
 			"branch": "HEAD",
 			"path": "vendor/github.com/hashicorp/go-plugin",
 			"notests": true
@@ -989,7 +980,7 @@
 			"importpath": "github.com/hashicorp/terraform/vendor/github.com/hashicorp/go-uuid",
 			"repository": "https://github.com/hashicorp/terraform",
 			"vcs": "git",
-			"revision": "142dd256ad48ab17b6019fe9cd18712167fcf4b4",
+			"revision": "7c25ef851bd26f720e749983597b36b17061e3ca",
 			"branch": "HEAD",
 			"path": "vendor/github.com/hashicorp/go-uuid",
 			"notests": true
@@ -998,7 +989,7 @@
 			"importpath": "github.com/hashicorp/terraform/vendor/github.com/hashicorp/go-version",
 			"repository": "https://github.com/hashicorp/terraform",
 			"vcs": "git",
-			"revision": "142dd256ad48ab17b6019fe9cd18712167fcf4b4",
+			"revision": "7c25ef851bd26f720e749983597b36b17061e3ca",
 			"branch": "HEAD",
 			"path": "vendor/github.com/hashicorp/go-version",
 			"notests": true
@@ -1007,7 +998,7 @@
 			"importpath": "github.com/hashicorp/terraform/vendor/github.com/hashicorp/hcl",
 			"repository": "https://github.com/hashicorp/terraform",
 			"vcs": "git",
-			"revision": "142dd256ad48ab17b6019fe9cd18712167fcf4b4",
+			"revision": "7c25ef851bd26f720e749983597b36b17061e3ca",
 			"branch": "HEAD",
 			"path": "vendor/github.com/hashicorp/hcl",
 			"notests": true
@@ -1016,7 +1007,7 @@
 			"importpath": "github.com/hashicorp/terraform/vendor/github.com/hashicorp/hil",
 			"repository": "https://github.com/hashicorp/terraform",
 			"vcs": "git",
-			"revision": "142dd256ad48ab17b6019fe9cd18712167fcf4b4",
+			"revision": "7c25ef851bd26f720e749983597b36b17061e3ca",
 			"branch": "HEAD",
 			"path": "vendor/github.com/hashicorp/hil",
 			"notests": true
@@ -1025,7 +1016,7 @@
 			"importpath": "github.com/hashicorp/terraform/vendor/github.com/hashicorp/yamux",
 			"repository": "https://github.com/hashicorp/terraform",
 			"vcs": "git",
-			"revision": "142dd256ad48ab17b6019fe9cd18712167fcf4b4",
+			"revision": "7c25ef851bd26f720e749983597b36b17061e3ca",
 			"branch": "HEAD",
 			"path": "vendor/github.com/hashicorp/yamux",
 			"notests": true
@@ -1034,7 +1025,7 @@
 			"importpath": "github.com/hashicorp/terraform/vendor/github.com/jmespath/go-jmespath",
 			"repository": "https://github.com/hashicorp/terraform",
 			"vcs": "git",
-			"revision": "142dd256ad48ab17b6019fe9cd18712167fcf4b4",
+			"revision": "7c25ef851bd26f720e749983597b36b17061e3ca",
 			"branch": "HEAD",
 			"path": "vendor/github.com/jmespath/go-jmespath",
 			"notests": true
@@ -1043,7 +1034,7 @@
 			"importpath": "github.com/hashicorp/terraform/vendor/github.com/mitchellh/copystructure",
 			"repository": "https://github.com/hashicorp/terraform",
 			"vcs": "git",
-			"revision": "142dd256ad48ab17b6019fe9cd18712167fcf4b4",
+			"revision": "7c25ef851bd26f720e749983597b36b17061e3ca",
 			"branch": "HEAD",
 			"path": "vendor/github.com/mitchellh/copystructure",
 			"notests": true
@@ -1052,16 +1043,25 @@
 			"importpath": "github.com/hashicorp/terraform/vendor/github.com/mitchellh/go-homedir",
 			"repository": "https://github.com/hashicorp/terraform",
 			"vcs": "git",
-			"revision": "142dd256ad48ab17b6019fe9cd18712167fcf4b4",
+			"revision": "7c25ef851bd26f720e749983597b36b17061e3ca",
 			"branch": "HEAD",
 			"path": "vendor/github.com/mitchellh/go-homedir",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/hashicorp/terraform/vendor/github.com/mitchellh/hashstructure",
+			"repository": "https://github.com/hashicorp/terraform",
+			"vcs": "git",
+			"revision": "7c25ef851bd26f720e749983597b36b17061e3ca",
+			"branch": "HEAD",
+			"path": "vendor/github.com/mitchellh/hashstructure",
 			"notests": true
 		},
 		{
 			"importpath": "github.com/hashicorp/terraform/vendor/github.com/mitchellh/mapstructure",
 			"repository": "https://github.com/hashicorp/terraform",
 			"vcs": "git",
-			"revision": "142dd256ad48ab17b6019fe9cd18712167fcf4b4",
+			"revision": "7c25ef851bd26f720e749983597b36b17061e3ca",
 			"branch": "HEAD",
 			"path": "vendor/github.com/mitchellh/mapstructure",
 			"notests": true
@@ -1070,7 +1070,7 @@
 			"importpath": "github.com/hashicorp/terraform/vendor/github.com/mitchellh/reflectwalk",
 			"repository": "https://github.com/hashicorp/terraform",
 			"vcs": "git",
-			"revision": "142dd256ad48ab17b6019fe9cd18712167fcf4b4",
+			"revision": "7c25ef851bd26f720e749983597b36b17061e3ca",
 			"branch": "HEAD",
 			"path": "vendor/github.com/mitchellh/reflectwalk",
 			"notests": true
@@ -1079,7 +1079,7 @@
 			"importpath": "github.com/hashicorp/terraform/vendor/github.com/satori/go.uuid",
 			"repository": "https://github.com/hashicorp/terraform",
 			"vcs": "git",
-			"revision": "142dd256ad48ab17b6019fe9cd18712167fcf4b4",
+			"revision": "7c25ef851bd26f720e749983597b36b17061e3ca",
 			"branch": "HEAD",
 			"path": "vendor/github.com/satori/go.uuid",
 			"notests": true
