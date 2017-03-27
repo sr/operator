@@ -67,11 +67,12 @@ resource "bamboo_repository" "cimta-topology" {
 }
 
 resource "bamboo_repository" "docker-library" {
-  name           = "docker-library"
-  username       = "${var.bamboo_git_username}"
-  password       = "${var.bamboo_git_password}"
-  repository     = "Pardot/docker-library"
-  shallow_clones = true
+  name                   = "docker-library"
+  username               = "${var.bamboo_git_username}"
+  password               = "${var.bamboo_git_password}"
+  repository             = "Pardot/docker-library"
+  shallow_clones         = false
+  fetch_whole_repository = true
 }
 
 resource "bamboo_repository" "engage-campaign-reports" {
