@@ -21,6 +21,7 @@ import (
 	"google.golang.org/grpc"
 
 	"git.dev.pardot.com/Pardot/infrastructure/bread"
+	"git.dev.pardot.com/Pardot/infrastructure/bread/generated"
 	"git.dev.pardot.com/Pardot/infrastructure/bread/generated/pb"
 	"git.dev.pardot.com/Pardot/infrastructure/bread/generated/pb/hal9000"
 	"git.dev.pardot.com/Pardot/infrastructure/bread/jira"
@@ -310,7 +311,7 @@ func run(invoker operator.InvokerFunc) error {
 }
 
 func main() {
-	if err := run(invoker); err != nil {
+	if err := run(breadgen.OperatorInvoker); err != nil {
 		fmt.Fprintf(os.Stderr, "operatord: %s\n", err)
 		os.Exit(1)
 	}
