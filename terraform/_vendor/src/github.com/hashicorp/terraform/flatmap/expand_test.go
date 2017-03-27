@@ -3,6 +3,8 @@ package flatmap
 import (
 	"reflect"
 	"testing"
+
+	"github.com/hashicorp/hil"
 )
 
 func TestExpand(t *testing.T) {
@@ -66,6 +68,82 @@ func TestExpand(t *testing.T) {
 						"1",
 						"2",
 					},
+				},
+			},
+		},
+
+		{
+			Map: map[string]string{
+				"list_of_map.#":   "2",
+				"list_of_map.0.%": "1",
+				"list_of_map.0.a": "1",
+				"list_of_map.1.%": "2",
+				"list_of_map.1.b": "2",
+				"list_of_map.1.c": "3",
+			},
+			Key: "list_of_map",
+			Output: []interface{}{
+				map[string]interface{}{
+					"a": "1",
+				},
+				map[string]interface{}{
+					"b": "2",
+					"c": "3",
+				},
+			},
+		},
+
+		{
+			Map: map[string]string{
+				"map_of_list.%":       "2",
+				"map_of_list.list2.#": "1",
+				"map_of_list.list2.0": "c",
+				"map_of_list.list1.#": "2",
+				"map_of_list.list1.0": "a",
+				"map_of_list.list1.1": "b",
+			},
+			Key: "map_of_list",
+			Output: map[string]interface{}{
+				"list1": []interface{}{"a", "b"},
+				"list2": []interface{}{"c"},
+			},
+		},
+
+		{
+			Map: map[string]string{
+				"set.#":    "3",
+				"set.1234": "a",
+				"set.1235": "b",
+				"set.1236": "c",
+			},
+			Key:    "set",
+			Output: []interface{}{"a", "b", "c"},
+		},
+
+		{
+			Map: map[string]string{
+				"computed_set.#":       "1",
+				"computed_set.~1234.a": "a",
+				"computed_set.~1234.b": "b",
+				"computed_set.~1234.c": "c",
+			},
+			Key: "computed_set",
+			Output: []interface{}{
+				map[string]interface{}{"a": "a", "b": "b", "c": "c"},
+			},
+		},
+
+		{
+			Map: map[string]string{
+				"struct.#":         "1",
+				"struct.0.name":    "hello",
+				"struct.0.rules.#": hil.UnknownValue,
+			},
+			Key: "struct",
+			Output: []interface{}{
+				map[string]interface{}{
+					"name":  "hello",
+					"rules": hil.UnknownValue,
 				},
 			},
 		},

@@ -35,6 +35,12 @@ func resourceAwsSubnet() *schema.Resource {
 				ForceNew: true,
 			},
 
+			"ipv6_cidr_block": {
+				Type:     schema.TypeString,
+				Optional: true,
+				ForceNew: true,
+			},
+
 			"availability_zone": {
 				Type:     schema.TypeString,
 				Optional: true,
@@ -46,6 +52,17 @@ func resourceAwsSubnet() *schema.Resource {
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  false,
+			},
+
+			"assign_ipv6_address_on_creation": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
+			},
+
+			"ipv6_cidr_block_association_id": {
+				Type:     schema.TypeString,
+				Computed: true,
 			},
 
 			"tags": tagsSchema(),
@@ -60,6 +77,10 @@ func resourceAwsSubnetCreate(d *schema.ResourceData, meta interface{}) error {
 		AvailabilityZone: aws.String(d.Get("availability_zone").(string)),
 		CidrBlock:        aws.String(d.Get("cidr_block").(string)),
 		VpcId:            aws.String(d.Get("vpc_id").(string)),
+	}
+
+	if v, ok := d.GetOk("ipv6_cidr_block"); ok {
+		createOpts.Ipv6CidrBlock = aws.String(v.(string))
 	}
 
 	var err error
@@ -119,6 +140,11 @@ func resourceAwsSubnetRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("availability_zone", subnet.AvailabilityZone)
 	d.Set("cidr_block", subnet.CidrBlock)
 	d.Set("map_public_ip_on_launch", subnet.MapPublicIpOnLaunch)
+	d.Set("assign_ipv6_address_on_creation", subnet.AssignIpv6AddressOnCreation)
+	if subnet.Ipv6CidrBlockAssociationSet != nil {
+		d.Set("ipv6_cidr_block", subnet.Ipv6CidrBlockAssociationSet[0].Ipv6CidrBlock)
+		d.Set("ipv6_cidr_block_association_id", subnet.Ipv6CidrBlockAssociationSet[0].AssociationId)
+	}
 	d.Set("tags", tagsToMap(subnet.Tags))
 
 	return nil
@@ -133,6 +159,25 @@ func resourceAwsSubnetUpdate(d *schema.ResourceData, meta interface{}) error {
 		return err
 	} else {
 		d.SetPartial("tags")
+	}
+
+	if d.HasChange("assign_ipv6_address_on_creation") {
+		modifyOpts := &ec2.ModifySubnetAttributeInput{
+			SubnetId: aws.String(d.Id()),
+			AssignIpv6AddressOnCreation: &ec2.AttributeBooleanValue{
+				Value: aws.Bool(d.Get("assign_ipv6_address_on_creation").(bool)),
+			},
+		}
+
+		log.Printf("[DEBUG] Subnet modify attributes: %#v", modifyOpts)
+
+		_, err := conn.ModifySubnetAttribute(modifyOpts)
+
+		if err != nil {
+			return err
+		} else {
+			d.SetPartial("assign_ipv6_address_on_creation")
+		}
 	}
 
 	if d.HasChange("map_public_ip_on_launch") {

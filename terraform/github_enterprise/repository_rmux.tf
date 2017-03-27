@@ -12,9 +12,11 @@ resource "github_branch_protection" "rmux_master" {
   repository = "${github_repository.rmux.name}"
   branch     = "master"
 
-  include_admins = false
-  strict         = false
-  contexts       = ["compliance"]
+  required_status_checks {
+    include_admins = false
+    strict         = false
+    contexts       = ["compliance"]
+  }
 }
 
 resource "github_team_repository" "rmux_developers" {

@@ -148,7 +148,7 @@ func testCheckAzureRMNetworkSecurityRuleDestroy(s *terraform.State) error {
 		}
 
 		if resp.StatusCode != http.StatusNotFound {
-			return fmt.Errorf("Network Security Rule still exists:\n%#v", resp.Properties)
+			return fmt.Errorf("Network Security Rule still exists:\n%#v", resp.SecurityRulePropertiesFormat)
 		}
 	}
 
@@ -170,16 +170,16 @@ resource "azurerm_network_security_group" "test" {
 
 resource "azurerm_network_security_rule" "test" {
 	name = "test123"
-	priority = 100
-	direction = "Outbound"
-	access = "Allow"
-	protocol = "Tcp"
-	source_port_range = "*"
-	destination_port_range = "*"
-	source_address_prefix = "*"
-	destination_address_prefix = "*"
-	resource_group_name = "${azurerm_resource_group.test.name}"
-	network_security_group_name = "${azurerm_network_security_group.test.name}"
+    	priority = 100
+    	direction = "Outbound"
+    	access = "Allow"
+    	protocol = "Tcp"
+    	source_port_range = "*"
+    	destination_port_range = "*"
+    	source_address_prefix = "*"
+    	destination_address_prefix = "*"
+    	resource_group_name = "${azurerm_resource_group.test.name}"
+    	network_security_group_name = "${azurerm_network_security_group.test.name}"
 }
 `, rInt)
 }
@@ -199,16 +199,16 @@ resource "azurerm_network_security_group" "test1" {
 
 resource "azurerm_network_security_rule" "test1" {
 	name = "test123"
-	priority = 100
-	direction = "Outbound"
-	access = "Allow"
-	protocol = "Tcp"
-	source_port_range = "*"
-	destination_port_range = "*"
-	source_address_prefix = "*"
-	destination_address_prefix = "*"
-	resource_group_name = "${azurerm_resource_group.test1.name}"
-	network_security_group_name = "${azurerm_network_security_group.test1.name}"
+    	priority = 100
+    	direction = "Outbound"
+    	access = "Allow"
+    	protocol = "Tcp"
+    	source_port_range = "*"
+    	destination_port_range = "*"
+    	source_address_prefix = "*"
+    	destination_address_prefix = "*"
+    	resource_group_name = "${azurerm_resource_group.test1.name}"
+    	network_security_group_name = "${azurerm_network_security_group.test1.name}"
 }
 `, rInt)
 }
@@ -228,30 +228,30 @@ resource "azurerm_network_security_group" "test1" {
 
 resource "azurerm_network_security_rule" "test1" {
 	name = "test123"
-	priority = 100
-	direction = "Outbound"
-	access = "Allow"
-	protocol = "Tcp"
-	source_port_range = "*"
-	destination_port_range = "*"
-	source_address_prefix = "*"
-	destination_address_prefix = "*"
-	resource_group_name = "${azurerm_resource_group.test1.name}"
-	network_security_group_name = "${azurerm_network_security_group.test1.name}"
+    	priority = 100
+    	direction = "Outbound"
+    	access = "Allow"
+    	protocol = "Tcp"
+    	source_port_range = "*"
+    	destination_port_range = "*"
+    	source_address_prefix = "*"
+    	destination_address_prefix = "*"
+    	resource_group_name = "${azurerm_resource_group.test1.name}"
+    	network_security_group_name = "${azurerm_network_security_group.test1.name}"
 }
 
 resource "azurerm_network_security_rule" "test2" {
 	name = "testing456"
-	priority = 101
-	direction = "Inbound"
-	access = "Deny"
-	protocol = "Tcp"
-	source_port_range = "*"
-	destination_port_range = "*"
-	source_address_prefix = "*"
-	destination_address_prefix = "*"
-	resource_group_name = "${azurerm_resource_group.test1.name}"
-	network_security_group_name = "${azurerm_network_security_group.test1.name}"
+    	priority = 101
+    	direction = "Inbound"
+    	access = "Deny"
+    	protocol = "Tcp"
+    	source_port_range = "*"
+    	destination_port_range = "*"
+    	source_address_prefix = "*"
+    	destination_address_prefix = "*"
+    	resource_group_name = "${azurerm_resource_group.test1.name}"
+    	network_security_group_name = "${azurerm_network_security_group.test1.name}"
 }
 `, rInt)
 }

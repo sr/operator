@@ -12,7 +12,7 @@ Pass the password variable through your ENV variable.
 
 Several parameters are externalized, review the different variables.tf files and change them to fit your needs. Carefully review the CIDR blocks, egress/ingress rules, availability zones that are very specific to your account.
 
-Once ready run `terraform plan` to review.
+Once ready run `terraform plan` to review. 
 At the minimum, provide the vpc_id as input variable.
 
-Once satisfied with plan, run `terraform apply`
+Once satisfied with plan, run `terraform apply`  

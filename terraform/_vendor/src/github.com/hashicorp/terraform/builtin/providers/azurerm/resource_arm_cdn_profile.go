@@ -60,7 +60,7 @@ func resourceArmCdnProfileCreate(d *schema.ResourceData, meta interface{}) error
 	sku := d.Get("sku").(string)
 	tags := d.Get("tags").(map[string]interface{})
 
-	cdnProfile := cdn.ProfileCreateParameters{
+	cdnProfile := cdn.Profile{
 		Location: &location,
 		Tags:     expandTags(tags),
 		Sku: &cdn.Sku{
@@ -68,17 +68,17 @@ func resourceArmCdnProfileCreate(d *schema.ResourceData, meta interface{}) error
 		},
 	}
 
-	_, err := cdnProfilesClient.Create(name, cdnProfile, resGroup, make(chan struct{}))
+	_, err := cdnProfilesClient.Create(resGroup, name, cdnProfile, make(chan struct{}))
 	if err != nil {
 		return err
 	}
 
-	read, err := cdnProfilesClient.Get(name, resGroup)
+	read, err := cdnProfilesClient.Get(resGroup, name)
 	if err != nil {
 		return err
 	}
 	if read.ID == nil {
-		return fmt.Errorf("Cannot read CND Profile %s (resource group %s) ID", name, resGroup)
+		return fmt.Errorf("Cannot read CDN Profile %s (resource group %s) ID", name, resGroup)
 	}
 
 	d.SetId(*read.ID)
@@ -96,7 +96,7 @@ func resourceArmCdnProfileRead(d *schema.ResourceData, meta interface{}) error {
 	resGroup := id.ResourceGroup
 	name := id.Path["profiles"]
 
-	resp, err := cdnProfilesClient.Get(name, resGroup)
+	resp, err := cdnProfilesClient.Get(resGroup, name)
 	if err != nil {
 		if resp.StatusCode == http.StatusNotFound {
 			d.SetId("")
@@ -133,7 +133,7 @@ func resourceArmCdnProfileUpdate(d *schema.ResourceData, meta interface{}) error
 		Tags: expandTags(newTags),
 	}
 
-	_, err := cdnProfilesClient.Update(name, props, resGroup, make(chan struct{}))
+	_, err := cdnProfilesClient.Update(resGroup, name, props, make(chan struct{}))
 	if err != nil {
 		return fmt.Errorf("Error issuing Azure ARM update request to update CDN Profile %q: %s", name, err)
 	}
@@ -151,7 +151,8 @@ func resourceArmCdnProfileDelete(d *schema.ResourceData, meta interface{}) error
 	resGroup := id.ResourceGroup
 	name := id.Path["profiles"]
 
-	_, err = cdnProfilesClient.DeleteIfExists(name, resGroup, make(chan struct{}))
+	_, err = cdnProfilesClient.Delete(resGroup, name, make(chan struct{}))
+	// TODO: check the status code
 
 	return err
 }

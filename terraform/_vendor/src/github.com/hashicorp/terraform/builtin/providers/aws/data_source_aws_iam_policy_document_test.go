@@ -54,7 +54,7 @@ var testAccAWSIAMPolicyDocumentConfig = `
 data "aws_iam_policy_document" "test" {
     policy_id = "policy_id"
     statement {
-	sid = "1"
+    	sid = "1"
         actions = [
             "s3:ListAllMyBuckets",
             "s3:GetBucketLocation",

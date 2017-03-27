@@ -7,4 +7,4 @@ module "test" {
     source = "./inner"
 
     map_in = "${var.input}"
-}
+}   

@@ -102,6 +102,37 @@ func TestAccAWSCloudWatchLogGroup_disappears(t *testing.T) {
 	})
 }
 
+func TestAccAWSCloudWatchLogGroup_tagging(t *testing.T) {
+	var lg cloudwatchlogs.LogGroup
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckAWSCloudWatchLogGroupDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccAWSCloudWatchLogGroupConfigWithTags(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckCloudWatchLogGroupExists("aws_cloudwatch_log_group.foobar", &lg),
+					resource.TestCheckResourceAttr("aws_cloudwatch_log_group.foobar", "tags.%", "2"),
+					resource.TestCheckResourceAttr("aws_cloudwatch_log_group.foobar", "tags.Environment", "Production"),
+					resource.TestCheckResourceAttr("aws_cloudwatch_log_group.foobar", "tags.Foo", "Bar"),
+				),
+			},
+			{
+				Config: testAccAWSCloudWatchLogGroupConfigWithTagsUpdated(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckCloudWatchLogGroupExists("aws_cloudwatch_log_group.foobar", &lg),
+					resource.TestCheckResourceAttr("aws_cloudwatch_log_group.foobar", "tags.%", "3"),
+					resource.TestCheckResourceAttr("aws_cloudwatch_log_group.foobar", "tags.Environment", "Development"),
+					resource.TestCheckResourceAttr("aws_cloudwatch_log_group.foobar", "tags.Bar", "baz"),
+				),
+			},
+		},
+	})
+}
+
 func testAccCheckCloudWatchLogGroupDisappears(lg *cloudwatchlogs.LogGroup) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		conn := testAccProvider.Meta().(*AWSClient).cloudwatchlogsconn
@@ -166,6 +197,33 @@ resource "aws_cloudwatch_log_group" "foobar" {
 `, rInt)
 }
 
+func testAccAWSCloudWatchLogGroupConfigWithTags(rInt int) string {
+	return fmt.Sprintf(`
+resource "aws_cloudwatch_log_group" "foobar" {
+    name = "foo-bar-%d"
+
+    tags {
+    	Environment = "Production"
+    	Foo = "Bar"
+    }
+}
+`, rInt)
+}
+
+func testAccAWSCloudWatchLogGroupConfigWithTagsUpdated(rInt int) string {
+	return fmt.Sprintf(`
+resource "aws_cloudwatch_log_group" "foobar" {
+    name = "foo-bar-%d"
+
+    tags {
+    	Environment = "Development"
+    	Foo = "Bar"
+    	Bar = "baz"
+    }
+}
+`, rInt)
+}
+
 func testAccAWSCloudWatchLogGroupConfig_withRetention(rInt int) string {
 	return fmt.Sprintf(`
 resource "aws_cloudwatch_log_group" "foobar" {
@@ -196,5 +254,5 @@ resource "aws_cloudwatch_log_group" "charlie" {
     name = "foo-bar-%d"
     retention_in_days = 3653
 }
-`, rInt, rInt, rInt)
+`, rInt, rInt+1, rInt+2)
 }

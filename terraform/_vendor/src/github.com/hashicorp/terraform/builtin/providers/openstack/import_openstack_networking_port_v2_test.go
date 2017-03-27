@@ -19,10 +19,9 @@ func TestAccOpenStackNetworkingPortV2_importBasic(t *testing.T) {
 			},
 
 			{
-				ResourceName:            resourceName,
-				ImportState:             true,
-				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{"region"},
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 		},
 	})

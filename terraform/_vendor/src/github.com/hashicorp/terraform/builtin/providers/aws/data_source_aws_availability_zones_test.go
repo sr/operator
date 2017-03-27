@@ -22,6 +22,15 @@ func TestAccAWSAvailabilityZones_basic(t *testing.T) {
 					testAccCheckAwsAvailabilityZonesMeta("data.aws_availability_zones.availability_zones"),
 				),
 			},
+		},
+	})
+}
+
+func TestAccAWSAvailabilityZones_stateFilter(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
 			{
 				Config: testAccCheckAwsAvailabilityZonesStateConfig,
 				Check: resource.ComposeTestCheckFunc(

@@ -166,7 +166,7 @@ func testCheckAzureRMTrafficManagerProfileDestroy(s *terraform.State) error {
 		}
 
 		if resp.StatusCode != http.StatusNotFound {
-			return fmt.Errorf("Traffic Manager profile sitll exists:\n%#v", resp.Properties)
+			return fmt.Errorf("Traffic Manager profile sitll exists:\n%#v", resp.ProfileProperties)
 		}
 	}
 
@@ -266,7 +266,7 @@ resource "azurerm_traffic_manager_profile" "test" {
         port = 443
         path = "/"
     }
-
+    
     tags {
         environment = "Production"
         cost_center = "MSFT"
@@ -295,7 +295,7 @@ resource "azurerm_traffic_manager_profile" "test" {
         port = 443
         path = "/"
     }
-
+    
     tags {
         environment = "staging"
     }

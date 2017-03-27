@@ -26,3 +26,4 @@ The command-line flags are all optional. The list of available flags are:
   By default this is -1, which will expand all.
 
 * `-no-color` - Disables output with coloring
+

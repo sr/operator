@@ -12,9 +12,11 @@ resource "github_branch_protection" "pardot-es-parser_master" {
   repository = "${github_repository.pardot-es-parser.name}"
   branch     = "master"
 
-  include_admins = false
-  strict         = false
-  contexts       = ["compliance"]
+  required_status_checks {
+    include_admins = false
+    strict         = false
+    contexts       = ["compliance"]
+  }
 }
 
 resource "github_team_repository" "pardot-es-parser_developers" {

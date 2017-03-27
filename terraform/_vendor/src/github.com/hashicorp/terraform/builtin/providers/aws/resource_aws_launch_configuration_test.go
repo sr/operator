@@ -367,8 +367,8 @@ resource "aws_launch_configuration" "baz" {
    instance_type = "t2.micro"
    associate_public_ip_address = false
 
-	root_block_device {
-		volume_type = "gp2"
+   	root_block_device {
+   		volume_type = "gp2"
 		volume_size = 11
 	}
 	ebs_block_device {

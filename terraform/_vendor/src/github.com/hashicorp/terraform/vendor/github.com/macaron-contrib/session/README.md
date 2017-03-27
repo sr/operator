@@ -6,7 +6,7 @@ Middleware session provides session management for [Macaron](https://github.com/
 ### Installation
 
 	go get github.com/macaron-contrib/session
-
+	
 ## Getting Help
 
 - [API Reference](https://gowalker.org/github.com/macaron-contrib/session)

@@ -43,16 +43,28 @@ The command-line flags are all optional. The list of available flags are:
 * `-input=true` - Whether to ask for input for provider configuration.
 
 * `-state=path` - The path to read and save state files (unless state-out is
-  specified). Ignored when [remote state](/docs/state/remote/index.html) is used.
+  specified). Ignored when [remote state](/docs/state/remote.html) is used.
 
 * `-state-out=path` - Path to write the final state file. By default, this is
-  the state path. Ignored when [remote state](/docs/state/remote/index.html) is
+  the state path. Ignored when [remote state](/docs/state/remote.html) is
   used.
 
 * `-provider=provider` - Specified provider to use for import. This is used for
   specifying provider aliases, such as "aws.eu". This defaults to the normal
   provider based on the prefix of the resource being imported. You usually
   don't need to specify this.
+
+* `-var 'foo=bar'` - Set a variable in the Terraform configuration. This flag
+  can be set multiple times. Variable values are interpreted as
+  [HCL](/docs/configuration/syntax.html#HCL), so list and map values can be
+  specified via this flag. This is only useful with the `-config` flag.
+
+* `-var-file=foo` - Set variables in the Terraform configuration from
+   a [variable file](/docs/configuration/variables.html#variable-files). If
+  "terraform.tfvars" is present, it will be automatically loaded first. Any
+  files specified by `-var-file` override any values in a "terraform.tfvars".
+  This flag can be used multiple times. This is only useful with the `-config`
+  flag.
 
 ## Provider Configuration
 

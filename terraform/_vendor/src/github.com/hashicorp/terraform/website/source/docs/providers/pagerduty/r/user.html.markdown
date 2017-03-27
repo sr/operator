@@ -20,9 +20,9 @@ resource "pagerduty_team" "example" {
 }
 
 resource "pagerduty_user" "example" {
-    name  = "Earline Greenholt"
-    email = "125.greenholt.earline@graham.name"
-    teams = ["${pagerduty_team.example.id}"]
+  name  = "Earline Greenholt"
+  email = "125.greenholt.earline@graham.name"
+  teams = ["${pagerduty_team.example.id}"]
 }
 ```
 
@@ -33,7 +33,7 @@ The following arguments are supported:
   * `name` - (Required) The name of the user.
   * `email` - (Required) The user's email address.
   * `color` - (Optional) The schedule color for the user.
-  * `role` - (Optional) The user role. Account must have the `read_only_users` ability to set a user as a `read_only_user`. Can be `admin`, `limited_user`, `owner`, `read_only_user` or `user`
+  * `role` - (Optional) The user role. Account must have the `read_only_users` ability to set a user as a `read_only_user`. Can be `admin`, `limited_user`, `owner`, `read_only_user`, `team_responder` or `user`
   * `job_title` - (Optional) The user's title.
   * `teams` - (Optional) A list of teams the user should belong to.
   * `description` - (Optional) A human-friendly description of the user.

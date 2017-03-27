@@ -12,9 +12,11 @@ resource "github_branch_protection" "java-snippets_master" {
   repository = "${github_repository.java-snippets.name}"
   branch     = "master"
 
-  include_admins = false
-  strict         = false
-  contexts       = ["compliance"]
+  required_status_checks {
+    include_admins = false
+    strict         = false
+    contexts       = ["compliance"]
+  }
 }
 
 resource "github_team_repository" "java-snippets_developers" {

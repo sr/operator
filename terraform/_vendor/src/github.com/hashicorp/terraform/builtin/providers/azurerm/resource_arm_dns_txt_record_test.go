@@ -157,11 +157,11 @@ resource "azurerm_dns_txt_record" "test" {
     ttl = "300"
 
     record {
-	value = "Quick brown fox"
+    	value = "Quick brown fox"
     }
 
     record {
-	value = "Another test txt string"
+    	value = "Another test txt string"
     }
 }
 `
@@ -183,15 +183,15 @@ resource "azurerm_dns_txt_record" "test" {
     ttl = "300"
 
     record {
-	value = "Quick brown fox"
+    	value = "Quick brown fox"
     }
 
     record {
-	value = "Another test txt string"
+    	value = "Another test txt string"
     }
 
     record {
-	value = "A wild 3rd record appears"
+    	value = "A wild 3rd record appears"
     }
 }
 `
@@ -213,11 +213,11 @@ resource "azurerm_dns_txt_record" "test" {
     ttl = "300"
 
     record {
-	value = "Quick brown fox"
+    	value = "Quick brown fox"
     }
 
     record {
-	value = "Another test txt string"
+    	value = "Another test txt string"
     }
 
     tags {
@@ -243,11 +243,11 @@ resource "azurerm_dns_txt_record" "test" {
     zone_name = "${azurerm_dns_zone.test.name}"
     ttl = "300"
     record {
-	value = "Quick brown fox"
+    	value = "Quick brown fox"
     }
 
     record {
-	value = "Another test txt string"
+    	value = "Another test txt string"
     }
 
     tags {

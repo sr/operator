@@ -33,6 +33,29 @@ func TestAccAWSElasticSearchDomain_basic(t *testing.T) {
 	})
 }
 
+func TestAccAWSElasticSearchDomain_importBasic(t *testing.T) {
+	resourceName := "aws_elasticsearch_domain.example"
+	ri := acctest.RandInt()
+	resourceId := fmt.Sprintf("tf-test-%d", ri)
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckAWSRedshiftClusterDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccESDomainConfig(ri),
+			},
+			{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateVerify: true,
+				ImportStateId:     resourceId,
+			},
+		},
+	})
+}
+
 func TestAccAWSElasticSearchDomain_v23(t *testing.T) {
 	var domain elasticsearch.ElasticsearchDomainStatus
 	ri := acctest.RandInt()

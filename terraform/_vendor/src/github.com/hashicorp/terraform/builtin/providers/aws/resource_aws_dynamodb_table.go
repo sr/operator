@@ -186,6 +186,7 @@ func resourceAwsDynamoDbTable() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
+			"tags": tagsSchema(),
 		},
 	}
 }
@@ -239,7 +240,7 @@ func resourceAwsDynamoDbTableCreate(d *schema.ResourceData, meta interface{}) er
 	}
 
 	if lsidata, ok := d.GetOk("local_secondary_index"); ok {
-		fmt.Printf("[DEBUG] Adding LSI data to the table")
+		log.Printf("[DEBUG] Adding LSI data to the table")
 
 		lsiSet := lsidata.(*schema.Set)
 		localSecondaryIndexes := []*dynamodb.LocalSecondaryIndex{}
@@ -276,7 +277,7 @@ func resourceAwsDynamoDbTableCreate(d *schema.ResourceData, meta interface{}) er
 
 		req.LocalSecondaryIndexes = localSecondaryIndexes
 
-		fmt.Printf("[DEBUG] Added %d LSI definitions", len(localSecondaryIndexes))
+		log.Printf("[DEBUG] Added %d LSI definitions", len(localSecondaryIndexes))
 	}
 
 	if gsidata, ok := d.GetOk("global_secondary_index"); ok {
@@ -298,8 +299,10 @@ func resourceAwsDynamoDbTableCreate(d *schema.ResourceData, meta interface{}) er
 			StreamViewType: aws.String(d.Get("stream_view_type").(string)),
 		}
 
-		fmt.Printf("[DEBUG] Adding StreamSpecifications to the table")
+		log.Printf("[DEBUG] Adding StreamSpecifications to the table")
 	}
+
+	_, tagsOk := d.GetOk("tags")
 
 	attemptCount := 1
 	for attemptCount <= DYNAMODB_MAX_THROTTLE_RETRIES {
@@ -325,10 +328,16 @@ func resourceAwsDynamoDbTableCreate(d *schema.ResourceData, meta interface{}) er
 		} else {
 			// No error, set ID and return
 			d.SetId(*output.TableDescription.TableName)
-			if err := d.Set("arn", *output.TableDescription.TableArn); err != nil {
+			tableArn := *output.TableDescription.TableArn
+			if err := d.Set("arn", tableArn); err != nil {
 				return err
 			}
-
+			if tagsOk {
+				log.Printf("[DEBUG] Setting DynamoDB Tags on arn: %s", tableArn)
+				if err := createTableTags(d, meta); err != nil {
+					return err
+				}
+			}
 			return resourceAwsDynamoDbTableRead(d, meta)
 		}
 	}
@@ -581,6 +590,11 @@ func resourceAwsDynamoDbTableUpdate(d *schema.ResourceData, meta interface{}) er
 
 	}
 
+	// Update tags
+	if err := setTagsDynamoDb(dynamodbconn, d); err != nil {
+		return err
+	}
+
 	return resourceAwsDynamoDbTableRead(d, meta)
 }
 
@@ -699,6 +713,14 @@ func resourceAwsDynamoDbTableRead(d *schema.ResourceData, meta interface{}) erro
 	}
 
 	d.Set("arn", table.TableArn)
+
+	tags, err := readTableTags(d, meta)
+	if err != nil {
+		return err
+	}
+	if len(tags) != 0 {
+		d.Set("tags", tags)
+	}
 
 	return nil
 }
@@ -889,4 +911,44 @@ func waitForTableToBeActive(tableName string, meta interface{}) error {
 
 	return nil
 
+}
+
+func createTableTags(d *schema.ResourceData, meta interface{}) error {
+	// DynamoDB Table has to be in the ACTIVE state in order to tag the resource
+	if err := waitForTableToBeActive(d.Id(), meta); err != nil {
+		return err
+	}
+	tags := d.Get("tags").(map[string]interface{})
+	arn := d.Get("arn").(string)
+	dynamodbconn := meta.(*AWSClient).dynamodbconn
+	req := &dynamodb.TagResourceInput{
+		ResourceArn: aws.String(arn),
+		Tags:        tagsFromMapDynamoDb(tags),
+	}
+	_, err := dynamodbconn.TagResource(req)
+	if err != nil {
+		return fmt.Errorf("Error tagging dynamodb resource: %s", err)
+	}
+	return nil
+}
+
+func readTableTags(d *schema.ResourceData, meta interface{}) (map[string]string, error) {
+	if err := waitForTableToBeActive(d.Id(), meta); err != nil {
+		return nil, err
+	}
+	arn := d.Get("arn").(string)
+	//result := make(map[string]string)
+
+	dynamodbconn := meta.(*AWSClient).dynamodbconn
+	req := &dynamodb.ListTagsOfResourceInput{
+		ResourceArn: aws.String(arn),
+	}
+
+	output, err := dynamodbconn.ListTagsOfResource(req)
+	if err != nil {
+		return nil, fmt.Errorf("Error reading tags from dynamodb resource: %s", err)
+	}
+	result := tagsToMapDynamoDb(output.Tags)
+	// TODO Read NextToken if avail
+	return result, nil
 }

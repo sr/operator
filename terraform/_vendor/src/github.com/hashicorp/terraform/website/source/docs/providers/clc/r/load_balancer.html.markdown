@@ -19,9 +19,9 @@ See also [Complete API documentation](https://www.ctl.io/api-docs/v2/#shared-loa
 # Provision a load balancer
 resource "clc_load_balancer" "api" {
   data_center = "${clc_group.frontends.location_id}"
-  name = "api"
+  name        = "api"
   description = "api load balancer"
-  status = "enabled"
+  status      = "enabled"
 }
 
 output "api_ip" {
@@ -38,3 +38,8 @@ The following arguments are supported:
 * `data_center` - (Required, string) The datacenter location of both parent group and this group.
 * `status` - (Required, string) Either "enabled" or "disabled"
 * `description` - (Optional, string) Description for server group (visible in control portal only)
+
+
+
+
+

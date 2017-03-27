@@ -5,6 +5,8 @@ import (
 	"strings"
 	"testing"
 
+	"regexp"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/service/iam"
@@ -76,6 +78,20 @@ func TestAccAWSRole_testNameChange(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSRoleExists("aws_iam_role.role_update_test", &conf),
 				),
+			},
+		},
+	})
+}
+
+func TestAccAWSRole_badJSON(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckAWSRoleDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config:      testAccAWSRoleConfig_badJson,
+				ExpectError: regexp.MustCompile(`.*contains an invalid JSON:.*`),
 			},
 		},
 	})
@@ -168,37 +184,17 @@ func testAccCheckAWSRoleAttributes(role *iam.GetRoleOutput) resource.TestCheckFu
 
 const testAccAWSRoleConfig = `
 resource "aws_iam_role" "role" {
-<<<<<<< HEAD
   name   = "test-role"
   path = "/"
   assume_role_policy = "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"Service\":[\"ec2.amazonaws.com\"]},\"Action\":[\"sts:AssumeRole\"]}]}"
-=======
-	name   = "test-role"
-	path = "/"
-<<<<<<< HEAD
-	assume_role_policy = "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"ec2.amazonaws.com\"},\"Action\":\"sts:AssumeRole\"}]}"
->>>>>>> 9c051a5... Tests for importing various iam resources
-=======
-	assume_role_policy = "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"Service\":[\"ec2.amazonaws.com\"]},\"Action\":[\"sts:AssumeRole\"]}]}"
->>>>>>> daaae09... Add DiffSuppressFunc to support heredocs for aws_iam_role.assume_role_policy and aws_iam_policy.policy
 }
 `
 
 const testAccAWSRolePrefixNameConfig = `
 resource "aws_iam_role" "role" {
-<<<<<<< HEAD
   name_prefix = "test-role-"
   path = "/"
   assume_role_policy = "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"Service\":[\"ec2.amazonaws.com\"]},\"Action\":[\"sts:AssumeRole\"]}]}"
-=======
-    name_prefix = "test-role-"
-    path = "/"
-<<<<<<< HEAD
-    assume_role_policy = "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"ec2.amazonaws.com\"},\"Action\":\"sts:AssumeRole\"}]}"
->>>>>>> 9c051a5... Tests for importing various iam resources
-=======
-    assume_role_policy = "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"Service\":[\"ec2.amazonaws.com\"]},\"Action\":[\"sts:AssumeRole\"]}]}"
->>>>>>> daaae09... Add DiffSuppressFunc to support heredocs for aws_iam_role.assume_role_policy and aws_iam_policy.policy
 }
 `
 
@@ -299,3 +295,24 @@ resource "aws_iam_instance_profile" "role_update_test" {
 }
 
 `
+
+const testAccAWSRoleConfig_badJson = `
+	resource "aws_iam_role" "my_instance_role" {
+  name = "test-role"
+
+  assume_role_policy = <<POLICY
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": "sts:AssumeRole",
+            "Principal": {
+                "Service": "ec2.amazonaws.com",
+            },
+            "Effect": "Allow",
+            "Sid": ""
+        }
+    ]
+}
+POLICY
+}`

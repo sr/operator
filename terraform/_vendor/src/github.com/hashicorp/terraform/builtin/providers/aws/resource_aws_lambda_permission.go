@@ -15,7 +15,7 @@ import (
 	"github.com/hashicorp/terraform/helper/schema"
 )
 
-var LambdaFunctionRegexp = `^(arn:aws:lambda:)?([a-z]{2}-[a-z]+-\d{1}:)?(\d{12}:)?(function:)?([a-zA-Z0-9-_]+)(:(\$LATEST|[a-zA-Z0-9-_]+))?$`
+var LambdaFunctionRegexp = `^(arn:[\w-]+:lambda:)?([a-z]{2}-[a-z]+-\d{1}:)?(\d{12}:)?(function:)?([a-zA-Z0-9-_]+)(:(\$LATEST|[a-zA-Z0-9-_]+))?$`
 
 func resourceAwsLambdaPermission() *schema.Resource {
 	return &schema.Resource{
@@ -211,12 +211,13 @@ func resourceAwsLambdaPermissionRead(d *schema.ResourceData, meta interface{}) e
 	}
 
 	qualifier, err := getQualifierFromLambdaAliasOrVersionArn(statement.Resource)
-	if err == nil {
-		d.Set("qualifier", qualifier)
+	if err != nil {
+		log.Printf("[ERR] Error getting Lambda Qualifier: %s", err)
 	}
+	d.Set("qualifier", qualifier)
 
 	// Save Lambda function name in the same format
-	if strings.HasPrefix(d.Get("function_name").(string), "arn:aws:lambda:") {
+	if strings.HasPrefix(d.Get("function_name").(string), "arn:"+meta.(*AWSClient).partition+":lambda:") {
 		// Strip qualifier off
 		trimmedArn := strings.TrimSuffix(statement.Resource, ":"+qualifier)
 		d.Set("function_name", trimmedArn)

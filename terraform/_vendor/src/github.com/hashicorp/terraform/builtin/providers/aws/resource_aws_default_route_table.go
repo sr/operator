@@ -43,7 +43,17 @@ func resourceAwsDefaultRouteTable() *schema.Resource {
 					Schema: map[string]*schema.Schema{
 						"cidr_block": {
 							Type:     schema.TypeString,
-							Required: true,
+							Optional: true,
+						},
+
+						"ipv6_cidr_block": {
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+
+						"egress_only_gateway_id": {
+							Type:     schema.TypeString,
+							Optional: true,
 						},
 
 						"gateway_id": {
@@ -193,16 +203,33 @@ func revokeAllRouteTableRules(defaultRouteTableId string, meta interface{}) erro
 			// See aws_vpc_endpoint
 			continue
 		}
-		log.Printf(
-			"[INFO] Deleting route from %s: %s",
-			defaultRouteTableId, *r.DestinationCidrBlock)
-		_, err := conn.DeleteRoute(&ec2.DeleteRouteInput{
-			RouteTableId:         aws.String(defaultRouteTableId),
-			DestinationCidrBlock: r.DestinationCidrBlock,
-		})
-		if err != nil {
-			return err
+
+		if r.DestinationCidrBlock != nil {
+			log.Printf(
+				"[INFO] Deleting route from %s: %s",
+				defaultRouteTableId, *r.DestinationCidrBlock)
+			_, err := conn.DeleteRoute(&ec2.DeleteRouteInput{
+				RouteTableId:         aws.String(defaultRouteTableId),
+				DestinationCidrBlock: r.DestinationCidrBlock,
+			})
+			if err != nil {
+				return err
+			}
 		}
+
+		if r.DestinationIpv6CidrBlock != nil {
+			log.Printf(
+				"[INFO] Deleting route from %s: %s",
+				defaultRouteTableId, *r.DestinationIpv6CidrBlock)
+			_, err := conn.DeleteRoute(&ec2.DeleteRouteInput{
+				RouteTableId:             aws.String(defaultRouteTableId),
+				DestinationIpv6CidrBlock: r.DestinationIpv6CidrBlock,
+			})
+			if err != nil {
+				return err
+			}
+		}
+
 	}
 
 	return nil

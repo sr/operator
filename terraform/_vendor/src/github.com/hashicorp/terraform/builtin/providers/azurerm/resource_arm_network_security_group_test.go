@@ -180,7 +180,7 @@ func testCheckAzureRMNetworkSecurityGroupDestroy(s *terraform.State) error {
 		}
 
 		if resp.StatusCode != http.StatusNotFound {
-			return fmt.Errorf("Network Security Group still exists:\n%#v", resp.Properties)
+			return fmt.Errorf("Network Security Group still exists:\n%#v", resp.SecurityGroupPropertiesFormat)
 		}
 	}
 
@@ -200,15 +200,15 @@ resource "azurerm_network_security_group" "test" {
     resource_group_name = "${azurerm_resource_group.test.name}"
 
     security_rule {
-	name = "test123"
-	priority = 100
-	direction = "Inbound"
-	access = "Allow"
-	protocol = "Tcp"
-	source_port_range = "*"
-	destination_port_range = "*"
-	source_address_prefix = "*"
-	destination_address_prefix = "*"
+    	name = "test123"
+    	priority = 100
+    	direction = "Inbound"
+    	access = "Allow"
+    	protocol = "Tcp"
+    	source_port_range = "*"
+    	destination_port_range = "*"
+    	source_address_prefix = "*"
+    	destination_address_prefix = "*"
     }
 }
 `, rInt)
@@ -227,27 +227,27 @@ resource "azurerm_network_security_group" "test" {
     resource_group_name = "${azurerm_resource_group.test.name}"
 
     security_rule {
-	name = "test123"
-	priority = 100
-	direction = "Inbound"
-	access = "Allow"
-	protocol = "Tcp"
-	source_port_range = "*"
-	destination_port_range = "*"
-	source_address_prefix = "*"
-	destination_address_prefix = "*"
+    	name = "test123"
+    	priority = 100
+    	direction = "Inbound"
+    	access = "Allow"
+    	protocol = "Tcp"
+    	source_port_range = "*"
+    	destination_port_range = "*"
+    	source_address_prefix = "*"
+    	destination_address_prefix = "*"
     }
 
     security_rule {
-	name = "testDeny"
-	priority = 101
-	direction = "Inbound"
-	access = "Deny"
-	protocol = "Udp"
-	source_port_range = "*"
-	destination_port_range = "*"
-	source_address_prefix = "*"
-	destination_address_prefix = "*"
+    	name = "testDeny"
+    	priority = 101
+    	direction = "Inbound"
+    	access = "Deny"
+    	protocol = "Udp"
+    	source_port_range = "*"
+    	destination_port_range = "*"
+    	source_address_prefix = "*"
+    	destination_address_prefix = "*"
     }
 }
 `, rInt)
@@ -266,15 +266,15 @@ resource "azurerm_network_security_group" "test" {
     resource_group_name = "${azurerm_resource_group.test.name}"
 
     security_rule {
-	name = "test123"
-	priority = 100
-	direction = "Inbound"
-	access = "Allow"
-	protocol = "Tcp"
-	source_port_range = "*"
-	destination_port_range = "*"
-	source_address_prefix = "*"
-	destination_address_prefix = "*"
+    	name = "test123"
+    	priority = 100
+    	direction = "Inbound"
+    	access = "Allow"
+    	protocol = "Tcp"
+    	source_port_range = "*"
+    	destination_port_range = "*"
+    	source_address_prefix = "*"
+    	destination_address_prefix = "*"
     }
 
 
@@ -299,15 +299,15 @@ resource "azurerm_network_security_group" "test" {
     resource_group_name = "${azurerm_resource_group.test.name}"
 
     security_rule {
-	name = "test123"
-	priority = 100
-	direction = "Inbound"
-	access = "Allow"
-	protocol = "Tcp"
-	source_port_range = "*"
-	destination_port_range = "*"
-	source_address_prefix = "*"
-	destination_address_prefix = "*"
+    	name = "test123"
+    	priority = 100
+    	direction = "Inbound"
+    	access = "Allow"
+    	protocol = "Tcp"
+    	source_port_range = "*"
+    	destination_port_range = "*"
+    	source_address_prefix = "*"
+    	destination_address_prefix = "*"
     }
 
     tags {

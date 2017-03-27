@@ -1,6 +1,7 @@
 package nomad
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 	"testing"
@@ -91,6 +92,19 @@ func TestResourceJob_idChange(t *testing.T) {
 	})
 }
 
+func TestResourceJob_parameterizedJob(t *testing.T) {
+	r.Test(t, r.TestCase{
+		Providers: testProviders,
+		PreCheck:  func() { testAccPreCheck(t) },
+		Steps: []r.TestStep{
+			{
+				Config: testResourceJob_parameterizedJob,
+				Check:  testResourceJob_initialCheck,
+			},
+		},
+	})
+}
+
 var testResourceJob_initialConfig = `
 resource "nomad_job" "test" {
     jobspec = <<EOT
@@ -108,7 +122,6 @@ job "foo" {
             resources {
                 cpu = 20
                 memory = 10
-                disk = 100
             }
 
             logs {
@@ -140,7 +153,6 @@ job "foo" {
             resources {
                 cpu = 20
                 memory = 10
-                disk = 100
             }
 
             logs {
@@ -157,12 +169,12 @@ EOT
 func testResourceJob_initialCheck(s *terraform.State) error {
 	resourceState := s.Modules[0].Resources["nomad_job.test"]
 	if resourceState == nil {
-		return fmt.Errorf("resource not found in state")
+		return errors.New("resource not found in state")
 	}
 
 	instanceState := resourceState.Primary
 	if instanceState == nil {
-		return fmt.Errorf("resource has no primary instance")
+		return errors.New("resource has no primary instance")
 	}
 
 	jobID := instanceState.ID
@@ -200,7 +212,7 @@ func testResourceJob_checkDestroy(jobID string) r.TestCheckFunc {
 			return nil
 		}
 		if err == nil {
-			err = fmt.Errorf("not destroyed")
+			err = errors.New("not destroyed")
 		}
 
 		return err
@@ -234,7 +246,6 @@ job "bar" {
             resources {
                 cpu = 20
                 memory = 10
-                disk = 100
             }
 
             logs {
@@ -251,12 +262,12 @@ EOT
 func testResourceJob_updateCheck(s *terraform.State) error {
 	resourceState := s.Modules[0].Resources["nomad_job.test"]
 	if resourceState == nil {
-		return fmt.Errorf("resource not found in state")
+		return errors.New("resource not found in state")
 	}
 
 	instanceState := resourceState.Primary
 	if instanceState == nil {
-		return fmt.Errorf("resource has no primary instance")
+		return errors.New("resource has no primary instance")
 	}
 
 	jobID := instanceState.ID
@@ -275,9 +286,41 @@ func testResourceJob_updateCheck(s *terraform.State) error {
 		// Verify foo doesn't exist
 		_, _, err := client.Jobs().Info("foo", nil)
 		if err == nil {
-			return fmt.Errorf("reading foo success")
+			return errors.New("reading foo success")
 		}
 	}
 
 	return nil
 }
+
+var testResourceJob_parameterizedJob = `
+resource "nomad_job" "test" {
+    jobspec = <<EOT
+job "bar" {
+    datacenters = ["dc1"]
+    type = "batch"
+    parameterized {
+      payload = "required"
+    }
+    group "foo" {
+        task "foo" {
+            driver = "raw_exec"
+            config {
+                command = "/bin/sleep"
+                args = ["1"]
+            }
+            resources {
+                cpu = 20
+                memory = 10
+            }
+
+            logs {
+                max_files = 3
+                max_file_size = 10
+            }
+        }
+    }
+}
+EOT
+}
+`

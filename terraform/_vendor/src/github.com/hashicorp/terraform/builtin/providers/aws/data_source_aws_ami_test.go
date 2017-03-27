@@ -139,6 +139,22 @@ func TestAccAWSAmiDataSource_owners(t *testing.T) {
 	})
 }
 
+// Acceptance test for: https://github.com/hashicorp/terraform/issues/10758
+func TestAccAWSAmiDataSource_ownersEmpty(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCheckAwsAmiDataSourceEmptyOwnersConfig,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckAwsAmiDataSourceID("data.aws_ami.amazon_ami"),
+				),
+			},
+		},
+	})
+}
+
 func TestAccAWSAmiDataSource_localNameFilter(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:  func() { testAccPreCheck(t) },
@@ -310,6 +326,13 @@ const testAccCheckAwsAmiDataSourceOwnersConfig = `
 data "aws_ami" "amazon_ami" {
 	most_recent = true
 	owners = ["amazon"]
+}
+`
+
+const testAccCheckAwsAmiDataSourceEmptyOwnersConfig = `
+data "aws_ami" "amazon_ami" {
+	most_recent = true
+	owners = [""]
 }
 `
 

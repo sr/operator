@@ -12,9 +12,11 @@ resource "github_branch_protection" "repfix_master" {
   repository = "${github_repository.repfix.name}"
   branch     = "master"
 
-  include_admins = false
-  strict         = false
-  contexts       = ["compliance"]
+  required_status_checks {
+    include_admins = false
+    strict         = false
+    contexts       = ["compliance"]
+  }
 }
 
 resource "github_team_repository" "repfix_service-accounts-read-only" {

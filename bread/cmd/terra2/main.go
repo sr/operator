@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
@@ -114,23 +115,20 @@ func terra() (int, string) {
 		return 1, "flag canoe-url is not a valid URL: " + err.Error()
 	}
 	client := bread.NewCanoeClient(u, "")
-	cmd := exec.Command(
-		tf.Exec,
-		"remote",
-		"config",
-		"-backend=artifactory",
-		fmt.Sprintf("-backend-config=url=%s", afy.URL),
-		fmt.Sprintf(`-backend-config=repo=%s`, afy.RepoName),
-		fmt.Sprintf(`-backend-config=subpath=%s`, tf.Project),
-		fmt.Sprintf(`-backend-config=username=%s`, afy.User),
-		fmt.Sprintf(`-backend-config=password=%s`, afy.Password),
-	)
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	cmd.Dir = filepath.Join(tf.Dir, tf.Project)
-	if err := cmd.Run(); err != nil {
+
+	_ = os.Setenv("ARTIFACTORY_USERNAME", afy.User)
+	_ = os.Setenv("ARTIFACTORY_PASSWORD", afy.Password)
+
+	if err := removeLegacyStateFile(&tf); err != nil {
 		return 1, err.Error()
 	}
+
+	// terraform init is safe to run multiple times:
+	// https://www.terraform.io/docs/commands/init.html
+	if status, output := tinit(&tf); status != 0 {
+		return status, output
+	}
+
 	switch tf.Cmd {
 	case "plan":
 		if tf.Dir == "" {
@@ -211,6 +209,65 @@ func terra() (int, string) {
 	default:
 		return 1, fmt.Sprintf("Invalid action: \"%s\". Must be one of \"plan\" or \"apply\"", tf.Cmd)
 	}
+}
+
+// removeLegacyStateFile removes .terraform/terraform.tfstate if it exists and
+// is in a 'legacy' format. This forces terraform to fetch it from our remote
+// backend (artifactory), which is what we want in this situation. If we don't
+// remove the file, terraform will ask every user if they want to import the
+// existing legacy state, and we don't want that.
+func removeLegacyStateFile(tf *terraform) error {
+	stateFilePath := filepath.Join(tf.Dir, tf.Project, ".terraform", "terraform.tfstate")
+
+	f, err := os.Open(stateFilePath)
+	if os.IsNotExist(err) {
+		return nil
+	} else if err != nil {
+		return err
+	}
+	defer func() { _ = f.Close() }()
+
+	var v map[string]interface{}
+	if err := json.NewDecoder(f).Decode(&v); err != nil {
+		return err
+	}
+
+	// Legacy configurations have a key named 'remote'
+	if _, ok := v["remote"]; ok {
+		fmt.Fprintf(os.Stderr, "Detected that '%s' is a legacy state file. Removing it so that Terraform will pull the updated version from Artifactory automatically.\n", stateFilePath)
+		return os.Remove(stateFilePath)
+	}
+	return nil
+}
+
+func tinit(tf *terraform) (int, string) {
+	cmd := exec.Command(
+		tf.Exec,
+		"init",
+		"-input=false",
+	)
+	cmd.Dir = filepath.Join(tf.Dir, tf.Project)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+	go func() {
+		for sig := range c {
+			if cmd.Process != nil && cmd.ProcessState != nil && !cmd.ProcessState.Exited() {
+				_ = cmd.Process.Signal(sig)
+			}
+		}
+	}()
+	if err := cmd.Run(); err != nil {
+		if exiterr, ok := err.(*exec.ExitError); ok {
+			if status, ok := exiterr.Sys().(syscall.WaitStatus); ok {
+				return status.ExitStatus(), ""
+			}
+		} else {
+			return 3, err.Error()
+		}
+	}
+	return 0, ""
 }
 
 func plan(tf *terraform) (int, string) {

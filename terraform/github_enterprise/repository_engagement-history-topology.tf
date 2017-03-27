@@ -12,9 +12,11 @@ resource "github_branch_protection" "engagement-history-topology_master" {
   repository = "${github_repository.engagement-history-topology.name}"
   branch     = "master"
 
-  include_admins = false
-  strict         = false
-  contexts       = ["compliance"]
+  required_status_checks {
+    include_admins = false
+    strict         = false
+    contexts       = ["compliance"]
+  }
 }
 
 resource "github_team_repository" "engagement-history-topology_service-accounts-write-only" {

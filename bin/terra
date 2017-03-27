@@ -5,7 +5,6 @@
 #/        terra unlock <account>
 #/        terra fmt
 #/        terra pull <account>
-#/        terra push <account>
 #/        terra vendor <version>
 #/        terra validate
 if [ -n "${DEBUG:-""}" ]; then
@@ -53,7 +52,8 @@ TERRAFORM_VENDORDIR="${TERRAFORM_BASEDIR}/_vendor"
 TERRAFORM_DIR="${TERRAFORM_BASEDIR}/${TERRAFORM_PROJECT}"
 TERRAFORM_PLAN="${TERRAFORM_DIR}/plan.out"
 TERRAFORM_VAR_FILE="${TERRAFORM_BASEDIR}/terraform.tfvars"
-export TERRAFORM_DIR TERRAFORM_PLAN TERRAFORM_PROJECT TERRAFORM_VAR_FILE TERRAFORM_OPTS
+TERRAFORM="${TERRAFORM_VENDORDIR}/bin/terraform"
+export TERRAFORM TERRAFORM_DIR TERRAFORM_PLAN TERRAFORM_PROJECT TERRAFORM_VAR_FILE TERRAFORM_OPTS
 
 if test -z "${GOPATH:-""}" || test "$BREAD" != "${GOPATH}/src/git.dev.pardot.com/Pardot/infrastructure/bread"; then
     echo "Deploying Terraform changes requires a working Go environment:"
@@ -98,11 +98,11 @@ case "$action" in
       -terraform-command "$action" \
       -terraform-dir "$TERRAFORM_BASEDIR" \
       -terraform-project "$TERRAFORM_PROJECT" \
-      -terraform-exec "${TERRAFORM_VENDORDIR}/bin/terraform" \
+      -terraform-exec "$TERRAFORM" \
       -terraform-plan "$TERRAFORM_PLAN" \
       -terraform-var-file "$TERRAFORM_VAR_FILE"
     ;;
-  pull|push|import)
+  pull|import)
     go install -v ./bread/cmd/breadsignal
 
     artifactoryenv="terraform/artifactory.env"
@@ -138,7 +138,7 @@ case "$action" in
     if [ "$action" != "pull" ]; then
       breadsignal -terraform "$action" \
         -terraform-resource "${3-""}" \
-        -terraform-version "$(terraform version)" \
+        -terraform-version "$("$TERRAFORM" version)" \
         -branch "$GIT_BRANCH" \
         -terraform-path "$TERRAFORM_PROJECT" \
         -testing=false
@@ -149,14 +149,14 @@ case "$action" in
     grep -vi password
     ;;
   fmt)
-    find "${TERRAFORM_BASEDIR}" -type d -mindepth 1 -not -path "*/terraform/_vendor*" -print0 | xargs -0 -n1 "${TERRAFORM_VENDORDIR}/bin/terraform" fmt -write=true -list=false
+    find "${TERRAFORM_BASEDIR}" -type d -mindepth 1 -not -path "*/terraform/_vendor*" -print0 | xargs -0 -n1 "$TERRAFORM" fmt -write=true -list=false
     exit "$?"
     ;;
   validate)
     find "${TERRAFORM_BASEDIR}" -type d -mindepth 2 -not -name '.terraform' -a -not -path '*/terraform/_vendor/*' -print0 | \
-    xargs -0 -n1 "${TERRAFORM_VENDORDIR}"/bin/terraform validate
+    xargs -0 -n1 "${TERRAFORM}" validate
 
-    out="$(find "${TERRAFORM_BASEDIR}" -type d -mindepth 1 -not -path "*/terraform/_vendor*" -print0 | xargs -0 -n1 "${TERRAFORM_VENDORDIR}/bin/terraform" fmt -write=false -list=true)"
+    out="$(find "${TERRAFORM_BASEDIR}" -type d -mindepth 1 -not -path "*/terraform/_vendor*" -print0 | xargs -0 -n1 "$TERRAFORM" fmt -write=false -list=true)"
     if [ -z "$out" ]; then
       exit 0
     else
@@ -187,7 +187,7 @@ case "$action" in
     gofmt -w -s "$vendordir"
 
     echo "Vendored terraform version ${version} to $vendordir" 2>&1
-    echo "$version" > canoe/config/terraform-version
+    echo "$version" > bread/canoe/config/terraform-version
     exit 0
     ;;
   *)

@@ -12,9 +12,11 @@ resource "github_branch_protection" "pd-homebrew_master" {
   repository = "${github_repository.pd-homebrew.name}"
   branch     = "master"
 
-  include_admins = false
-  strict         = false
-  contexts       = ["compliance"]
+  required_status_checks {
+    include_admins = false
+    strict         = false
+    contexts       = ["compliance"]
+  }
 }
 
 resource "github_team_repository" "pd-homebrew_developers" {

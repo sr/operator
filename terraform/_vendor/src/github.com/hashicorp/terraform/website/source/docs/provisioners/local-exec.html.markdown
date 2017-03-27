@@ -22,10 +22,10 @@ such as `sshd` may not be started yet on compute resources.
 ```
 # Join the newly created machine to our Consul cluster
 resource "aws_instance" "web" {
-    ...
-    provisioner "local-exec" {
-        command = "echo ${aws_instance.web.private_ip} >> private_ips.txt"
-    }
+  # ...
+  provisioner "local-exec" {
+    command = "echo ${aws_instance.web.private_ip} >> private_ips.txt"
+  }
 }
 ```
 
@@ -37,3 +37,4 @@ The following arguments are supported:
   as a relative path to the current working directory or as an absolute path.
   It is evaluated in a shell, and can use environment variables or Terraform
   variables.
+

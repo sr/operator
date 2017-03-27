@@ -6,3 +6,4 @@ module "child" {
   source = "./child"
   things = "${join(",", aws_instance.parent.*.id)}"
 }
+

@@ -70,6 +70,17 @@ func resourceAwsEMRCluster() *schema.Resource {
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Set:      schema.HashString,
 			},
+			"termination_protection": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Computed: true,
+			},
+			"keep_job_flow_alive_when_no_steps": {
+				Type:     schema.TypeBool,
+				ForceNew: true,
+				Optional: true,
+				Computed: true,
+			},
 			"ec2_attributes": {
 				Type:     schema.TypeList,
 				MaxItems: 1,
@@ -149,7 +160,6 @@ func resourceAwsEMRCluster() *schema.Resource {
 			"visible_to_all_users": {
 				Type:     schema.TypeBool,
 				Optional: true,
-				ForceNew: true,
 				Default:  true,
 			},
 		},
@@ -169,13 +179,22 @@ func resourceAwsEMRClusterCreate(d *schema.ResourceData, meta interface{}) error
 
 	applications := d.Get("applications").(*schema.Set).List()
 
+	keepJobFlowAliveWhenNoSteps := true
+	if v, ok := d.GetOk("keep_job_flow_alive_when_no_steps"); ok {
+		keepJobFlowAliveWhenNoSteps = v.(bool)
+	}
+
+	terminationProtection := false
+	if v, ok := d.GetOk("termination_protection"); ok {
+		terminationProtection = v.(bool)
+	}
 	instanceConfig := &emr.JobFlowInstancesConfig{
 		MasterInstanceType: aws.String(masterInstanceType),
 		SlaveInstanceType:  aws.String(coreInstanceType),
 		InstanceCount:      aws.Int64(int64(coreInstanceCount)),
-		// Default values that we can open up in the future
-		KeepJobFlowAliveWhenNoSteps: aws.Bool(true),
-		TerminationProtected:        aws.Bool(false),
+
+		KeepJobFlowAliveWhenNoSteps: aws.Bool(keepJobFlowAliveWhenNoSteps),
+		TerminationProtected:        aws.Bool(terminationProtection),
 	}
 
 	var instanceProfile string
@@ -359,7 +378,10 @@ func resourceAwsEMRClusterRead(d *schema.ResourceData, meta interface{}) error {
 func resourceAwsEMRClusterUpdate(d *schema.ResourceData, meta interface{}) error {
 	conn := meta.(*AWSClient).emrconn
 
+	d.Partial(true)
+
 	if d.HasChange("core_instance_count") {
+		d.SetPartial("core_instance_count")
 		log.Printf("[DEBUG] Modify EMR cluster")
 		groups, err := fetchAllEMRInstanceGroups(meta, d.Id())
 		if err != nil {
@@ -377,7 +399,7 @@ func resourceAwsEMRClusterUpdate(d *schema.ResourceData, meta interface{}) error
 			InstanceGroups: []*emr.InstanceGroupModifyConfig{
 				{
 					InstanceGroupId: coreGroup.Id,
-					InstanceCount:   aws.Int64(int64(coreInstanceCount)),
+					InstanceCount:   aws.Int64(int64(coreInstanceCount) - 1),
 				},
 			},
 		}
@@ -388,24 +410,55 @@ func resourceAwsEMRClusterUpdate(d *schema.ResourceData, meta interface{}) error
 		}
 
 		log.Printf("[DEBUG] Modify EMR Cluster done...")
+
+		log.Println("[INFO] Waiting for EMR Cluster to be available")
+
+		stateConf := &resource.StateChangeConf{
+			Pending:    []string{"STARTING", "BOOTSTRAPPING"},
+			Target:     []string{"WAITING", "RUNNING"},
+			Refresh:    resourceAwsEMRClusterStateRefreshFunc(d, meta),
+			Timeout:    40 * time.Minute,
+			MinTimeout: 10 * time.Second,
+			Delay:      5 * time.Second,
+		}
+
+		_, err = stateConf.WaitForState()
+		if err != nil {
+			return fmt.Errorf("[WARN] Error waiting for EMR Cluster state to be \"WAITING\" or \"RUNNING\" after modification: %s", err)
+		}
 	}
 
-	log.Println(
-		"[INFO] Waiting for EMR Cluster to be available")
-
-	stateConf := &resource.StateChangeConf{
-		Pending:    []string{"STARTING", "BOOTSTRAPPING"},
-		Target:     []string{"WAITING", "RUNNING"},
-		Refresh:    resourceAwsEMRClusterStateRefreshFunc(d, meta),
-		Timeout:    40 * time.Minute,
-		MinTimeout: 10 * time.Second,
-		Delay:      5 * time.Second,
+	if d.HasChange("visible_to_all_users") {
+		d.SetPartial("visible_to_all_users")
+		_, errModify := conn.SetVisibleToAllUsers(&emr.SetVisibleToAllUsersInput{
+			JobFlowIds:        []*string{aws.String(d.Id())},
+			VisibleToAllUsers: aws.Bool(d.Get("visible_to_all_users").(bool)),
+		})
+		if errModify != nil {
+			log.Printf("[ERROR] %s", errModify)
+			return errModify
+		}
 	}
 
-	_, err := stateConf.WaitForState()
-	if err != nil {
-		return fmt.Errorf("[WARN] Error waiting for EMR Cluster state to be \"WAITING\" or \"RUNNING\" after modification: %s", err)
+	if d.HasChange("termination_protection") {
+		d.SetPartial("termination_protection")
+		_, errModify := conn.SetTerminationProtection(&emr.SetTerminationProtectionInput{
+			JobFlowIds:           []*string{aws.String(d.Id())},
+			TerminationProtected: aws.Bool(d.Get("termination_protection").(bool)),
+		})
+		if errModify != nil {
+			log.Printf("[ERROR] %s", errModify)
+			return errModify
+		}
 	}
+
+	if err := setTagsEMR(conn, d); err != nil {
+		return err
+	} else {
+		d.SetPartial("tags")
+	}
+
+	d.Partial(false)
 
 	return resourceAwsEMRClusterRead(d, meta)
 }
@@ -570,6 +623,64 @@ func tagsToMapEMR(ts []*emr.Tag) map[string]string {
 	}
 
 	return result
+}
+
+func diffTagsEMR(oldTags, newTags []*emr.Tag) ([]*emr.Tag, []*emr.Tag) {
+	// First, we're creating everything we have
+	create := make(map[string]interface{})
+	for _, t := range newTags {
+		create[*t.Key] = *t.Value
+	}
+
+	// Build the list of what to remove
+	var remove []*emr.Tag
+	for _, t := range oldTags {
+		old, ok := create[*t.Key]
+		if !ok || old != *t.Value {
+			// Delete it!
+			remove = append(remove, t)
+		}
+	}
+
+	return expandTags(create), remove
+}
+
+func setTagsEMR(conn *emr.EMR, d *schema.ResourceData) error {
+	if d.HasChange("tags") {
+		oraw, nraw := d.GetChange("tags")
+		o := oraw.(map[string]interface{})
+		n := nraw.(map[string]interface{})
+		create, remove := diffTagsEMR(expandTags(o), expandTags(n))
+
+		// Set tags
+		if len(remove) > 0 {
+			log.Printf("[DEBUG] Removing tags: %s", remove)
+			k := make([]*string, len(remove), len(remove))
+			for i, t := range remove {
+				k[i] = t.Key
+			}
+
+			_, err := conn.RemoveTags(&emr.RemoveTagsInput{
+				ResourceId: aws.String(d.Id()),
+				TagKeys:    k,
+			})
+			if err != nil {
+				return err
+			}
+		}
+		if len(create) > 0 {
+			log.Printf("[DEBUG] Creating tags: %s", create)
+			_, err := conn.AddTags(&emr.AddTagsInput{
+				ResourceId: aws.String(d.Id()),
+				Tags:       create,
+			})
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
 }
 
 func expandBootstrapActions(bootstrapActions []interface{}) []*emr.BootstrapActionConfig {

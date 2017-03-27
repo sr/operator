@@ -23,12 +23,12 @@ variable "do_token" {}
 
 # Configure the DigitalOcean Provider
 provider "digitalocean" {
-    token = "${var.do_token}"
+  token = "${var.do_token}"
 }
 
 # Create a web server
 resource "digitalocean_droplet" "web" {
-    ...
+  # ...
 }
 ```
 
@@ -38,3 +38,4 @@ The following arguments are supported:
 
 * `token` - (Required) This is the DO API token. This can also be specified
   with the `DIGITALOCEAN_TOKEN` shell environment variable.
+

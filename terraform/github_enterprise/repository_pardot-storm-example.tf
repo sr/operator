@@ -12,9 +12,11 @@ resource "github_branch_protection" "pardot-storm-example_master" {
   repository = "${github_repository.pardot-storm-example.name}"
   branch     = "master"
 
-  include_admins = false
-  strict         = false
-  contexts       = ["compliance"]
+  required_status_checks {
+    include_admins = false
+    strict         = false
+    contexts       = ["compliance"]
+  }
 }
 
 resource "github_team_repository" "pardot-storm-example_developers" {

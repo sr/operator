@@ -157,11 +157,11 @@ resource "azurerm_dns_ns_record" "test" {
     ttl = "300"
 
     record {
-	nsdname = "ns1.contoso.com"
+    	nsdname = "ns1.contoso.com"
     }
 
     record {
-	nsdname = "ns2.contoso.com"
+    	nsdname = "ns2.contoso.com"
     }
 }
 `
@@ -183,15 +183,15 @@ resource "azurerm_dns_ns_record" "test" {
     ttl = "300"
 
     record {
-	nsdname = "ns1.contoso.com"
+    	nsdname = "ns1.contoso.com"
     }
 
     record {
-	nsdname = "ns2.contoso.com"
+    	nsdname = "ns2.contoso.com"
     }
 
     record {
-	nsdname = "ns3.contoso.com"
+    	nsdname = "ns3.contoso.com"
     }
 }
 `
@@ -213,11 +213,11 @@ resource "azurerm_dns_ns_record" "test" {
     ttl = "300"
 
     record {
-	nsdname = "ns1.contoso.com"
+    	nsdname = "ns1.contoso.com"
     }
 
     record {
-	nsdname = "ns2.contoso.com"
+    	nsdname = "ns2.contoso.com"
     }
 
     tags {
@@ -243,11 +243,11 @@ resource "azurerm_dns_ns_record" "test" {
     zone_name = "${azurerm_dns_zone.test.name}"
     ttl = "300"
     record {
-	nsdname = "ns1.contoso.com"
+    	nsdname = "ns1.contoso.com"
     }
 
     record {
-	nsdname = "ns2.contoso.com"
+    	nsdname = "ns2.contoso.com"
     }
 
     tags {

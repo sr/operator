@@ -10,14 +10,21 @@ description: |-
 
 Provides a VPC Endpoint resource.
 
+~> **NOTE on VPC Endpoints and VPC Endpoint Route Table Associations:** Terraform provides
+both a standalone [VPC Endpoint Route Table Association](vpc_endpoint_route_table_association.html)
+(an association between a VPC endpoint and a single `route_table_id`) and a VPC Endpoint resource
+with a `route_table_ids` attribute. Do not use the same route table ID in both a VPC Endpoint resource
+and a VPC Endpoint Route Table Association resource. Doing so will cause a conflict of associations
+and will overwrite the association.
+
 ## Example Usage
 
 Basic usage:
 
 ```
 resource "aws_vpc_endpoint" "private-s3" {
-    vpc_id = "${aws_vpc.main.id}"
-    service_name = "com.amazonaws.us-west-2.s3"
+  vpc_id       = "${aws_vpc.main.id}"
+  service_name = "com.amazonaws.us-west-2.s3"
 }
 ```
 

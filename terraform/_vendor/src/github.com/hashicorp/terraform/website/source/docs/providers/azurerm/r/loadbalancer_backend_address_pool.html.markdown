@@ -16,33 +16,32 @@ Create a LoadBalancer Backend Address Pool.
 
 ```
 resource "azurerm_resource_group" "test" {
-    name = "LoadBalancerRG"
-    location = "West US"
+  name     = "LoadBalancerRG"
+  location = "West US"
 }
 
 resource "azurerm_public_ip" "test" {
-    name = "PublicIPForLB"
-    location = "West US"
-    resource_group_name = "${azurerm_resource_group.test.name}"
-    public_ip_address_allocation = "static"
+  name                         = "PublicIPForLB"
+  location                     = "West US"
+  resource_group_name          = "${azurerm_resource_group.test.name}"
+  public_ip_address_allocation = "static"
 }
 
 resource "azurerm_lb" "test" {
-    name = "TestLoadBalancer"
-    location = "West US"
-    resource_group_name = "${azurerm_resource_group.test.name}"
+  name                = "TestLoadBalancer"
+  location            = "West US"
+  resource_group_name = "${azurerm_resource_group.test.name}"
 
-    frontend_ip_configuration {
-      name = "PublicIPAddress"
-      public_ip_address_id = "${azurerm_public_ip.test.id}"
-    }
+  frontend_ip_configuration {
+    name                 = "PublicIPAddress"
+    public_ip_address_id = "${azurerm_public_ip.test.id}"
+  }
 }
 
 resource "azurerm_lb_backend_address_pool" "test" {
-  location = "West US"
   resource_group_name = "${azurerm_resource_group.test.name}"
-  loadbalancer_id = "${azurerm_lb.test.id}"
-  name = "BackEndAddressPool"
+  loadbalancer_id     = "${azurerm_lb.test.id}"
+  name                = "BackEndAddressPool"
 }
 ```
 
@@ -60,3 +59,11 @@ The following arguments are supported:
 The following attributes are exported:
 
 * `id` - The ID of the LoadBalancer to which the resource is attached.
+
+## Import
+
+Load Balancer Backend Address Pools can be imported using the `resource id`, e.g.
+
+```
+terraform import azurerm_lb_backend_address_pool.test /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/group1/providers/Microsoft.Network/loadBalancers/lb1/backendAddressPools/pool1
+```

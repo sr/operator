@@ -226,14 +226,14 @@ resource "cloudstack_network_acl_rule" "foo" {
   acl_id = "${cloudstack_network_acl.foo.id}"
 
   rule {
-	action = "allow"
+  	action = "allow"
     cidr_list = ["172.18.100.0/24"]
     protocol = "all"
     traffic_type = "ingress"
   }
 
   rule {
-	action = "allow"
+  	action = "allow"
     cidr_list = ["172.18.100.0/24"]
     protocol = "icmp"
     icmp_type = "-1"
@@ -270,14 +270,14 @@ resource "cloudstack_network_acl_rule" "foo" {
   acl_id = "${cloudstack_network_acl.foo.id}"
 
   rule {
-	action = "deny"
+  	action = "deny"
     cidr_list = ["172.18.100.0/24"]
     protocol = "all"
     traffic_type = "ingress"
   }
 
   rule {
-	action = "deny"
+  	action = "deny"
 		cidr_list = ["172.18.100.0/24", "172.18.101.0/24"]
     protocol = "icmp"
     icmp_type = "-1"

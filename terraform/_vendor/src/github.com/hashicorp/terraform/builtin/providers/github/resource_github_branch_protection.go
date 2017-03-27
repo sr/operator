@@ -1,6 +1,9 @@
 package github
 
 import (
+	"context"
+	"errors"
+
 	"github.com/google/go-github/github"
 	"github.com/hashicorp/terraform/helper/schema"
 )
@@ -26,30 +29,64 @@ func resourceGithubBranchProtection() *schema.Resource {
 				Required: true,
 				ForceNew: true,
 			},
-			"include_admins": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				Default:  false,
-			},
-			"strict": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				Default:  false,
-			},
-			"contexts": {
+			"required_status_checks": {
 				Type:     schema.TypeList,
 				Optional: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
+				MaxItems: 1,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"include_admins": {
+							Type:     schema.TypeBool,
+							Optional: true,
+							Default:  false,
+						},
+						"strict": {
+							Type:     schema.TypeBool,
+							Optional: true,
+							Default:  false,
+						},
+						"contexts": {
+							Type:     schema.TypeList,
+							Optional: true,
+							Elem: &schema.Schema{
+								Type: schema.TypeString,
+							},
+						},
+					},
+				},
 			},
-			"users_restriction": {
+			"required_pull_request_reviews": {
 				Type:     schema.TypeList,
 				Optional: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
+				MaxItems: 1,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"include_admins": {
+							Type:     schema.TypeBool,
+							Optional: true,
+							Default:  false,
+						},
+					},
+				},
 			},
-			"teams_restriction": {
+			"restrictions": {
 				Type:     schema.TypeList,
 				Optional: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
+				MaxItems: 1,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"users": {
+							Type:     schema.TypeList,
+							Optional: true,
+							Elem:     &schema.Schema{Type: schema.TypeString},
+						},
+						"teams": {
+							Type:     schema.TypeList,
+							Optional: true,
+							Elem:     &schema.Schema{Type: schema.TypeString},
+						},
+					},
+				},
 			},
 		},
 	}
@@ -60,12 +97,12 @@ func resourceGithubBranchProtectionCreate(d *schema.ResourceData, meta interface
 	r := d.Get("repository").(string)
 	b := d.Get("branch").(string)
 
-	protectionRequest, err := resourceGithubBranchProtectionRequestObject(d)
+	protectionRequest, err := buildProtectionRequest(d)
 	if err != nil {
 		return err
 	}
 
-	_, _, err = client.Repositories.UpdateBranchProtection(meta.(*Organization).name, r, b, protectionRequest)
+	_, _, err = client.Repositories.UpdateBranchProtection(context.TODO(), meta.(*Organization).name, r, b, protectionRequest)
 	if err != nil {
 		return err
 	}
@@ -78,7 +115,7 @@ func resourceGithubBranchProtectionRead(d *schema.ResourceData, meta interface{}
 	client := meta.(*Organization).client
 	r, b := parseTwoPartID(d.Id())
 
-	githubProtection, _, err := client.Repositories.GetBranchProtection(meta.(*Organization).name, r, b)
+	githubProtection, _, err := client.Repositories.GetBranchProtection(context.TODO(), meta.(*Organization).name, r, b)
 	if err != nil {
 		d.SetId("")
 		return nil
@@ -88,47 +125,52 @@ func resourceGithubBranchProtectionRead(d *schema.ResourceData, meta interface{}
 	d.Set("branch", b)
 
 	rsc := githubProtection.RequiredStatusChecks
-	if rsc != nil && rsc.IncludeAdmins != nil {
-		d.Set("include_admins", *rsc.IncludeAdmins)
+	if rsc != nil {
+		d.Set("required_status_checks", []interface{}{
+			map[string]interface{}{
+				"include_admins": rsc.IncludeAdmins,
+				"strict":         rsc.Strict,
+				"contexts":       rsc.Contexts,
+			},
+		})
 	} else {
-		d.Set("include_admins", false)
+		d.Set("required_status_checks", []interface{}{})
 	}
 
-	if rsc != nil && rsc.Strict != nil {
-		d.Set("strict", *rsc.Strict)
+	rprr := githubProtection.RequiredPullRequestReviews
+	if rprr != nil {
+		d.Set("required_pull_request_reviews", []interface{}{
+			map[string]interface{}{
+				"include_admins": rprr.IncludeAdmins,
+			},
+		})
 	} else {
-		d.Set("strict", false)
-	}
-
-	if rsc != nil && rsc.Contexts != nil {
-		d.Set("contexts", *rsc.Contexts)
-	} else {
-		d.Set("contexts", []string{})
+		d.Set("required_pull_request_reviews", []interface{}{})
 	}
 
 	restrictions := githubProtection.Restrictions
-	if restrictions != nil && restrictions.Users != nil {
-		logins := []string{}
+	if restrictions != nil {
+		var userLogins []string
 		for _, u := range restrictions.Users {
 			if u.Login != nil {
-				logins = append(logins, *u.Login)
+				userLogins = append(userLogins, *u.Login)
 			}
 		}
-		d.Set("users_restriction", logins)
-	} else {
-		d.Set("users_restriction", nil)
-	}
-
-	if restrictions != nil && restrictions.Teams != nil {
-		slugs := []string{}
+		var teamSlugs []string
 		for _, t := range restrictions.Teams {
 			if t.Slug != nil {
-				slugs = append(slugs, *t.Slug)
+				teamSlugs = append(teamSlugs, *t.Slug)
 			}
 		}
-		d.Set("teams_restriction", slugs)
+
+		d.Set("restrictions", []interface{}{
+			map[string]interface{}{
+				"users": userLogins,
+				"teams": teamSlugs,
+			},
+		})
 	} else {
-		d.Set("teams_restriction", nil)
+		d.Set("restrictions", []interface{}{})
 	}
 
 	return nil
@@ -138,12 +180,12 @@ func resourceGithubBranchProtectionUpdate(d *schema.ResourceData, meta interface
 	client := meta.(*Organization).client
 	r, b := parseTwoPartID(d.Id())
 
-	protectionRequest, err := resourceGithubBranchProtectionRequestObject(d)
+	protectionRequest, err := buildProtectionRequest(d)
 	if err != nil {
 		return err
 	}
 
-	_, _, err = client.Repositories.UpdateBranchProtection(meta.(*Organization).name, r, b, protectionRequest)
+	_, _, err = client.Repositories.UpdateBranchProtection(context.TODO(), meta.(*Organization).name, r, b, protectionRequest)
 	if err != nil {
 		return err
 	}
@@ -156,43 +198,79 @@ func resourceGithubBranchProtectionDelete(d *schema.ResourceData, meta interface
 	client := meta.(*Organization).client
 	r, b := parseTwoPartID(d.Id())
 
-	_, err := client.Repositories.RemoveBranchProtection(meta.(*Organization).name, r, b)
+	_, err := client.Repositories.RemoveBranchProtection(context.TODO(), meta.(*Organization).name, r, b)
 	return err
 }
 
-func resourceGithubBranchProtectionRequestObject(d *schema.ResourceData) (*github.ProtectionRequest, error) {
+func buildProtectionRequest(d *schema.ResourceData) (*github.ProtectionRequest, error) {
 	protectionRequest := new(github.ProtectionRequest)
 
-	rsc := new(github.RequiredStatusChecks)
-	protectionRequest.RequiredStatusChecks = rsc
-	rsc.IncludeAdmins = github.Bool(d.Get("include_admins").(bool))
-	rsc.Strict = github.Bool(d.Get("strict").(bool))
+	if v, ok := d.GetOk("required_status_checks"); ok {
+		vL := v.([]interface{})
+		if len(vL) > 1 {
+			return nil, errors.New("cannot specify required_status_checks more than one time")
+		}
 
-	rsc.Contexts = &[]string{}
-	if vL, ok := d.GetOk("contexts"); ok {
-		for _, c := range vL.([]interface{}) {
-			*rsc.Contexts = append(*rsc.Contexts, c.(string))
+		for _, v := range vL {
+			m := v.(map[string]interface{})
+
+			rsc := new(github.RequiredStatusChecks)
+			rsc.IncludeAdmins = m["include_admins"].(bool)
+			rsc.Strict = m["strict"].(bool)
+
+			rsc.Contexts = []string{}
+			if contexts, ok := m["contexts"].([]interface{}); ok {
+				for _, c := range contexts {
+					rsc.Contexts = append(rsc.Contexts, c.(string))
+				}
+			}
+
+			protectionRequest.RequiredStatusChecks = rsc
 		}
 	}
 
-	uL, uOK := d.GetOk("users_restriction")
-	tL, tOK := d.GetOk("teams_restriction")
-	if uOK || tOK {
-		restrictions := &github.BranchRestrictionsRequest{
-			Users: &[]string{},
-			Teams: &[]string{},
+	if v, ok := d.GetOk("required_pull_request_reviews"); ok {
+		vL := v.([]interface{})
+		if len(vL) > 1 {
+			return nil, errors.New("cannot specify required_pull_request_reviews more than one time")
 		}
-		protectionRequest.Restrictions = restrictions
 
-		if uOK {
-			for _, u := range uL.([]interface{}) {
-				*restrictions.Users = append(*restrictions.Users, u.(string))
-			}
+		for _, v := range vL {
+			m := v.(map[string]interface{})
+
+			rprr := new(github.RequiredPullRequestReviews)
+			rprr.IncludeAdmins = m["include_admins"].(bool)
+
+			protectionRequest.RequiredPullRequestReviews = rprr
 		}
-		if tOK {
-			for _, t := range tL.([]interface{}) {
-				*restrictions.Teams = append(*restrictions.Teams, t.(string))
+	}
+
+	if v, ok := d.GetOk("restrictions"); ok {
+		vL := v.([]interface{})
+		if len(vL) > 1 {
+			return nil, errors.New("cannot specify restrictions more than one time")
+		}
+
+		for _, v := range vL {
+			m := v.(map[string]interface{})
+
+			restrictions := new(github.BranchRestrictionsRequest)
+
+			restrictions.Users = []string{}
+			if users, ok := m["users"].([]interface{}); ok {
+				for _, u := range users {
+					restrictions.Users = append(restrictions.Users, u.(string))
+				}
 			}
+
+			restrictions.Teams = []string{}
+			if teams, ok := m["teams"].([]interface{}); ok {
+				for _, t := range teams {
+					restrictions.Teams = append(restrictions.Teams, t.(string))
+				}
+			}
+
+			protectionRequest.Restrictions = restrictions
 		}
 	}
 

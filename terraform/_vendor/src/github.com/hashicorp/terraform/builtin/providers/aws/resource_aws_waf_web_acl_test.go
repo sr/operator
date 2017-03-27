@@ -295,7 +295,7 @@ resource "aws_waf_web_acl" "waf_acl" {
     action {
        type = "BLOCK"
     }
-    priority = 1
+    priority = 1 
     rule_id = "${aws_waf_rule.wafrule.id}"
   }
 }`, name, name, name, name, name)
@@ -331,7 +331,7 @@ resource "aws_waf_web_acl" "waf_acl" {
     action {
        type = "BLOCK"
     }
-    priority = 1
+    priority = 1 
     rule_id = "${aws_waf_rule.wafrule.id}"
   }
 }`, name, name, name, name, name)
@@ -367,7 +367,7 @@ resource "aws_waf_web_acl" "waf_acl" {
     action {
        type = "BLOCK"
     }
-    priority = 1
+    priority = 1 
     rule_id = "${aws_waf_rule.wafrule.id}"
   }
 }`, name, name, name, name, name)

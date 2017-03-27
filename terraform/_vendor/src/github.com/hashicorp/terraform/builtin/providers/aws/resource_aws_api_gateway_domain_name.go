@@ -21,30 +21,46 @@ func resourceAwsApiGatewayDomainName() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 
+			//According to AWS Documentation, ACM will be the only way to add certificates
+			//to ApiGateway DomainNames. When this happens, we will be deprecating all certificate methods
+			//except certificate_arn. We are not quite sure when this will happen.
 			"certificate_body": {
-				Type:     schema.TypeString,
-				Required: true,
+				Type:          schema.TypeString,
+				ForceNew:      true,
+				Optional:      true,
+				ConflictsWith: []string{"certificate_arn"},
 			},
 
 			"certificate_chain": {
-				Type:     schema.TypeString,
-				Required: true,
+				Type:          schema.TypeString,
+				ForceNew:      true,
+				Optional:      true,
+				ConflictsWith: []string{"certificate_arn"},
 			},
 
 			"certificate_name": {
-				Type:     schema.TypeString,
-				Required: true,
+				Type:          schema.TypeString,
+				Optional:      true,
+				ConflictsWith: []string{"certificate_arn"},
 			},
 
 			"certificate_private_key": {
-				Type:     schema.TypeString,
-				Required: true,
+				Type:          schema.TypeString,
+				ForceNew:      true,
+				Optional:      true,
+				ConflictsWith: []string{"certificate_arn"},
 			},
 
 			"domain_name": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
+			},
+
+			"certificate_arn": {
+				Type:          schema.TypeString,
+				Optional:      true,
+				ConflictsWith: []string{"certificate_body", "certificate_chain", "certificate_name", "certificate_private_key"},
 			},
 
 			"cloudfront_domain_name": {
@@ -69,13 +85,31 @@ func resourceAwsApiGatewayDomainNameCreate(d *schema.ResourceData, meta interfac
 	conn := meta.(*AWSClient).apigateway
 	log.Printf("[DEBUG] Creating API Gateway Domain Name")
 
-	domainName, err := conn.CreateDomainName(&apigateway.CreateDomainNameInput{
-		CertificateBody:       aws.String(d.Get("certificate_body").(string)),
-		CertificateChain:      aws.String(d.Get("certificate_chain").(string)),
-		CertificateName:       aws.String(d.Get("certificate_name").(string)),
-		CertificatePrivateKey: aws.String(d.Get("certificate_private_key").(string)),
-		DomainName:            aws.String(d.Get("domain_name").(string)),
-	})
+	params := &apigateway.CreateDomainNameInput{
+		DomainName: aws.String(d.Get("domain_name").(string)),
+	}
+
+	if v, ok := d.GetOk("certificate_arn"); ok {
+		params.CertificateArn = aws.String(v.(string))
+	}
+
+	if v, ok := d.GetOk("certificate_name"); ok {
+		params.CertificateName = aws.String(v.(string))
+	}
+
+	if v, ok := d.GetOk("certificate_body"); ok {
+		params.CertificateBody = aws.String(v.(string))
+	}
+
+	if v, ok := d.GetOk("certificate_chain"); ok {
+		params.CertificateChain = aws.String(v.(string))
+	}
+
+	if v, ok := d.GetOk("certificate_private_key"); ok {
+		params.CertificatePrivateKey = aws.String(v.(string))
+	}
+
+	domainName, err := conn.CreateDomainName(params)
 	if err != nil {
 		return fmt.Errorf("Error creating API Gateway Domain Name: %s", err)
 	}
@@ -110,6 +144,7 @@ func resourceAwsApiGatewayDomainNameRead(d *schema.ResourceData, meta interface{
 	}
 	d.Set("cloudfront_domain_name", domainName.DistributionDomainName)
 	d.Set("domain_name", domainName.DomainName)
+	d.Set("certificate_arn", domainName.CertificateArn)
 
 	return nil
 }
@@ -117,35 +152,19 @@ func resourceAwsApiGatewayDomainNameRead(d *schema.ResourceData, meta interface{
 func resourceAwsApiGatewayDomainNameUpdateOperations(d *schema.ResourceData) []*apigateway.PatchOperation {
 	operations := make([]*apigateway.PatchOperation, 0)
 
-	if d.HasChange("certificate_body") {
-		operations = append(operations, &apigateway.PatchOperation{
-			Op:    aws.String("replace"),
-			Path:  aws.String("/certificate_body"),
-			Value: aws.String(d.Get("certificate_body").(string)),
-		})
-	}
-
-	if d.HasChange("certificate_chain") {
-		operations = append(operations, &apigateway.PatchOperation{
-			Op:    aws.String("replace"),
-			Path:  aws.String("/certificate_chain"),
-			Value: aws.String(d.Get("certificate_chain").(string)),
-		})
-	}
-
 	if d.HasChange("certificate_name") {
 		operations = append(operations, &apigateway.PatchOperation{
 			Op:    aws.String("replace"),
-			Path:  aws.String("/certificate_name"),
+			Path:  aws.String("/certificateName"),
 			Value: aws.String(d.Get("certificate_name").(string)),
 		})
 	}
 
-	if d.HasChange("certificate_private_key") {
+	if d.HasChange("certificate_arn") {
 		operations = append(operations, &apigateway.PatchOperation{
 			Op:    aws.String("replace"),
-			Path:  aws.String("/certificate_private_key"),
-			Value: aws.String(d.Get("certificate_private_key").(string)),
+			Path:  aws.String("/certificateArn"),
+			Value: aws.String(d.Get("certificate_arn").(string)),
 		})
 	}
 
@@ -160,6 +179,7 @@ func resourceAwsApiGatewayDomainNameUpdate(d *schema.ResourceData, meta interfac
 		DomainName:      aws.String(d.Id()),
 		PatchOperations: resourceAwsApiGatewayDomainNameUpdateOperations(d),
 	})
+
 	if err != nil {
 		return err
 	}

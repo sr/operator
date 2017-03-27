@@ -138,8 +138,8 @@ resource "azurerm_sql_server" "test" {
     administrator_login_password = "thisIsDog11"
 
     tags {
-	environment = "staging"
-	database = "test"
+    	environment = "staging"
+    	database = "test"
     }
 }
 `
@@ -158,7 +158,7 @@ resource "azurerm_sql_server" "test" {
     administrator_login_password = "thisIsDog11"
 
     tags {
-	environment = "production"
+    	environment = "production"
     }
 }
 `

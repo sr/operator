@@ -1,6 +1,8 @@
 package aws
 
 import (
+	"fmt"
+
 	"github.com/hashicorp/terraform/helper/schema"
 )
 
@@ -23,7 +25,7 @@ func dataSourceAwsBillingServiceAccount() *schema.Resource {
 func dataSourceAwsBillingServiceAccountRead(d *schema.ResourceData, meta interface{}) error {
 	d.SetId(billingAccountId)
 
-	d.Set("arn", "arn:aws:iam::"+billingAccountId+":root")
+	d.Set("arn", fmt.Sprintf("arn:%s:iam::%s:root", meta.(*AWSClient).partition, billingAccountId))
 
 	return nil
 }

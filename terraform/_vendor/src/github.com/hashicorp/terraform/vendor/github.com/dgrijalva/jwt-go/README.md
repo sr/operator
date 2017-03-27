@@ -31,13 +31,13 @@ See [the project documentation](https://godoc.org/github.com/dgrijalva/jwt-go) f
 
 ## Extensions
 
-This library publishes all the necessary components for adding your own signing methods.  Simply implement the `SigningMethod` interface and register a factory method using `RegisterSigningMethod`.
+This library publishes all the necessary components for adding your own signing methods.  Simply implement the `SigningMethod` interface and register a factory method using `RegisterSigningMethod`.  
 
 Here's an example of an extension that integrates with the Google App Engine signing tools: https://github.com/someone1/gcp-jwt-go
 
 ## Compliance
 
-This library was last reviewed to comply with [RTF 7519](http://www.rfc-editor.org/info/rfc7519) dated May 2015 with a few notable differences:
+This library was last reviewed to comply with [RTF 7519](http://www.rfc-editor.org/info/rfc7519) dated May 2015 with a few notable differences: 
 
 * In order to protect against accidental use of [Unsecured JWTs](http://self-issued.info/docs/draft-ietf-oauth-json-web-token.html#UnsecuredJWT), tokens using `alg=none` will only be accepted if the constant `jwt.UnsafeAllowNoneSignatureType` is provided as the key.
 
@@ -77,7 +77,7 @@ Without going too far down the rabbit hole, here's a description of the interact
 * OAuth is a protocol for allowing an identity provider to be separate from the service a user is logging in to.  For example, whenever you use Facebook to log into a different service (Yelp, Spotify, etc), you are using OAuth.
 * OAuth defines several options for passing around authentication data. One popular method is called a "bearer token". A bearer token is simply a string that _should_ only be held by an authenticated user. Thus, simply presenting this token proves your identity. You can probably derive from here why a JWT might make a good bearer token.
 * Because bearer tokens are used for authentication, it's important they're kept secret. This is why transactions that use bearer tokens typically happen over SSL.
-
+ 
 ## More
 
 Documentation can be found [on godoc.org](http://godoc.org/github.com/dgrijalva/jwt-go).

@@ -1,10 +1,10 @@
 package github
 
 import (
+	"context"
 	"fmt"
 	"testing"
 
-	"github.com/google/go-github/github"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
 )
@@ -56,7 +56,7 @@ func testAccCheckGithubRepositoryCollaboratorDestroy(s *terraform.State) error {
 
 		o := testAccProvider.Meta().(*Organization).name
 		r, u := parseTwoPartID(rs.Primary.ID)
-		isCollaborator, _, err := conn.Repositories.IsCollaborator(o, r, u)
+		isCollaborator, _, err := conn.Repositories.IsCollaborator(context.TODO(), o, r, u)
 
 		if err != nil {
 			return err
@@ -87,14 +87,21 @@ func testAccCheckGithubRepositoryCollaboratorExists(n string) resource.TestCheck
 		o := testAccProvider.Meta().(*Organization).name
 		r, u := parseTwoPartID(rs.Primary.ID)
 
-		isCollaborator, _, err := conn.Repositories.IsCollaborator(o, r, u)
-
+		invitations, _, err := conn.Repositories.ListInvitations(context.TODO(), o, r, nil)
 		if err != nil {
 			return err
 		}
 
-		if !isCollaborator {
-			return fmt.Errorf("Repository collaborator does not exist")
+		hasInvitation := false
+		for _, i := range invitations {
+			if *i.Invitee.Login == u {
+				hasInvitation = true
+				break
+			}
+		}
+
+		if !hasInvitation {
+			return fmt.Errorf("Repository collaboration invitation does not exist")
 		}
 
 		return nil
@@ -116,15 +123,14 @@ func testAccCheckGithubRepositoryCollaboratorPermission(n string) resource.TestC
 		o := testAccProvider.Meta().(*Organization).name
 		r, u := parseTwoPartID(rs.Primary.ID)
 
-		collaborators, _, err := conn.Repositories.ListCollaborators(o, r, &github.ListOptions{})
-
+		invitations, _, err := conn.Repositories.ListInvitations(context.TODO(), o, r, nil)
 		if err != nil {
 			return err
 		}
 
-		for _, c := range collaborators {
-			if *c.Login == u {
-				permName, err := getRepoPermission(c.Permissions)
+		for _, i := range invitations {
+			if *i.Invitee.Login == u {
+				permName, err := getInvitationPermission(i)
 
 				if err != nil {
 					return err

@@ -17,15 +17,14 @@ Run a SmartOS base-64 machine.
 
 ```
 resource "triton_machine" "test" {
-    name = "example-machine"
-    package = "g3-standard-0.25-smartos"
-    image = "842e6fa6-6e9b-11e5-8402-1b490459e334"
+  name    = "example-machine"
+  package = "g3-standard-0.25-smartos"
+  image   = "842e6fa6-6e9b-11e5-8402-1b490459e334"
 
-    tags = {
-        hello = "world"
-    }
+  tags = {
+    hello = "world"
+  }
 }
-
 ```
 
 ## Argument Reference
@@ -44,8 +43,8 @@ The following arguments are supported:
 * `image` - (string, Required)
     The UUID of the image to provision.
 
-* `networks` - (list of string)
-    A list of the IDs of the desired networks for the machine.
+* `nic` - (list of NIC blocks, Optional)
+    NICs associated with the machine. The fields allowed in a `NIC` block are defined below.
 
 * `firewall_enabled` - (boolean)  Default: `false`
     Whether the cloud firewall should be enabled for this machine.
@@ -61,6 +60,10 @@ The following arguments are supported:
 
 * `administrator_pw` - (string)
     The initial password for the Administrator user. Only used for Windows virtual machines.
+
+The nested `nic` block supports the following:
+* `network` - (string, Optional)
+    The network id to attach to the network interface. It will be hex, in the format: `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`.
 
 ## Attribute Reference
 

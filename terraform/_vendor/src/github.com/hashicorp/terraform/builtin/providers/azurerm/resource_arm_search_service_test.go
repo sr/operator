@@ -127,8 +127,8 @@ resource "azurerm_search_service" "test" {
     sku = "standard"
 
     tags {
-	environment = "staging"
-	database = "test"
+    	environment = "staging"
+    	database = "test"
     }
 }
 `
@@ -146,7 +146,7 @@ resource "azurerm_search_service" "test" {
     replica_count = 2
 
     tags {
-	environment = "production"
+    	environment = "production"
     }
 }
 `

@@ -15,11 +15,11 @@ Provides a Cloudflare record resource.
 ```
 # Add a record to the domain
 resource "cloudflare_record" "foobar" {
-	domain = "${var.cloudflare_domain}"
-	name = "terraform"
-	value = "192.168.0.11"
-	type = "A"
-	ttl = 3600
+  domain = "${var.cloudflare_domain}"
+  name   = "terraform"
+  value  = "192.168.0.11"
+  type   = "A"
+  ttl    = 3600
 }
 ```
 
@@ -47,3 +47,4 @@ The following attributes are exported:
 * `priority` - The priority of the record
 * `hostname` - The FQDN of the record
 * `proxied` - (Optional) Whether the record gets CloudFlares origin protection.
+

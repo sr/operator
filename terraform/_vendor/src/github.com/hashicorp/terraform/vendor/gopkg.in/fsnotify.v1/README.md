@@ -1,6 +1,6 @@
 # File system notifications for Go
 
-[![GoDoc](https://godoc.org/github.com/fsnotify/fsnotify?status.svg)](https://godoc.org/github.com/fsnotify/fsnotify) [![Go Report Card](https://goreportcard.com/badge/github.com/fsnotify/fsnotify)](https://goreportcard.com/report/github.com/fsnotify/fsnotify) [![Coverage](http://gocover.io/_badge/github.com/fsnotify/fsnotify)](http://gocover.io/github.com/fsnotify/fsnotify)
+[![GoDoc](https://godoc.org/github.com/fsnotify/fsnotify?status.svg)](https://godoc.org/github.com/fsnotify/fsnotify) [![Go Report Card](https://goreportcard.com/badge/github.com/fsnotify/fsnotify)](https://goreportcard.com/report/github.com/fsnotify/fsnotify) [![Coverage](http://gocover.io/_badge/github.com/fsnotify/fsnotify)](http://gocover.io/github.com/fsnotify/fsnotify) 
 
 fsnotify utilizes [golang.org/x/sys](https://godoc.org/golang.org/x/sys) rather than `syscall` from the standard library. Ensure you have the latest version installed by running:
 
@@ -27,7 +27,7 @@ Please see [the documentation](https://godoc.org/github.com/fsnotify/fsnotify) f
 
 ## API stability
 
-fsnotify is a fork of [howeyc/fsnotify](https://godoc.org/github.com/howeyc/fsnotify) with a new API as of v1.0. The API is based on [this design document](http://goo.gl/MrYxyA).
+fsnotify is a fork of [howeyc/fsnotify](https://godoc.org/github.com/howeyc/fsnotify) with a new API as of v1.0. The API is based on [this design document](http://goo.gl/MrYxyA). 
 
 All [releases](https://github.com/fsnotify/fsnotify/releases) are tagged based on [Semantic Versioning](http://semver.org/). Further API changes are [planned](https://github.com/fsnotify/fsnotify/milestones), and will be tagged with a new major revision number.
 
@@ -47,3 +47,4 @@ See [example_test.go](https://github.com/fsnotify/fsnotify/blob/master/example_t
 
 * [notify](https://github.com/rjeczalik/notify)
 * [fsevents](https://github.com/fsnotify/fsevents)
+

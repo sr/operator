@@ -17,10 +17,9 @@ Create a key
 
 ```
 resource "triton_key" "example" {
-    name = "Example Key"
-    key = "${file("keys/id_rsa")}"
+  name = "Example Key"
+  key  = "${file("keys/id_rsa")}"
 }
-
 ```
 
 ## Argument Reference
@@ -32,3 +31,4 @@ The following arguments are supported:
 
 * `key` - (string, Required, Change forces new resource)
     The SSH key material. In order to read this from a file, use the `file` interpolation.
+

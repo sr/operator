@@ -1,6 +1,7 @@
 package github
 
 import (
+	"context"
 	"fmt"
 	"reflect"
 	"testing"
@@ -26,13 +27,14 @@ func TestAccGithubBranchProtection_basic(t *testing.T) {
 					testAccCheckGithubBranchProtectionRestrictions(&protection, []string{testUser}, []string{}),
 					resource.TestCheckResourceAttr("github_branch_protection.master", "repository", testRepo),
 					resource.TestCheckResourceAttr("github_branch_protection.master", "branch", "master"),
-					resource.TestCheckResourceAttr("github_branch_protection.master", "include_admins", "true"),
-					resource.TestCheckResourceAttr("github_branch_protection.master", "strict", "true"),
-					resource.TestCheckResourceAttr("github_branch_protection.master", "contexts.#", "1"),
-					resource.TestCheckResourceAttr("github_branch_protection.master", "contexts.0", "github/foo"),
-					resource.TestCheckResourceAttr("github_branch_protection.master", "users_restriction.#", "1"),
-					resource.TestCheckResourceAttr("github_branch_protection.master", "users_restriction.0", testUser),
-					resource.TestCheckResourceAttr("github_branch_protection.master", "teams_restriction.#", "0"),
+					resource.TestCheckResourceAttr("github_branch_protection.master", "required_status_checks.0.include_admins", "true"),
+					resource.TestCheckResourceAttr("github_branch_protection.master", "required_status_checks.0.strict", "true"),
+					resource.TestCheckResourceAttr("github_branch_protection.master", "required_status_checks.0.contexts.#", "1"),
+					resource.TestCheckResourceAttr("github_branch_protection.master", "required_status_checks.0.contexts.0", "github/foo"),
+					resource.TestCheckResourceAttr("github_branch_protection.master", "required_pull_request_reviews.0.include_admins", "true"),
+					resource.TestCheckResourceAttr("github_branch_protection.master", "restrictions.0.users.#", "1"),
+					resource.TestCheckResourceAttr("github_branch_protection.master", "restrictions.0.users.0", testUser),
+					resource.TestCheckResourceAttr("github_branch_protection.master", "restrictions.0.teams.#", "0"),
 				),
 			},
 			{
@@ -43,12 +45,12 @@ func TestAccGithubBranchProtection_basic(t *testing.T) {
 					testAccCheckGithubBranchProtectionNoRestrictionsExist(&protection),
 					resource.TestCheckResourceAttr("github_branch_protection.master", "repository", testRepo),
 					resource.TestCheckResourceAttr("github_branch_protection.master", "branch", "master"),
-					resource.TestCheckResourceAttr("github_branch_protection.master", "include_admins", "false"),
-					resource.TestCheckResourceAttr("github_branch_protection.master", "strict", "false"),
-					resource.TestCheckResourceAttr("github_branch_protection.master", "contexts.#", "1"),
-					resource.TestCheckResourceAttr("github_branch_protection.master", "contexts.0", "github/bar"),
-					resource.TestCheckResourceAttr("github_branch_protection.master", "users_restriction.#", "0"),
-					resource.TestCheckResourceAttr("github_branch_protection.master", "teams_restriction.#", "0"),
+					resource.TestCheckResourceAttr("github_branch_protection.master", "required_status_checks.0.include_admins", "false"),
+					resource.TestCheckResourceAttr("github_branch_protection.master", "required_status_checks.0.strict", "false"),
+					resource.TestCheckResourceAttr("github_branch_protection.master", "required_status_checks.0.contexts.#", "1"),
+					resource.TestCheckResourceAttr("github_branch_protection.master", "required_status_checks.0.contexts.0", "github/bar"),
+					resource.TestCheckResourceAttr("github_branch_protection.master", "required_pull_request_reviews.#", "0"),
+					resource.TestCheckResourceAttr("github_branch_protection.master", "restrictions.#", "0"),
 				),
 			},
 		},
@@ -88,7 +90,7 @@ func testAccCheckGithubProtectedBranchExists(n string, protection *github.Protec
 		o := testAccProvider.Meta().(*Organization).name
 		r, b := parseTwoPartID(rs.Primary.ID)
 
-		githubProtection, _, err := conn.Repositories.GetBranchProtection(o, r, b)
+		githubProtection, _, err := conn.Repositories.GetBranchProtection(context.TODO(), o, r, b)
 		if err != nil {
 			return err
 		}
@@ -105,15 +107,15 @@ func testAccCheckGithubBranchProtectionRequiredStatusChecks(protection *github.P
 			return fmt.Errorf("Expected RequiredStatusChecks to be present, but was nil")
 		}
 
-		if *rsc.IncludeAdmins != expectedIncludeAdmins {
-			return fmt.Errorf("Expected RequiredStatusChecks.IncludeAdmins to be %v, got %v", expectedIncludeAdmins, *rsc.IncludeAdmins)
+		if rsc.IncludeAdmins != expectedIncludeAdmins {
+			return fmt.Errorf("Expected RequiredStatusChecks.IncludeAdmins to be %v, got %v", expectedIncludeAdmins, rsc.IncludeAdmins)
 		}
-		if *rsc.Strict != expectedStrict {
-			return fmt.Errorf("Expected RequiredStatusChecks.Strict to be %v, got %v", expectedStrict, *rsc.Strict)
+		if rsc.Strict != expectedStrict {
+			return fmt.Errorf("Expected RequiredStatusChecks.Strict to be %v, got %v", expectedStrict, rsc.Strict)
 		}
 
-		if !reflect.DeepEqual(*rsc.Contexts, expectedContexts) {
-			return fmt.Errorf("Expected RequiredStatusChecks.Contexts to be %v, got %v", expectedContexts, *rsc.Contexts)
+		if !reflect.DeepEqual(rsc.Contexts, expectedContexts) {
+			return fmt.Errorf("Expected RequiredStatusChecks.Contexts to be %v, got %v", expectedContexts, rsc.Contexts)
 		}
 
 		return nil
@@ -168,7 +170,7 @@ func testAccGithubBranchProtectionDestroy(s *terraform.State) error {
 
 		o := testAccProvider.Meta().(*Organization).name
 		r, b := parseTwoPartID(rs.Primary.ID)
-		protection, res, err := conn.Repositories.GetBranchProtection(o, r, b)
+		protection, res, err := conn.Repositories.GetBranchProtection(context.TODO(), o, r, b)
 
 		if err == nil {
 			if protection != nil {
@@ -188,11 +190,19 @@ resource "github_branch_protection" "master" {
   repository = "%s"
   branch     = "master"
 
-  include_admins = true
-  strict         = true
-  contexts       = ["github/foo"]
+  required_status_checks = {
+    include_admins = true
+    strict         = true
+    contexts       = ["github/foo"]
+  }
 
-  users_restriction = ["%s"]
+  required_pull_request_reviews {
+    include_admins = true
+  }
+
+  restrictions {
+    users = ["%s"]
+  }
 }
 `, testRepo, testUser)
 
@@ -201,8 +211,10 @@ resource "github_branch_protection" "master" {
   repository = "%s"
   branch     = "master"
 
-  include_admins = false
-  strict         = false
-  contexts       = ["github/bar"]
+  required_status_checks = {
+    include_admins = false
+    strict         = false
+    contexts       = ["github/bar"]
+  }
 }
 `, testRepo)

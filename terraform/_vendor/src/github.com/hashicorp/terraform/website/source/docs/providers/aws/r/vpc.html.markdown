@@ -16,7 +16,7 @@ Basic usage:
 
 ```
 resource "aws_vpc" "main" {
-    cidr_block = "10.0.0.0/16"
+  cidr_block = "10.0.0.0/16"
 }
 ```
 
@@ -24,12 +24,12 @@ Basic usage with tags:
 
 ```
 resource "aws_vpc" "main" {
-	cidr_block = "10.0.0.0/16"
-	instance_tenancy = "dedicated"
+  cidr_block       = "10.0.0.0/16"
+  instance_tenancy = "dedicated"
 
-	tags {
-		Name = "main"
-	}
+  tags {
+    Name = "main"
+  }
 }
 ```
 
@@ -44,6 +44,9 @@ The following arguments are supported:
 * `enable_classiclink` - (Optional) A boolean flag to enable/disable ClassicLink
   for the VPC. Only valid in regions and accounts that support EC2 Classic.
   See the [ClassicLink documentation][1] for more information. Defaults false.
+* `assign_generated_ipv6_cidr_block` - (Optional) Requests an Amazon-provided IPv6 CIDR 
+block with a /56 prefix length for the VPC. You cannot specify the range of IP addresses, or 
+the size of the CIDR block. Default is `false`.
 * `tags` - (Optional) A mapping of tags to assign to the resource.
 
 ## Attributes Reference
@@ -62,6 +65,8 @@ The following attributes are exported:
 * `default_network_acl_id` - The ID of the network ACL created by default on VPC creation
 * `default_security_group_id` - The ID of the security group created by default on VPC creation
 * `default_route_table_id` - The ID of the route table created by default on VPC creation
+* `ipv6_association_id` - The association ID for the IPv6 CIDR block.
+* `ipv6_cidr_block` - The IPv6 CIDR block.
 
 
 [1]: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/vpc-classiclink.html

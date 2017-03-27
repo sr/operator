@@ -1,7 +1,7 @@
 VERSION=0.1
 
 .PHONY : test cover deps
-test:
+test: 
 	godep go test ./...
 cover:
 	./cover.sh

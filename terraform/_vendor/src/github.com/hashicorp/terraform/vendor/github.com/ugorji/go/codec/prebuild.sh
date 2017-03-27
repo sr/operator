@@ -9,7 +9,7 @@ _needgen() {
         zneedgen=1
         echo 1
         return 0
-    fi
+    fi 
     for i in `ls -1 *.go.tmpl gen.go values_test.go`
     do
         if [[ "$a" -ot "$i" ]]
@@ -17,15 +17,15 @@ _needgen() {
             zneedgen=1
             echo 1
             return 0
-        fi
-    done
+        fi 
+    done 
     echo 0
 }
 
 # _build generates fast-path.go and gen-helper.go.
-#
+# 
 # It is needed because there is some dependency between the generated code
-# and the other classes. Consequently, we have to totally remove the
+# and the other classes. Consequently, we have to totally remove the 
 # generated files and put stubs in place, before calling "go run" again
 # to recreate them.
 _build() {
@@ -36,10 +36,10 @@ _build() {
                 1 == 0 ]]
     then
         return 0
-    fi
+    fi 
 
    # echo "Running prebuild"
-    if [ "${zbak}" == "1" ]
+    if [ "${zbak}" == "1" ] 
     then
         # echo "Backing up old generated files"
         _zts=`date '+%m%d%Y_%H%M%S'`
@@ -48,7 +48,7 @@ _build() {
         [ -e "fast-path${_gg}" ] && mv fast-path${_gg} fast-path${_gg}__${_zts}.bak
         # [ -e "safe${_gg}" ] && mv safe${_gg} safe${_gg}__${_zts}.bak
         # [ -e "unsafe${_gg}" ] && mv unsafe${_gg} unsafe${_gg}__${_zts}.bak
-    else
+    else 
         rm -f fast-path.generated.go gen.generated.go gen-helper.generated.go \
            *safe.generated.go *_generated_test.go *.generated_ffjson_expose.go
     fi
@@ -80,13 +80,13 @@ EOF
 EOF
 
     cat > gen-from-tmpl.codec.generated.go <<EOF
-package codec
+package codec 
 import "io"
 func GenInternalGoFile(r io.Reader, w io.Writer, safe bool) error {
 return genInternalGoFile(r, w, safe)
 }
 EOF
-
+    
     cat > gen-from-tmpl.generated.go <<EOF
 //+build ignore
 
@@ -108,7 +108,7 @@ if err != nil { panic(err) }
 }
 
 func main() {
-// do not make safe/unsafe variants.
+// do not make safe/unsafe variants. 
 // Instead, depend on escape analysis, and place string creation and usage appropriately.
 // run("unsafe.go.tmpl", "safe.generated.go", true)
 // run("unsafe.go.tmpl", "unsafe.generated.go", false)
@@ -118,32 +118,32 @@ run("gen-helper.go.tmpl", "gen-helper.generated.go", false)
 
 EOF
     go run -tags=notfastpath gen-from-tmpl.generated.go && \
-        rm -f gen-from-tmpl.*generated.go
+        rm -f gen-from-tmpl.*generated.go 
 }
 
 _codegenerators() {
-    if [[ $zforce == "1" ||
+    if [[ $zforce == "1" || 
                 "1" == $( _needgen "values_codecgen${zsfx}" ) ||
                 "1" == $( _needgen "values_msgp${zsfx}" ) ||
                 "1" == $( _needgen "values_ffjson${zsfx}" ) ||
-                1 == 0 ]]
+                1 == 0 ]] 
     then
         # codecgen creates some temporary files in the directory (main, pkg).
         # Consequently, we should start msgp and ffjson first, and also put a small time latency before
         # starting codecgen.
         # Without this, ffjson chokes on one of the temporary files from codecgen.
         if [[ $zexternal == "1" ]]
-        then
+        then 
             echo "ffjson ... " && \
                 ffjson -w values_ffjson${zsfx} $zfin &
             zzzIdFF=$!
             echo "msgp ... " && \
                 msgp -tests=false -o=values_msgp${zsfx} -file=$zfin &
             zzzIdMsgp=$!
-
+            
             sleep 1 # give ffjson and msgp some buffer time. see note above.
         fi
-
+        
         echo "codecgen - !unsafe ... " && \
             codecgen -rt codecgen -t 'x,codecgen,!unsafe' -o values_codecgen${zsfx} -d 19780 $zfin &
         zzzIdC=$!
@@ -159,7 +159,7 @@ _codegenerators() {
             fi && \
             echo "generators done!" && \
             true
-    fi
+    fi 
 }
 
 # _init reads the arguments and sets up the flags
@@ -167,7 +167,7 @@ _init() {
 OPTIND=1
 while getopts "fbx" flag
 do
-    case "x$flag" in
+    case "x$flag" in 
         'xf') zforce=1;;
         'xb') zbak=1;;
         'xx') zexternal=1;;
@@ -185,7 +185,7 @@ then
     zmydir=`pwd`
     zfin="test_values.generated.go"
     zsfx="_generated_test.go"
-    # rm -f *_generated_test.go
+    # rm -f *_generated_test.go 
     rm -f codecgen-*.go && \
         _init "$@" && \
         _build && \
@@ -195,4 +195,5 @@ then
     rm -f $zmydir/$zfin
 else
     echo "Script must be run from the directory it resides in"
-fi
+fi 
+

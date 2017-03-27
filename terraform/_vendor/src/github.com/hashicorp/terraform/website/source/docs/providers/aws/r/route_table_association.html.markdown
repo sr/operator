@@ -14,8 +14,8 @@ Provides a resource to create an association between a subnet and routing table.
 
 ```
 resource "aws_route_table_association" "a" {
-    subnet_id = "${aws_subnet.foo.id}"
-    route_table_id = "${aws_route_table.bar.id}"
+  subnet_id      = "${aws_subnet.foo.id}"
+  route_table_id = "${aws_route_table.bar.id}"
 }
 ```
 
@@ -31,3 +31,4 @@ The following arguments are supported:
 The following attributes are exported:
 
 * `id` - The ID of the association
+

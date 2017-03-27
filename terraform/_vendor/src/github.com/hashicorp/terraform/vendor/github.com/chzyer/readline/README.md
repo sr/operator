@@ -19,7 +19,7 @@ A powerful readline library in `Linux` `macOS` `Windows`
 * [Shortcut](doc/shortcut.md)
 
 ## Repos using readline
-
+	
 [![cockroachdb](https://img.shields.io/github/stars/cockroachdb/cockroach.svg?label=cockroachdb/cockroach)](https://github.com/cockroachdb/cockroach)
 [![empire](https://img.shields.io/github/stars/remind101/empire.svg?label=remind101/empire)](https://github.com/remind101/empire)
 [![youtube/doorman](https://img.shields.io/github/stars/youtube/doorman.svg?label=youtube/doorman)](https://github.com/youtube/doorman)
@@ -35,8 +35,8 @@ A powerful readline library in `Linux` `macOS` `Windows`
 
 If you have any questions, please submit a github issue and any pull requests is welcomed :)
 
-* [https://twitter.com/chzyer](https://twitter.com/chzyer)
-* [http://weibo.com/2145262190](http://weibo.com/2145262190)
+* [https://twitter.com/chzyer](https://twitter.com/chzyer)  
+* [http://weibo.com/2145262190](http://weibo.com/2145262190)  
 
 
 ## Backers
@@ -110,3 +110,4 @@ Become a sponsor and get your logo here on our Github page. [[Become a sponsor](
 <a href="https://opencollective.com/readline/sponsor/27/website" target="_blank"><img src="https://opencollective.com/readline/sponsor/27/avatar.svg"></a>
 <a href="https://opencollective.com/readline/sponsor/28/website" target="_blank"><img src="https://opencollective.com/readline/sponsor/28/avatar.svg"></a>
 <a href="https://opencollective.com/readline/sponsor/29/website" target="_blank"><img src="https://opencollective.com/readline/sponsor/29/avatar.svg"></a>
+

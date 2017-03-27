@@ -20,11 +20,15 @@ func resourceAwsElasticSearchDomain() *schema.Resource {
 		Read:   resourceAwsElasticSearchDomainRead,
 		Update: resourceAwsElasticSearchDomainUpdate,
 		Delete: resourceAwsElasticSearchDomainDelete,
+		Importer: &schema.ResourceImporter{
+			State: resourceAwsElasticSearchDomainImport,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"access_policies": {
 				Type:             schema.TypeString,
 				Optional:         true,
+				Computed:         true,
 				ValidateFunc:     validateJsonString,
 				DiffSuppressFunc: suppressEquivalentAwsPolicyDiffs,
 			},
@@ -141,6 +145,12 @@ func resourceAwsElasticSearchDomain() *schema.Resource {
 			"tags": tagsSchema(),
 		},
 	}
+}
+
+func resourceAwsElasticSearchDomainImport(
+	d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+	d.Set("domain_name", d.Id())
+	return []*schema.ResourceData{d}, nil
 }
 
 func resourceAwsElasticSearchDomainCreate(d *schema.ResourceData, meta interface{}) error {
@@ -281,6 +291,7 @@ func resourceAwsElasticSearchDomainRead(d *schema.ResourceData, meta interface{}
 	if err != nil {
 		return err
 	}
+	d.SetId(*ds.ARN)
 	d.Set("domain_id", ds.DomainId)
 	d.Set("domain_name", ds.DomainName)
 	d.Set("elasticsearch_version", ds.ElasticsearchVersion)
