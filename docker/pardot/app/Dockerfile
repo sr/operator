@@ -2,9 +2,10 @@ FROM docker.dev.pardot.com/base/php:7.0.8
 
 ARG dist=el6
 ARG percona_major_version=55
-ARG nodejs_version=4.4.2
+ARG nodejs_version=6.10.1
 ARG npm_version=3
-ARG yarn_version=0.19.1
+ARG yarn_version=0.21.3
+ARG yarn_checksum=0946a4d1abc106c131b700cc31e5c3aa5f2205eb3bb9d17411f8115354a97d5d
 ARG bower_version=1.7.2
 ARG phantomjs_version=2.1.1-1
 ARG artifactory_host
@@ -31,8 +32,15 @@ RUN curl -s "https://nodejs.org/dist/v${nodejs_version}/node-v${nodejs_version}-
   npm install -g npm@${npm_version} && \
   npm install -g bower@${bower_version} && \
   npm install -g bower-art-resolver@2.0.7 && \
-  npm install -g yarn@${yarn_version} && \
   npm install -g grunt-cli
+
+RUN cd /opt && \
+  mkdir yarn && \
+  curl -Lo yarn.tar.gz "https://github.com/yarnpkg/yarn/releases/download/v${yarn_version}/yarn-v${yarn_version}.tar.gz" && \
+  echo "${yarn_checksum}  yarn.tar.gz" | sha256sum -c - && \
+  tar --strip-components=1 -C /opt/yarn -xvf yarn.tar.gz && \
+  rm -f yarn.tar.gz && \
+  ln -sf /opt/yarn/bin/yarn{,pkg} /usr/bin
 
 # GeoIP
 RUN mkdir -p /var/www && \
