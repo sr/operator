@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-: "${BREAD:="${GOPATH}/src/git.dev.pardot.com/Pardot/bread"}"
+: "${BREAD:="${GOPATH}/src/git.dev.pardot.com/Pardot/infrastructure/bread"}"
 : "${BREAD_PROTO_DIR:="${BREAD}/proto"}"
 : "${BREAD_PROTO_VENDOR_DIR:="${BREAD}/vendor/proto"}"
 : "${BREAD_HAL9000_DIR:="${BREAD}/hal9000"}"
@@ -10,9 +10,9 @@ set -euo pipefail
 
 : "${BREAD_GO_PROTO_DIR:="${BREAD}/pb"}"
 : "${BREAD_GO_VENDOR_DIR:="${BREAD}/vendor"}"
-: "${BREAD_GO_SWAGGER_RELDIR:="generated/swagger"}"
+: "${BREAD_GO_SWAGGER_RELDIR:="bread/generated/swagger"}"
 
-: "${BREAD_GO_IMPORT_PATH:="git.dev.pardot.com/Pardot/bread"}"
+: "${BREAD_GO_IMPORT_PATH:="git.dev.pardot.com/Pardot/infrastructure/bread"}"
 : "${BREAD_GO_PROTO_IMPORT_PATH:="${BREAD_GO_IMPORT_PATH}/pb"}"
 : "${BREAD_GO_VENDOR_PATH:="${BREAD_GO_IMPORT_PATH}/vendor"}"
 
