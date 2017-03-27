@@ -9,7 +9,7 @@ resource "bamboo_build_plan" "BREAD-WAMJ" {
 
 resource "bamboo_build_plan" "BREAD-BREAD" {
   key                       = "BREAD-BREAD"
-  name                      = "bread"
+  name                      = "Infrastructure"
   default_repository_id     = "${bamboo_repository.infrastructure.id}"
   automatic_merging_enabled = false
 }
@@ -114,15 +114,6 @@ resource "bamboo_build_plan" "PDT-JOS" {
   key                               = "PDT-JOS"
   name                              = "Merge Master (Team Athena)"
   description                       = "Merges master branch changes into team Athenas integration branch"
-  default_repository_id             = "${bamboo_repository.pardot.id}"
-  automatic_merging_enabled         = false
-  automatic_branch_creation_enabled = false
-}
-
-resource "bamboo_build_plan" "PDT-TH" {
-  key                               = "PDT-TH"
-  name                              = "Merge Master (Team Hephaestus)"
-  description                       = "Merges master branch changes into team Hephaestus integration branch"
   default_repository_id             = "${bamboo_repository.pardot.id}"
   automatic_merging_enabled         = false
   automatic_branch_creation_enabled = false
