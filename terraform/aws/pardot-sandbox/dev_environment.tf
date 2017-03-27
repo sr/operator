@@ -238,7 +238,6 @@ resource "aws_db_instance" "oracle_sandbox_db" {
   name                    = "ORCLSBX"
   port                    = 1521
   username                = "pardottandp"
-  password                = "pardottandporaclesandbox" # WARNING: once changed, this is no longer tracked by TF
   parameter_group_name    = "default.oracle-ee-11.2"
   option_group_name       = "default:oracle-ee-11-2"
   character_set_name      = "AL32UTF8"

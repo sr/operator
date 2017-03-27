@@ -4,7 +4,6 @@ resource "aws_db_instance" "q3db" {
   instance_class       = "db.t2.small"
   name                 = "q3db"
   username             = "pardottandp"
-  password             = "thisIsNotThePasswordAnymore" # once changed, this is no longer tracked by TF. See secrets.ops.pardot.com for latest PW
   parameter_group_name = "default.postgres9.5"
 
   vpc_security_group_ids = [
