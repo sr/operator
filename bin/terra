@@ -41,14 +41,14 @@ fi
 action="${1:-""}"
 arg1="${2:-""}"
 
-GIT_DIR="$(pwd)/.git"
+GIT_DIR="${ROOT_DIR}/.git"
 export GIT_DIR
 GIT_BRANCH="$(git rev-parse --abbrev-ref HEAD)"
 GIT_COMMIT="$(git rev-parse HEAD)"
 
 TERRAFORM_PROJECT="$arg1"
 TERRAFORM_OPTS="${@:3}"
-TERRAFORM_BASEDIR="${BREAD}/terraform"
+TERRAFORM_BASEDIR="${ROOT_DIR}/terraform"
 TERRAFORM_VENDORDIR="${TERRAFORM_BASEDIR}/_vendor"
 TERRAFORM_DIR="${TERRAFORM_BASEDIR}/${TERRAFORM_PROJECT}"
 TERRAFORM_PLAN="${TERRAFORM_DIR}/plan.out"
@@ -82,7 +82,7 @@ case "$action" in
   apply|unlock|plan)
     go install -v ./bread/cmd/terra2
 
-    artifactoryenv="bread/terraform/artifactory.env"
+    artifactoryenv="terraform/artifactory.env"
     if ! test -f "$artifactoryenv"; then
       printf "%s: file %s is required. Please see %s.sample for an example.\n" \
         "$PROGRAM" "$artifactoryenv" "$artifactoryenv" 2>&1
@@ -105,7 +105,7 @@ case "$action" in
   pull|push|import)
     go install -v ./bread/cmd/breadsignal
 
-    artifactoryenv="bread/terraform/artifactory.env"
+    artifactoryenv="terraform/artifactory.env"
     if ! test -f "$artifactoryenv"; then
       printf "%s: file %s is required. Please see %s.sample for an example.\n" \
         "$PROGRAM" "$artifactoryenv" "$artifactoryenv" 2>&1
