@@ -2,8 +2,8 @@ DOCKER ?= docker
 GO ?= go
 TMPDIR ?= /tmp
 
-BREAD ?= $(GOPATH)/src/git.dev.pardot.com/Pardot/bread
-BREAD_IMPORT_PATH ?= git.dev.pardot.com/Pardot/bread
+BREAD ?= $(GOPATH)/src/git.dev.pardot.com/Pardot/infrastructure/bread
+BREAD_IMPORT_PATH ?= git.dev.pardot.com/Pardot/infrastructure/bread
 OPERATORD_LINUX ?= $(TMPDIR)/operatord_linux
 
 generate:
@@ -19,7 +19,7 @@ ldap-dev: docker-build-ldap
 test: etc/ldap.ldif ldap-dev
 	export LDAP_PORT_389_TCP_PORT="$$(docker inspect -f '{{(index (index .NetworkSettings.Ports "389/tcp") 0).HostPort }}' operator_ldap)"; \
 	export LDAP_PORT_389_TCP_ADDR="localhost"; \
-	$(GO) test $(BREAD_IMPORT_PATH) -ldap github.com/sr/operator/...
+	$(GO) test -v $(BREAD_IMPORT_PATH) -ldap github.com/sr/operator/...
 
 build-operatord: $(TMPDIR)
 	env CGO_ENABLED=0 GOOS=linux $(GO) build -a -tags netgo -ldflags "-w" \

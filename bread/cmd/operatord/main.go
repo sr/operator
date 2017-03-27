@@ -13,18 +13,17 @@ import (
 	"strings"
 	"time"
 
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/golang/protobuf/jsonpb"
+	"github.com/sr/operator"
+	operatorhipchat "github.com/sr/operator/hipchat"
+	"golang.org/x/net/context"
+	"google.golang.org/grpc"
+
 	"git.dev.pardot.com/Pardot/infrastructure/bread"
 	"git.dev.pardot.com/Pardot/infrastructure/bread/jira"
 	"git.dev.pardot.com/Pardot/infrastructure/bread/pb"
 	"git.dev.pardot.com/Pardot/infrastructure/bread/pb/hal9000"
-
-	"github.com/golang/protobuf/jsonpb"
-	"github.com/sr/operator"
-	"github.com/sr/operator/hipchat"
-	"golang.org/x/net/context"
-	"google.golang.org/grpc"
-
-	_ "github.com/go-sql-driver/mysql"
 )
 
 const (
@@ -190,7 +189,7 @@ func run(invoker operator.InvokerFunc) error {
 		httpServer.Handle("/_ping", bread.NewHandler(logger, bread.NewPingHandler(db)))
 		store = operatorhipchat.NewSQLStore(db, bread.HipchatHost)
 		sender = operatorhipchat.NewSender(store, bread.HipchatHost)
-		if auth, err = bread.NewAuthorizer(config.ldap, canoeAPI, bread.ACL); err != nil {
+		if auth, err = bread.NewLDAPAuthorizer(config.ldap, canoeAPI, bread.ACL); err != nil {
 			return err
 		}
 	}

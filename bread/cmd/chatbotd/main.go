@@ -18,7 +18,7 @@ import (
 
 	heroku "github.com/cyberdelia/heroku-go/v3"
 	"github.com/golang/protobuf/ptypes/empty"
-	"github.com/sr/operator/hipchat"
+	operatorhipchat "github.com/sr/operator/hipchat"
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2/clientcredentials"
 	"google.golang.org/grpc"
@@ -112,7 +112,7 @@ func run() error {
 		return err
 	}
 
-	authorizer, err := bread.NewAuthorizer(
+	authorizer, err := bread.NewLDAPAuthorizer(
 		ldapConfig,
 		bread.NewCanoeClient(parsedCanoeAPIURL, *canoeAPIKey),
 		bread.ACL,
@@ -120,8 +120,6 @@ func run() error {
 	if err != nil {
 		return err
 	}
-	interceptor := &bread.Interceptor{Authorizer: authorizer}
-
 	errC := make(chan error, 1)
 	// Start the gRPC server and establish a client connection to it.
 	grpcListener, err := net.Listen("tcp", grpcAddress)
@@ -129,7 +127,7 @@ func run() error {
 		return err
 	}
 
-	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(interceptor.UnaryServerInterceptor))
+	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(bread.GRPCServerInterceptor(authorizer)))
 	breadpb.RegisterPingerServer(grpcServer, &pingerServer{client})
 	go func() {
 		errC <- grpcServer.Serve(grpcListener)
