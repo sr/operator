@@ -178,9 +178,7 @@ echo "===> Building ${project}..." 2>&1
 
 case "$project" in
     canoe)
-        build-ruby "$project" "canoe"
-
-        file="${BREAD_DIR}/terraform/_vendor/src/github.com/hashicorp/terraform/terraform/version.go"
+        file="${REPO_ROOT_DIR}/terraform/_vendor/src/github.com/hashicorp/terraform/terraform/version.go"
         vendored="$(
           grep "const Version " "$file" |
           sed -e 's/^.*"\(.*\)".*$/\1/'
@@ -192,6 +190,8 @@ case "$project" in
             "$vendored" "$canoe"
           exit 1
         fi
+
+        build-ruby "$project" "canoe"
 
         if [ -n "$CI" ]; then
             docker_push "$project"
@@ -362,6 +362,7 @@ case "$project" in
             -v "${GOBIN}:/go/bin" \
             -v "${REPO_ROOT_DIR}:/go/src/${GO_PREFIX}" \
             -e "GOBIN=/go/bin" \
+            -e "ROOT_DIR=/go/src/${GO_PREFIX}" \
             build/build \
             "/go/src/${GO_PREFIX}/bin/terra" validate
         ;;
