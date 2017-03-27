@@ -5,7 +5,6 @@
 #/        terra unlock <account>
 #/        terra fmt
 #/        terra pull <account>
-#/        terra push <account>
 #/        terra vendor <version>
 #/        terra validate
 if [ -n "${DEBUG:-""}" ]; then
@@ -102,7 +101,7 @@ case "$action" in
       -terraform-plan "$TERRAFORM_PLAN" \
       -terraform-var-file "$TERRAFORM_VAR_FILE"
     ;;
-  pull|push|import)
+  pull|import)
     go install -v ./bread/cmd/breadsignal
 
     artifactoryenv="terraform/artifactory.env"
