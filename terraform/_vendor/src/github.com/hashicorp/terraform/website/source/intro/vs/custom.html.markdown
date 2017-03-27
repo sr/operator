@@ -37,3 +37,4 @@ fix bugs and document new use cases. Terraform helps solve a problem
 that exists in every organization and provides a standard that can
 be adopted to avoid reinventing the wheel between and within organizations.
 Its open source nature ensures it will be around in the long term.
+

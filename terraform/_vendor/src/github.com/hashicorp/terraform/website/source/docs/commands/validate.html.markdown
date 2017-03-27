@@ -23,7 +23,7 @@ The following can be reported:
  * same `resource` declared multiple times
  * invalid `module` name
  * interpolation used in places where it's unsupported
-	(e.g. `variable`, `depends_on`, `module.source`, `provider`)
+ 	(e.g. `variable`, `depends_on`, `module.source`, `provider`)
 
 ## Usage
 

@@ -273,7 +273,7 @@ rmqc, err := NewTLSClient("https://127.0.0.1:15672", "guest", "guest", transport
 ``` go
 var transport *http.Transport
 
-...
+... 
 
 rmqc.SetTransport(transport)
 ```

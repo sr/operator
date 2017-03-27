@@ -15,38 +15,38 @@ import (
 	"reflect"
 )
 
-// This file is used to generate helper code for codecgen.
-// The values here i.e. genHelper(En|De)coder are not to be used directly by
+// This file is used to generate helper code for codecgen. 
+// The values here i.e. genHelper(En|De)coder are not to be used directly by 
 // library users. They WILL change continuously and without notice.
-//
+// 
 // To help enforce this, we create an unexported type with exported members.
 // The only way to get the type is via the one exported type that we control (somewhat).
-//
+// 
 // When static codecs are created for types, they will use this value
 // to perform encoding or decoding of primitives or known slice or map types.
 
 // GenHelperEncoder is exported so that it can be used externally by codecgen.
 // Library users: DO NOT USE IT DIRECTLY. IT WILL CHANGE CONTINOUSLY WITHOUT NOTICE.
 func GenHelperEncoder(e *Encoder) (genHelperEncoder, encDriver) {
-	return genHelperEncoder{e:e}, e.e
+	return genHelperEncoder{e:e}, e.e 
 }
 
 // GenHelperDecoder is exported so that it can be used externally by codecgen.
 // Library users: DO NOT USE IT DIRECTLY. IT WILL CHANGE CONTINOUSLY WITHOUT NOTICE.
 func GenHelperDecoder(d *Decoder) (genHelperDecoder, decDriver) {
-	return genHelperDecoder{d:d}, d.d
+	return genHelperDecoder{d:d}, d.d 
 }
 
 // FOR USE BY CODECGEN ONLY. IT *WILL* CHANGE WITHOUT NOTICE. *DO NOT USE*
 type genHelperEncoder struct {
 	e *Encoder
-	F fastpathT
+	F fastpathT 
 }
 
 // FOR USE BY CODECGEN ONLY. IT *WILL* CHANGE WITHOUT NOTICE. *DO NOT USE*
 type genHelperDecoder struct {
 	d *Decoder
-	F fastpathT
+	F fastpathT 
 }
 
 // FOR USE BY CODECGEN ONLY. IT *WILL* CHANGE WITHOUT NOTICE. *DO NOT USE*
@@ -85,7 +85,7 @@ func (f genHelperEncoder) EncRaw(iv Raw) {
 // FOR USE BY CODECGEN ONLY. IT *WILL* CHANGE WITHOUT NOTICE. *DO NOT USE*
 func (f genHelperEncoder) TimeRtidIfBinc() uintptr {
 	if _, ok := f.e.hh.(*BincHandle); ok {
-		return timeTypId
+		return timeTypId 
 	}
 	return 0
 }
@@ -108,7 +108,7 @@ func (f genHelperEncoder) EncExt(v interface{}) (r bool) {
 		f.e.e.EncodeExt(v, xfFn.tag, xfFn.ext, f.e)
 		return true
 	}
-	return false
+	return false 
 }
 // FOR USE BY CODECGEN ONLY. IT *WILL* CHANGE WITHOUT NOTICE. *DO NOT USE*
 func (f genHelperEncoder) EncSendContainerState(c containerState) {
@@ -182,13 +182,13 @@ func (f genHelperDecoder) DecRaw() []byte {
 // FOR USE BY CODECGEN ONLY. IT *WILL* CHANGE WITHOUT NOTICE. *DO NOT USE*
 func (f genHelperDecoder) TimeRtidIfBinc() uintptr {
 	if _, ok := f.d.hh.(*BincHandle); ok {
-		return timeTypId
+		return timeTypId 
 	}
 	return 0
 }
 // FOR USE BY CODECGEN ONLY. IT *WILL* CHANGE WITHOUT NOTICE. *DO NOT USE*
 func (f genHelperDecoder) IsJSONHandle() bool {
-	return f.d.js
+	return f.d.js 
 }
 // FOR USE BY CODECGEN ONLY. IT *WILL* CHANGE WITHOUT NOTICE. *DO NOT USE*
 func (f genHelperDecoder) HasExtensions() bool {
@@ -202,7 +202,7 @@ func (f genHelperDecoder) DecExt(v interface{}) (r bool) {
 		f.d.d.DecodeExt(v, xfFn.tag, xfFn.ext)
 		return true
 	}
-	return false
+	return false 
 }
 // FOR USE BY CODECGEN ONLY. IT *WILL* CHANGE WITHOUT NOTICE. *DO NOT USE*
 func (f genHelperDecoder) DecInferLen(clen, maxlen, unit int) (rvlen int, truncated bool) {
@@ -358,14 +358,14 @@ func (f genHelperEncoder) {{ .MethodNamePfx "Enc" false }}(v map[{{ .MapKey }}]{
 }
 {{ end }}{{ end }}
 
-// -- decode calls (slices/maps)
+// -- decode calls (slices/maps) 
 {{range .Values}}{{if not .Primitive }}
 // FOR USE BY CODECGEN ONLY. IT *WILL* CHANGE WITHOUT NOTICE. *DO NOT USE*
-{{if .Slice }}func (f genHelperDecoder) {{ .MethodNamePfx "Dec" false }}(vp *[]{{ .Elem }}) {
+{{if .Slice }}func (f genHelperDecoder) {{ .MethodNamePfx "Dec" false }}(vp *[]{{ .Elem }}) { 
 {{else}}func (f genHelperDecoder) {{ .MethodNamePfx "Dec" false }}(vp *map[{{ .MapKey }}]{{ .Elem }}) { {{end}}
 	v, changed := f.F.{{ .MethodNamePfx "Dec" false }}V(*vp, false, true, f.d)
 	if changed {
-		*vp = v
+		*vp = v 
 	}
 }
 {{ end }}{{ end }}

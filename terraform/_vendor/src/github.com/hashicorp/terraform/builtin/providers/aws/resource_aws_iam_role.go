@@ -86,6 +86,7 @@ func resourceAwsIamRole() *schema.Resource {
 				Type:             schema.TypeString,
 				Required:         true,
 				DiffSuppressFunc: suppressEquivalentAwsPolicyDiffs,
+				ValidateFunc:     validateJsonString,
 			},
 
 			"create_date": {

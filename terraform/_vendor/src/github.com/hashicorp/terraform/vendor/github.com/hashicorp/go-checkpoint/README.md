@@ -14,7 +14,7 @@ to disable chekpoint calls, but the `CHECKPOINT_DISABLE` makes
 the underlying checkpoint component itself disabled. For example
 in the case of packer:
 ```
-CHECKPOINT_DISABLE=1 packer build
+CHECKPOINT_DISABLE=1 packer build 
 ```
 
 **Note:** This repository is probably useless outside of internal HashiCorp

@@ -54,6 +54,7 @@ func resourceAwsAutoscalingPolicy() *schema.Resource {
 			"metric_aggregation_type": {
 				Type:     schema.TypeString,
 				Optional: true,
+				Computed: true,
 			},
 			"min_adjustment_magnitude": {
 				Type:     schema.TypeInt,

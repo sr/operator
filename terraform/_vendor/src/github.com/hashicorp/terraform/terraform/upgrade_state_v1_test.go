@@ -163,8 +163,8 @@ const testV1StateWithOutputs = `{
                 "root"
             ],
             "outputs": {
-		"foo": "bar",
-		"baz": "foo"
+            	"foo": "bar",
+            	"baz": "foo"
             },
             "resources": {
                 "foo": {

@@ -2,6 +2,7 @@ package aws
 
 import (
 	"fmt"
+	"regexp"
 	"testing"
 	"time"
 
@@ -38,6 +39,28 @@ func TestAccAWSCustomerGateway_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckCustomerGateway("aws_customer_gateway.foo", &gateway),
 				),
+			},
+		},
+	})
+}
+
+func TestAccAWSCustomerGateway_similarAlreadyExists(t *testing.T) {
+	var gateway ec2.CustomerGateway
+	resource.Test(t, resource.TestCase{
+		PreCheck:      func() { testAccPreCheck(t) },
+		IDRefreshName: "aws_customer_gateway.foo",
+		Providers:     testAccProviders,
+		CheckDestroy:  testAccCheckCustomerGatewayDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCustomerGatewayConfig,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckCustomerGateway("aws_customer_gateway.foo", &gateway),
+				),
+			},
+			{
+				Config:      testAccCustomerGatewayConfigIdentical,
+				ExpectError: regexp.MustCompile("An existing customer gateway"),
 			},
 		},
 	})
@@ -174,6 +197,26 @@ resource "aws_customer_gateway" "foo" {
 	type = "ipsec.1"
 	tags {
 		Name = "foo-gateway"
+	}
+}
+`
+
+const testAccCustomerGatewayConfigIdentical = `
+resource "aws_customer_gateway" "foo" {
+	bgp_asn = 65000
+	ip_address = "172.0.0.1"
+	type = "ipsec.1"
+	tags {
+		Name = "foo-gateway"
+	}
+}
+
+resource "aws_customer_gateway" "identical" {
+	bgp_asn = 65000
+	ip_address = "172.0.0.1"
+	type = "ipsec.1"
+	tags {
+		Name = "foo-gateway-identical"
 	}
 }
 `

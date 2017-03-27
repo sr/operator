@@ -37,11 +37,11 @@ resource "aws_sns_topic_policy" "custom" {
    "Version":"2012-10-17",
    "Id": "default",
    "Statement":[{
-	"Sid":"default",
-	"Effect":"Allow",
-	"Principal":{"AWS":"*"},
-	"Action":["SNS:GetTopicAttributes","SNS:SetTopicAttributes","SNS:AddPermission","SNS:RemovePermission","SNS:DeleteTopic"],
-	"Resource":"${aws_sns_topic.test.arn}"
+   	"Sid":"default",
+   	"Effect":"Allow",
+   	"Principal":{"AWS":"*"},
+   	"Action":["SNS:GetTopicAttributes","SNS:SetTopicAttributes","SNS:AddPermission","SNS:RemovePermission","SNS:DeleteTopic"],
+   	"Resource":"${aws_sns_topic.test.arn}"
   }]
 }
 POLICY

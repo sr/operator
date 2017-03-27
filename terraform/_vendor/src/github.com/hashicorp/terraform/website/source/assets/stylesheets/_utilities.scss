@@ -4,12 +4,7 @@
 
 @mixin anti-alias() {
 	text-rendering: optimizeLegibility;
-	 -webkit-font-smoothing: antialiased;
-}
-
-@mixin lato-light() {
-  font-family: $font-family-lato;
-  font-weight: 300;
+ 	 -webkit-font-smoothing: antialiased;
 }
 
 @mixin skewY($skew) {
@@ -18,4 +13,12 @@
   -ms-transform: skewY($skew);
   -o-transform: skewY($skew);
   transform: skewY($skew);
+}
+
+.sub-black {
+	color: #545454;
+}
+
+.lower-opacity {
+	opacity: .7;
 }

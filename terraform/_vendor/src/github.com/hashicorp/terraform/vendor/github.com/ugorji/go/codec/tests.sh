@@ -9,17 +9,17 @@ _run() {
     #                json-indent (d), circular (l)
     # 2. MODE: reflection (r), external (x), codecgen (g), unsafe (u), notfastpath (f)
     # 3. OPTIONS: verbose (v), reset (z), must (m),
-    #
+    # 
     # Use combinations of mode to get exactly what you want,
     # and then pass the variations you need.
 
     ztags=""
     zargs=""
-    local OPTIND
+    local OPTIND 
     OPTIND=1
     while getopts "_xurtcinsvgzmefdl" flag
     do
-        case "x$flag" in
+        case "x$flag" in 
             'xr')  ;;
             'xf') ztags="$ztags notfastpath" ;;
             'xg') ztags="$ztags codecgen" ;;
@@ -35,11 +35,11 @@ _run() {
     # shift $((OPTIND-1))
     printf '............. TAGS: %s .............\n' "$ztags"
     # echo ">>>>>>> TAGS: $ztags"
-
+    
     OPTIND=1
     while getopts "_xurtcinsvgzmefdl" flag
     do
-        case "x$flag" in
+        case "x$flag" in 
             'xt') printf ">>>>>>> REGULAR    : "; go test "-tags=$ztags" $zargs ; sleep 2 ;;
             'xc') printf ">>>>>>> CANONICAL  : "; go test "-tags=$ztags" $zargs -tc; sleep 2 ;;
             'xi') printf ">>>>>>> I/O        : "; go test "-tags=$ztags" $zargs -ti; sleep 2 ;;
@@ -58,7 +58,7 @@ _run() {
     OPTIND=1
 }
 
-# echo ">>>>>>> RUNNING VARIATIONS OF TESTS"
+# echo ">>>>>>> RUNNING VARIATIONS OF TESTS"    
 if [[ "x$@" = "x" ]]; then
     # All: r, x, g, gu
     _run "-_tcinsed_ml"  # regular

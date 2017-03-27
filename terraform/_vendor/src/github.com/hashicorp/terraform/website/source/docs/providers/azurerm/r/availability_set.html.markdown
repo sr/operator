@@ -14,18 +14,18 @@ Create an availability set for virtual machines.
 
 ```
 resource "azurerm_resource_group" "test" {
-    name = "resourceGroup1"
-    location = "West US"
+  name     = "resourceGroup1"
+  location = "West US"
 }
 
 resource "azurerm_availability_set" "test" {
-    name = "acceptanceTestAvailabilitySet1"
-    location = "West US"
-    resource_group_name = "${azurerm_resource_group.test.name}"
+  name                = "acceptanceTestAvailabilitySet1"
+  location            = "West US"
+  resource_group_name = "${azurerm_resource_group.test.name}"
 
-    tags {
-        environment = "Production"
-    }
+  tags {
+    environment = "Production"
+  }
 }
 ```
 
@@ -44,6 +44,9 @@ The following arguments are supported:
 * `platform_update_domain_count` - (Optional) Specifies the number of update domains that are used. Defaults to 5.
 
 * `platform_fault_domain_count` - (Optional) Specifies the number of fault domains that are used. Defaults to 3.
+
+* `managed` - (Optional) Specifies whether the availability set is managed or not. Possible values are `true` (to specify aligned) or `false` (to specify classic). Default is `false`.
+
 * `tags` - (Optional) A mapping of tags to assign to the resource.
 
 ## Attributes Reference

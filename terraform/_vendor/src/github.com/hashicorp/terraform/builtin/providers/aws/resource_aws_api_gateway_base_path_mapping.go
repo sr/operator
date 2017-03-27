@@ -12,6 +12,8 @@ import (
 	"github.com/hashicorp/terraform/helper/schema"
 )
 
+const emptyBasePathMappingValue = "(none)"
+
 func resourceAwsApiGatewayBasePathMapping() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceAwsApiGatewayBasePathMappingCreate,
@@ -87,6 +89,10 @@ func resourceAwsApiGatewayBasePathMappingRead(d *schema.ResourceData, meta inter
 		return nil
 	}
 
+	if basePath == "" {
+		basePath = emptyBasePathMappingValue
+	}
+
 	mapping, err := conn.GetBasePathMapping(&apigateway.GetBasePathMappingInput{
 		DomainName: aws.String(domainName),
 		BasePath:   aws.String(basePath),
@@ -101,7 +107,13 @@ func resourceAwsApiGatewayBasePathMappingRead(d *schema.ResourceData, meta inter
 		return fmt.Errorf("Error reading Gateway base path mapping: %s", err)
 	}
 
-	d.Set("base_path", mapping.BasePath)
+	mappingBasePath := *mapping.BasePath
+
+	if mappingBasePath == emptyBasePathMappingValue {
+		mappingBasePath = ""
+	}
+
+	d.Set("base_path", mappingBasePath)
 	d.Set("api_id", mapping.RestApiId)
 	d.Set("stage_name", mapping.Stage)
 
@@ -111,9 +123,15 @@ func resourceAwsApiGatewayBasePathMappingRead(d *schema.ResourceData, meta inter
 func resourceAwsApiGatewayBasePathMappingDelete(d *schema.ResourceData, meta interface{}) error {
 	conn := meta.(*AWSClient).apigateway
 
+	basePath := d.Get("base_path").(string)
+
+	if basePath == "" {
+		basePath = emptyBasePathMappingValue
+	}
+
 	_, err := conn.DeleteBasePathMapping(&apigateway.DeleteBasePathMappingInput{
 		DomainName: aws.String(d.Get("domain_name").(string)),
-		BasePath:   aws.String(d.Get("base_path").(string)),
+		BasePath:   aws.String(basePath),
 	})
 
 	if err != nil {

@@ -97,7 +97,7 @@ func resourceArmVirtualMachineExtensionsCreate(d *schema.ResourceData, meta inte
 
 	extension := compute.VirtualMachineExtension{
 		Location: &location,
-		Properties: &compute.VirtualMachineExtensionProperties{
+		VirtualMachineExtensionProperties: &compute.VirtualMachineExtensionProperties{
 			Publisher:               &publisher,
 			Type:                    &extensionType,
 			TypeHandlerVersion:      &typeHandlerVersion,
@@ -111,7 +111,7 @@ func resourceArmVirtualMachineExtensionsCreate(d *schema.ResourceData, meta inte
 		if err != nil {
 			return fmt.Errorf("unable to parse settings: %s", err)
 		}
-		extension.Properties.Settings = &settings
+		extension.VirtualMachineExtensionProperties.Settings = &settings
 	}
 
 	if protectedSettingsString := d.Get("protected_settings").(string); protectedSettingsString != "" {
@@ -119,7 +119,7 @@ func resourceArmVirtualMachineExtensionsCreate(d *schema.ResourceData, meta inte
 		if err != nil {
 			return fmt.Errorf("unable to parse protected_settings: %s", err)
 		}
-		extension.Properties.ProtectedSettings = &protectedSettings
+		extension.VirtualMachineExtensionProperties.ProtectedSettings = &protectedSettings
 	}
 
 	_, err := client.CreateOrUpdate(resGroup, vmName, name, extension, make(chan struct{}))
@@ -153,25 +153,26 @@ func resourceArmVirtualMachineExtensionsRead(d *schema.ResourceData, meta interf
 	name := id.Path["extensions"]
 
 	resp, err := client.Get(resGroup, vmName, name, "")
+
 	if err != nil {
+		if resp.StatusCode == http.StatusNotFound {
+			d.SetId("")
+			return nil
+		}
 		return fmt.Errorf("Error making Read request on Virtual Machine Extension %s: %s", name, err)
-	}
-	if resp.StatusCode == http.StatusNotFound {
-		d.SetId("")
-		return nil
 	}
 
 	d.Set("name", resp.Name)
 	d.Set("location", azureRMNormalizeLocation(*resp.Location))
 	d.Set("virtual_machine_name", vmName)
 	d.Set("resource_group_name", resGroup)
-	d.Set("publisher", resp.Properties.Publisher)
-	d.Set("type", resp.Properties.Type)
-	d.Set("type_handler_version", resp.Properties.TypeHandlerVersion)
-	d.Set("auto_upgrade_minor_version", resp.Properties.AutoUpgradeMinorVersion)
+	d.Set("publisher", resp.VirtualMachineExtensionProperties.Publisher)
+	d.Set("type", resp.VirtualMachineExtensionProperties.Type)
+	d.Set("type_handler_version", resp.VirtualMachineExtensionProperties.TypeHandlerVersion)
+	d.Set("auto_upgrade_minor_version", resp.VirtualMachineExtensionProperties.AutoUpgradeMinorVersion)
 
-	if resp.Properties.Settings != nil {
-		settings, err := flattenArmVirtualMachineExtensionSettings(*resp.Properties.Settings)
+	if resp.VirtualMachineExtensionProperties.Settings != nil {
+		settings, err := flattenArmVirtualMachineExtensionSettings(*resp.VirtualMachineExtensionProperties.Settings)
 		if err != nil {
 			return fmt.Errorf("unable to parse settings from response: %s", err)
 		}

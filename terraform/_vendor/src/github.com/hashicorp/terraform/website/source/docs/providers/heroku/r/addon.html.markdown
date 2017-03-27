@@ -16,22 +16,23 @@ services to a Heroku app.
 ```
 # Create a new Heroku app
 resource "heroku_app" "default" {
-    name = "test-app"
+  name = "test-app"
 }
 
 # Create a database, and configure the app to use it
 resource "heroku_addon" "database" {
-  app = "${heroku_app.default.name}"
+  app  = "${heroku_app.default.name}"
   plan = "heroku-postgresql:hobby-basic"
 }
 
 # Add a web-hook addon for the app
 resource "heroku_addon" "webhook" {
-    app = "${heroku_app.default.name}"
-    plan = "deployhooks:http"
-    config {
-        url = "http://google.com"
-    }
+  app  = "${heroku_app.default.name}"
+  plan = "deployhooks:http"
+
+  config {
+    url = "http://google.com"
+  }
 }
 ```
 
@@ -51,3 +52,4 @@ The following attributes are exported:
 * `name` - The add-on name
 * `plan` - The plan name
 * `provider_id` - The ID of the plan provider
+

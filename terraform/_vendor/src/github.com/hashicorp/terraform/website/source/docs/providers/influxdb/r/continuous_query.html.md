@@ -31,7 +31,7 @@ The following arguments are supported:
 
 * `name` - (Required) The name for the continuous_query. This must be unique on the InfluxDB server.
 * `database` - (Required) The database for the continuous_query. This must be an existing influxdb database.
-* `query` - (Required) The query for the continuous_query.
+* `query` - (Required) The query for the continuous_query. 
 
 ## Attributes Reference
 

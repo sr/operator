@@ -18,14 +18,13 @@ See also [Complete API documentation](https://www.ctl.io/api-docs/v2/#groups).
 # Provision/Resolve a server group
 resource "clc_group" "frontends" {
   location_id = "WA1"
-  name = "frontends"
-  parent = "Default Group"
+  name        = "frontends"
+  parent      = "Default Group"
 }
 
 output "group_id" {
   value = "clc_group.frontends.id"
 }
-
 ```
 
 
@@ -52,3 +51,4 @@ up in advance. Each `custom_fields` block supports the following:
 
 * `id` - (Required, string) The ID of the custom field to set.
 * `value` - (Required, string) The value for the specified field.
+

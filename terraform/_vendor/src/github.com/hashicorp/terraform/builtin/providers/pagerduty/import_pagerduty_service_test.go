@@ -26,3 +26,24 @@ func TestAccPagerDutyService_import(t *testing.T) {
 		},
 	})
 }
+
+func TestAccPagerDutyServiceWithIncidentUrgency_import(t *testing.T) {
+	resourceName := "pagerduty_service.foo"
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckPagerDutyServiceDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCheckPagerDutyServiceWithIncidentUrgencyRulesConfig,
+			},
+
+			{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}

@@ -15,6 +15,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/apparentlymart/go-cidr/cidr"
 	"github.com/hashicorp/go-uuid"
@@ -78,13 +79,16 @@ func Funcs() map[string]ast.Function {
 		"md5":          interpolationFuncMd5(),
 		"merge":        interpolationFuncMerge(),
 		"min":          interpolationFuncMin(),
+		"pathexpand":   interpolationFuncPathExpand(),
 		"uuid":         interpolationFuncUUID(),
 		"replace":      interpolationFuncReplace(),
 		"sha1":         interpolationFuncSha1(),
 		"sha256":       interpolationFuncSha256(),
 		"signum":       interpolationFuncSignum(),
+		"slice":        interpolationFuncSlice(),
 		"sort":         interpolationFuncSort(),
 		"split":        interpolationFuncSplit(),
+		"timestamp":    interpolationFuncTimestamp(),
 		"title":        interpolationFuncTitle(),
 		"trimspace":    interpolationFuncTrimSpace(),
 		"upper":        interpolationFuncUpper(),
@@ -425,6 +429,17 @@ func interpolationFuncMin() ast.Function {
 			}
 
 			return min, nil
+		},
+	}
+}
+
+// interpolationFuncPathExpand will expand any `~`'s found with the full file path
+func interpolationFuncPathExpand() ast.Function {
+	return ast.Function{
+		ArgTypes:   []ast.Type{ast.TypeString},
+		ReturnType: ast.TypeString,
+		Callback: func(args []interface{}) (interface{}, error) {
+			return homedir.Expand(args[0].(string))
 		},
 	}
 }
@@ -779,6 +794,42 @@ func interpolationFuncSignum() ast.Function {
 	}
 }
 
+// interpolationFuncSlice returns a portion of the input list between from, inclusive and to, exclusive.
+func interpolationFuncSlice() ast.Function {
+	return ast.Function{
+		ArgTypes: []ast.Type{
+			ast.TypeList, // inputList
+			ast.TypeInt,  // from
+			ast.TypeInt,  // to
+		},
+		ReturnType: ast.TypeList,
+		Variadic:   false,
+		Callback: func(args []interface{}) (interface{}, error) {
+			inputList := args[0].([]ast.Variable)
+			from := args[1].(int)
+			to := args[2].(int)
+
+			if from < 0 {
+				return nil, fmt.Errorf("from index must be >= 0")
+			}
+			if to > len(inputList) {
+				return nil, fmt.Errorf("to index must be <= length of the input list")
+			}
+			if from > to {
+				return nil, fmt.Errorf("from index must be <= to index")
+			}
+
+			var outputList []ast.Variable
+			for i, val := range inputList {
+				if i >= from && i < to {
+					outputList = append(outputList, val)
+				}
+			}
+			return outputList, nil
+		},
+	}
+}
+
 // interpolationFuncSort sorts a list of a strings lexographically
 func interpolationFuncSort() ast.Function {
 	return ast.Function{
@@ -1105,6 +1156,17 @@ func interpolationFuncUUID() ast.Function {
 		ReturnType: ast.TypeString,
 		Callback: func(args []interface{}) (interface{}, error) {
 			return uuid.GenerateUUID()
+		},
+	}
+}
+
+// interpolationFuncTimestamp
+func interpolationFuncTimestamp() ast.Function {
+	return ast.Function{
+		ArgTypes:   []ast.Type{},
+		ReturnType: ast.TypeString,
+		Callback: func(args []interface{}) (interface{}, error) {
+			return time.Now().UTC().Format(time.RFC3339), nil
 		},
 	}
 }

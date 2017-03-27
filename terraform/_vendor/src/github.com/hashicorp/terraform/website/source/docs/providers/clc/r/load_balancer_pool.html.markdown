@@ -18,27 +18,27 @@ See also [Complete API documentation](https://www.ctl.io/api-docs/v2/#shared-loa
 ```
 # Provision a load balancer pool
 resource "clc_load_balancer_pool" "pool" {
-  data_center = "${clc_group.frontends.location_id}"
+  data_center   = "${clc_group.frontends.location_id}"
   load_balancer = "${clc_load_balancer.api.id}"
-  method = "roundRobin"
-  persistence = "standard"
-  port = 80
-  nodes
-    {
-      status = "enabled"
-      ipAddress = "${clc_server.node.0.private_ip_address}"
-      privatePort = 3000
-    }
-  nodes
-    {
-      status = "enabled"
-      ipAddress = "${clc_server.node.1.private_ip_address}"
-      privatePort = 3000
-    }
+  method        = "roundRobin"
+  persistence   = "standard"
+  port          = 80
+
+  nodes {
+    status      = "enabled"
+    ipAddress   = "${clc_server.node.0.private_ip_address}"
+    privatePort = 3000
+  }
+
+  nodes {
+    status      = "enabled"
+    ipAddress   = "${clc_server.node.1.private_ip_address}"
+    privatePort = 3000
+  }
 }
 
 output "pool" {
-  value = "$join(" ", clc_load_balancer.pool.nodes)}"
+  value = "${join(" ", clc_load_balancer.pool.nodes)}"
 }
 ```
 
@@ -68,3 +68,9 @@ following:
 * `ipAddress` (Required, string) The destination internal ip of pool node.
 * `privatePort` (Required, int) The destination port on the pool node.
 * `status` (Optional, string) Either "enabled" or "disabled".
+
+
+
+
+
+

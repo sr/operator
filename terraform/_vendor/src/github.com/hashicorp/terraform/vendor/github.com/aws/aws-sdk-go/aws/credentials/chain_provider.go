@@ -13,7 +13,7 @@ var (
 	//
 	// @readonly
 	ErrNoValidProvidersFoundInChain = awserr.New("NoCredentialProviders",
-		`no valid providers in chain. Deprecated.
+		`no valid providers in chain. Deprecated. 
 	For verbose messaging see aws.Config.CredentialsChainVerboseErrors`,
 		nil)
 )

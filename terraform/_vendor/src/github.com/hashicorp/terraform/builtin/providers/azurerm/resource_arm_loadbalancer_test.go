@@ -178,7 +178,7 @@ func testCheckAzureRMLoadBalancerDestroy(s *terraform.State) error {
 		}
 
 		if resp.StatusCode != http.StatusNotFound {
-			return fmt.Errorf("LoadBalancer still exists:\n%#v", resp.Properties)
+			return fmt.Errorf("LoadBalancer still exists:\n%#v", resp.LoadBalancerPropertiesFormat)
 		}
 	}
 
@@ -199,8 +199,8 @@ resource "azurerm_lb" "test" {
     resource_group_name = "${azurerm_resource_group.test.name}"
 
     tags {
-	Environment = "production"
-	Purpose = "AcceptanceTests"
+    	Environment = "production"
+    	Purpose = "AcceptanceTests"
     }
 
 }`, rInt, rInt)
@@ -220,7 +220,7 @@ resource "azurerm_lb" "test" {
     resource_group_name = "${azurerm_resource_group.test.name}"
 
     tags {
-	Purpose = "AcceptanceTests"
+    	Purpose = "AcceptanceTests"
     }
 
 }`, rInt, rInt)

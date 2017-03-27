@@ -21,6 +21,9 @@ func resourceAwsOpsworksInstance() *schema.Resource {
 		Read:   resourceAwsOpsworksInstanceRead,
 		Update: resourceAwsOpsworksInstanceUpdate,
 		Delete: resourceAwsOpsworksInstanceDelete,
+		Importer: &schema.ResourceImporter{
+			State: resourceAwsOpsworksInstanceImport,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"id": {
@@ -276,6 +279,14 @@ func resourceAwsOpsworksInstance() *schema.Resource {
 				ForceNew: true,
 			},
 
+			"tenancy": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Computed:     true,
+				ForceNew:     true,
+				ValidateFunc: validateTenancy,
+			},
+
 			"virtualization_type": {
 				Type:         schema.TypeString,
 				Optional:     true,
@@ -429,6 +440,15 @@ func validateArchitecture(v interface{}, k string) (ws []string, errors []error)
 	return
 }
 
+func validateTenancy(v interface{}, k string) (ws []string, errors []error) {
+	value := v.(string)
+	if value != "dedicated" && value != "default" && value != "host" {
+		errors = append(errors, fmt.Errorf(
+			"%q must be one of \"dedicated\", \"default\" or \"host\"", k))
+	}
+	return
+}
+
 func validateAutoScalingType(v interface{}, k string) (ws []string, errors []error) {
 	value := v.(string)
 	if value != "load" && value != "timer" {
@@ -541,7 +561,13 @@ func resourceAwsOpsworksInstanceRead(d *schema.ResourceData, meta interface{}) e
 	d.Set("instance_profile_arn", instance.InstanceProfileArn)
 	d.Set("instance_type", instance.InstanceType)
 	d.Set("last_service_error_id", instance.LastServiceErrorId)
-	d.Set("layer_ids", instance.LayerIds)
+	var layerIds []string
+	for _, v := range instance.LayerIds {
+		layerIds = append(layerIds, *v)
+	}
+	if err := d.Set("layer_ids", layerIds); err != nil {
+		return fmt.Errorf("[DEBUG] Error setting layer_ids attribute: %#v, error: %#v", layerIds, err)
+	}
 	d.Set("os", instance.Os)
 	d.Set("platform", instance.Platform)
 	d.Set("private_dns", instance.PrivateDns)
@@ -561,6 +587,7 @@ func resourceAwsOpsworksInstanceRead(d *schema.ResourceData, meta interface{}) e
 	d.Set("stack_id", instance.StackId)
 	d.Set("status", instance.Status)
 	d.Set("subnet_id", instance.SubnetId)
+	d.Set("tenancy", instance.Tenancy)
 	d.Set("virtualization_type", instance.VirtualizationType)
 
 	// Read BlockDeviceMapping
@@ -644,6 +671,10 @@ func resourceAwsOpsworksInstanceCreate(d *schema.ResourceData, meta interface{})
 
 	if v, ok := d.GetOk("subnet_id"); ok {
 		req.SubnetId = aws.String(v.(string))
+	}
+
+	if v, ok := d.GetOk("tenancy"); ok {
+		req.Tenancy = aws.String(v.(string))
 	}
 
 	if v, ok := d.GetOk("virtualization_type"); ok {
@@ -862,6 +893,16 @@ func resourceAwsOpsworksInstanceDelete(d *schema.ResourceData, meta interface{})
 
 	d.SetId("")
 	return nil
+}
+
+func resourceAwsOpsworksInstanceImport(
+	d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+	// Neither delete_eip nor delete_ebs can be fetched
+	// from any API call, so we need to default to the values
+	// we set in the schema by default
+	d.Set("delete_ebs", true)
+	d.Set("delete_eip", true)
+	return []*schema.ResourceData{d}, nil
 }
 
 func startOpsworksInstance(d *schema.ResourceData, meta interface{}, wait bool) error {

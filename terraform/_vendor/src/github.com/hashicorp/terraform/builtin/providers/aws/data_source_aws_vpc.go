@@ -45,6 +45,16 @@ func dataSourceAwsVpc() *schema.Resource {
 				Computed: true,
 			},
 
+			"ipv6_cidr_block": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+
+			"ipv6_association_id": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+
 			"state": {
 				Type:     schema.TypeString,
 				Optional: true,
@@ -116,6 +126,11 @@ func dataSourceAwsVpcRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("default", vpc.IsDefault)
 	d.Set("state", vpc.State)
 	d.Set("tags", tagsToMap(vpc.Tags))
+
+	if vpc.Ipv6CidrBlockAssociationSet != nil {
+		d.Set("ipv6_association_id", vpc.Ipv6CidrBlockAssociationSet[0].AssociationId)
+		d.Set("ipv6_cidr_block", vpc.Ipv6CidrBlockAssociationSet[0].Ipv6CidrBlock)
+	}
 
 	return nil
 }

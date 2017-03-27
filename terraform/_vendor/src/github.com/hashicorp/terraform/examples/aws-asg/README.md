@@ -12,16 +12,21 @@ To run, configure your AWS provider as described in https://www.terraform.io/doc
 
 Running the example
 
-For planning phase
+For planning phase 
 
-terraform plan -var 'key_name={your_key_name}}'
+```
+terraform plan -var 'key_name={your_key_name}'
+```
 
 For apply phase
 
-terraform apply -var 'key_name={your_key_name}}'
-
+```
+terraform apply -var 'key_name={your_key_name}'
+```
 Once the stack is created, wait for few minutes and test the stack by launching a browser with ELB url.
 
 To remove the stack
 
- terraform destroy -var 'key_name={your_key_name}}'
+```
+ terraform destroy -var 'key_name={your_key_name}'
+```

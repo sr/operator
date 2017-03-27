@@ -14,7 +14,7 @@ Provides an API Gateway REST API.
 
 ```
 resource "aws_api_gateway_rest_api" "MyDemoAPI" {
-  name = "MyDemoAPI"
+  name        = "MyDemoAPI"
   description = "This is my API for demonstration purposes"
 }
 ```
@@ -25,6 +25,7 @@ The following arguments are supported:
 
 * `name` - (Required) The name of the REST API
 * `description` - (Optional) The description of the REST API
+* `binary_media_types` - (Optional) The list of binary media types supported by the RestApi. By default, the RestApi supports only UTF-8-encoded text payloads.
 
 ## Attributes Reference
 

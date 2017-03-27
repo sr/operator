@@ -1,6 +1,7 @@
 package github
 
 import (
+	"context"
 	"log"
 
 	"github.com/google/go-github/github"
@@ -110,7 +111,7 @@ func resourceGithubRepositoryCreate(d *schema.ResourceData, meta interface{}) er
 
 	repoReq := resourceGithubRepositoryObject(d)
 	log.Printf("[DEBUG] create github repository %s/%s", meta.(*Organization).name, *repoReq.Name)
-	repo, _, err := client.Repositories.Create(meta.(*Organization).name, repoReq)
+	repo, _, err := client.Repositories.Create(context.TODO(), meta.(*Organization).name, repoReq)
 	if err != nil {
 		return err
 	}
@@ -124,7 +125,7 @@ func resourceGithubRepositoryRead(d *schema.ResourceData, meta interface{}) erro
 	repoName := d.Id()
 
 	log.Printf("[DEBUG] read github repository %s/%s", meta.(*Organization).name, repoName)
-	repo, resp, err := client.Repositories.Get(meta.(*Organization).name, repoName)
+	repo, resp, err := client.Repositories.Get(context.TODO(), meta.(*Organization).name, repoName)
 	if err != nil {
 		if resp.StatusCode == 404 {
 			log.Printf(
@@ -158,7 +159,7 @@ func resourceGithubRepositoryUpdate(d *schema.ResourceData, meta interface{}) er
 	repoReq := resourceGithubRepositoryObject(d)
 	repoName := d.Id()
 	log.Printf("[DEBUG] update github repository %s/%s", meta.(*Organization).name, repoName)
-	repo, _, err := client.Repositories.Edit(meta.(*Organization).name, repoName, repoReq)
+	repo, _, err := client.Repositories.Edit(context.TODO(), meta.(*Organization).name, repoName, repoReq)
 	if err != nil {
 		return err
 	}
@@ -171,6 +172,6 @@ func resourceGithubRepositoryDelete(d *schema.ResourceData, meta interface{}) er
 	client := meta.(*Organization).client
 	repoName := d.Id()
 	log.Printf("[DEBUG] delete github repository %s/%s", meta.(*Organization).name, repoName)
-	_, err := client.Repositories.Delete(meta.(*Organization).name, repoName)
+	_, err := client.Repositories.Delete(context.TODO(), meta.(*Organization).name, repoName)
 	return err
 }

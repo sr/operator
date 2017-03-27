@@ -91,8 +91,8 @@ data "aws_iam_policy_document" "s3_policy" {
   }
 }
 
-aws_s3_bucket "bucket" {
-  ...
+resource "aws_s3_bucket" "bucket" {
+  # ...
   policy = "${data.aws_iam_policy_document.s3_policy.json}"
 }
 ```

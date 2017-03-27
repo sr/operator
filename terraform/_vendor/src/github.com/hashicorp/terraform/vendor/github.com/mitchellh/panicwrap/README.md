@@ -96,9 +96,9 @@ a way to do this.
 
 ### Server
 
-For backend applications, it is easier to detect crashes (since the application exits)
-and having an idea as to why the crash occurs is equally important;
-particularly on a production server.
+For backend applications, it is easier to detect crashes (since the application exits) 
+and having an idea as to why the crash occurs is equally important; 
+particularly on a production server. 
 
 At [HashiCorp](http://www.hashicorp.com),
 we use panicwrap to log panics to timestamped files with some additional

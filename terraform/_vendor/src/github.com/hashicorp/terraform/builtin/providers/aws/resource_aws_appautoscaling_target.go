@@ -20,25 +20,6 @@ func resourceAwsAppautoscalingTarget() *schema.Resource {
 		Delete: resourceAwsAppautoscalingTargetDelete,
 
 		Schema: map[string]*schema.Schema{
-			"name": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
-				ForceNew: true,
-				ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
-					// https://github.com/boto/botocore/blob/9f322b1/botocore/data/autoscaling/2011-01-01/service-2.json#L1862-L1873
-					value := v.(string)
-					if len(value) > 255 {
-						errors = append(errors, fmt.Errorf(
-							"%q cannot be longer than 255 characters", k))
-					}
-					return
-				},
-			},
-			"arn": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
 			"max_capacity": {
 				Type:     schema.TypeInt,
 				Required: true,
@@ -60,16 +41,16 @@ func resourceAwsAppautoscalingTarget() *schema.Resource {
 				ForceNew: true,
 			},
 			"scalable_dimension": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Default:  "ecs:service:DesiredCount",
-				ForceNew: true,
+				Type:         schema.TypeString,
+				Required:     true,
+				ForceNew:     true,
+				ValidateFunc: validateAppautoscalingScalableDimension,
 			},
 			"service_namespace": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Default:  "ecs",
-				ForceNew: true,
+				Type:         schema.TypeString,
+				Required:     true,
+				ForceNew:     true,
+				ValidateFunc: validateAppautoscalingServiceNamespace,
 			},
 		},
 	}

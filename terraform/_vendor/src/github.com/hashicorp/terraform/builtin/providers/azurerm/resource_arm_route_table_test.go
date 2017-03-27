@@ -242,7 +242,7 @@ func testCheckAzureRMRouteTableDestroy(s *terraform.State) error {
 		}
 
 		if resp.StatusCode != http.StatusNotFound {
-			return fmt.Errorf("Route Table still exists:\n%#v", resp.Properties)
+			return fmt.Errorf("Route Table still exists:\n%#v", resp.RouteTablePropertiesFormat)
 		}
 	}
 
@@ -261,7 +261,7 @@ resource "azurerm_route_table" "test" {
     resource_group_name = "${azurerm_resource_group.test.name}"
 
     route {
-	name = "route1"
+    	name = "route1"
 		address_prefix = "10.1.0.0/16"
 		next_hop_type = "vnetlocal"
     }
@@ -280,13 +280,13 @@ resource "azurerm_route_table" "test" {
     resource_group_name = "${azurerm_resource_group.test.name}"
 
     route {
-	name = "route1"
+    	name = "route1"
 		address_prefix = "10.1.0.0/16"
 		next_hop_type = "vnetlocal"
     }
 
     route {
-	name = "route2"
+    	name = "route2"
 		address_prefix = "10.2.0.0/16"
 		next_hop_type = "vnetlocal"
     }
@@ -305,9 +305,9 @@ resource "azurerm_route_table" "test" {
     resource_group_name = "${azurerm_resource_group.test.name}"
 
     route {
-	name = "route1"
-	address_prefix = "10.1.0.0/16"
-	next_hop_type = "vnetlocal"
+    	name = "route1"
+    	address_prefix = "10.1.0.0/16"
+    	next_hop_type = "vnetlocal"
     }
 
     tags {
@@ -329,9 +329,9 @@ resource "azurerm_route_table" "test" {
     resource_group_name = "${azurerm_resource_group.test.name}"
 
     route {
-	name = "route1"
-	address_prefix = "10.1.0.0/16"
-	next_hop_type = "vnetlocal"
+    	name = "route1"
+    	address_prefix = "10.1.0.0/16"
+    	next_hop_type = "vnetlocal"
     }
 
     tags {

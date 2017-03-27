@@ -16,10 +16,10 @@ Basic usage:
 
 ```
 resource "cloudstack_network" "default" {
-    name = "test-network"
-    cidr = "10.0.0.0/16"
-    network_offering = "Default Network"
-    zone = "zone-1"
+  name             = "test-network"
+  cidr             = "10.0.0.0/16"
+  network_offering = "Default Network"
+  zone             = "zone-1"
 }
 ```
 
@@ -42,6 +42,8 @@ The following arguments are supported:
 
 * `endip` - (Optional) End of the IP block that will be available on the
     network. Defaults to the last available IP in the range.
+
+* `network_domain` - (Optional) DNS domain for the network.
 
 * `network_offering` - (Required) The name or ID of the network offering to use
     for this network.
@@ -72,3 +74,4 @@ The following attributes are exported:
 
 * `id` - The ID of the network.
 * `display_text` - The display text of the network.
+* `network_domain` - DNS domain for the network.

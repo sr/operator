@@ -214,8 +214,8 @@ resource "azurerm_sql_database" "test" {
     requested_service_objective_name = "S0"
 
     tags {
-	environment = "staging"
-	database = "test"
+    	environment = "staging"
+    	database = "test"
     }
 }
 `
@@ -245,7 +245,7 @@ resource "azurerm_sql_database" "test" {
     requested_service_objective_name = "S0"
 
     tags {
-	environment = "production"
+    	environment = "production"
     }
 }
 `

@@ -81,7 +81,8 @@ func resourceAwsCloudFrontOriginAccessIdentityRead(d *schema.ResourceData, meta 
 	d.Set("etag", resp.ETag)
 	d.Set("s3_canonical_user_id", resp.CloudFrontOriginAccessIdentity.S3CanonicalUserId)
 	d.Set("cloudfront_access_identity_path", fmt.Sprintf("origin-access-identity/cloudfront/%s", *resp.CloudFrontOriginAccessIdentity.Id))
-	d.Set("iam_arn", fmt.Sprintf("arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity %s", *resp.CloudFrontOriginAccessIdentity.Id))
+	d.Set("iam_arn", fmt.Sprintf("arn:%s:iam::cloudfront:user/CloudFront Origin Access Identity %s",
+		meta.(*AWSClient).partition, *resp.CloudFrontOriginAccessIdentity.Id))
 	return nil
 }
 

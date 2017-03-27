@@ -47,8 +47,9 @@ func resourceAwsCloudWatchMetricAlarm() *schema.Resource {
 				Required: true,
 			},
 			"statistic": {
-				Type:     schema.TypeString,
-				Required: true,
+				Type:          schema.TypeString,
+				Optional:      true,
+				ConflictsWith: []string{"extended_statistic"},
 			},
 			"threshold": {
 				Type:     schema.TypeFloat,
@@ -89,12 +90,24 @@ func resourceAwsCloudWatchMetricAlarm() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
+			"extended_statistic": {
+				Type:          schema.TypeString,
+				Optional:      true,
+				ConflictsWith: []string{"statistic"},
+			},
 		},
 	}
 }
 
 func resourceAwsCloudWatchMetricAlarmCreate(d *schema.ResourceData, meta interface{}) error {
 	conn := meta.(*AWSClient).cloudwatchconn
+
+	_, statisticOk := d.GetOk("statistic")
+	_, extendedStatisticOk := d.GetOk("extended_statistic")
+
+	if !statisticOk && !extendedStatisticOk {
+		return fmt.Errorf("One of `statistic` or `extended_statistic` must be set for a cloudwatch metric alarm")
+	}
 
 	params := getAwsCloudWatchPutMetricAlarmInput(d)
 
@@ -147,6 +160,7 @@ func resourceAwsCloudWatchMetricAlarmRead(d *schema.ResourceData, meta interface
 	d.Set("statistic", a.Statistic)
 	d.Set("threshold", a.Threshold)
 	d.Set("unit", a.Unit)
+	d.Set("extended_statistic", a.ExtendedStatistic)
 
 	return nil
 }
@@ -199,7 +213,6 @@ func getAwsCloudWatchPutMetricAlarmInput(d *schema.ResourceData) cloudwatch.PutM
 		MetricName:         aws.String(d.Get("metric_name").(string)),
 		Namespace:          aws.String(d.Get("namespace").(string)),
 		Period:             aws.Int64(int64(d.Get("period").(int))),
-		Statistic:          aws.String(d.Get("statistic").(string)),
 		Threshold:          aws.Float64(d.Get("threshold").(float64)),
 	}
 
@@ -213,6 +226,14 @@ func getAwsCloudWatchPutMetricAlarmInput(d *schema.ResourceData) cloudwatch.PutM
 
 	if v, ok := d.GetOk("unit"); ok {
 		params.Unit = aws.String(v.(string))
+	}
+
+	if v, ok := d.GetOk("statistic"); ok {
+		params.Statistic = aws.String(v.(string))
+	}
+
+	if v, ok := d.GetOk("extended_statistic"); ok {
+		params.ExtendedStatistic = aws.String(v.(string))
 	}
 
 	var alarmActions []*string

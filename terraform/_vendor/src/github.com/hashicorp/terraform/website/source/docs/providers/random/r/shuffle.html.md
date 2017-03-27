@@ -56,3 +56,4 @@ The following arguments are supported:
 The following attributes are exported:
 
 * `result` - Random permutation of the list of strings given in `input`.
+

@@ -17,28 +17,32 @@ and deleted. Instances also support [provisioning](/docs/provisioners/index.html
 # Create a new instance of the latest Ubuntu 14.04 on an
 # t2.micro node with an AWS Tag naming it "HelloWorld"
 provider "aws" {
-    region = "us-west-2"
+  region = "us-west-2"
 }
 
 data "aws_ami" "ubuntu" {
   most_recent = true
+
   filter {
-    name = "name"
+    name   = "name"
     values = ["ubuntu/images/hvm-ssd/ubuntu-trusty-14.04-amd64-server-*"]
   }
+
   filter {
-    name = "virtualization-type"
+    name   = "virtualization-type"
     values = ["hvm"]
   }
+
   owners = ["099720109477"] # Canonical
 }
 
 resource "aws_instance" "web" {
-    ami = "${data.aws_ami.ubuntu.id}"
-    instance_type = "t2.micro"
-    tags {
-        Name = "HelloWorld"
-    }
+  ami           = "${data.aws_ami.ubuntu.id}"
+  instance_type = "t2.micro"
+
+  tags {
+    Name = "HelloWorld"
+  }
 }
 ```
 
@@ -73,6 +77,8 @@ instances. See [Shutdown Behavior](https://docs.aws.amazon.com/AWSEC2/latest/Use
 * `user_data` - (Optional) The user data to provide when launching the instance.
 * `iam_instance_profile` - (Optional) The IAM Instance Profile to
   launch the instance with.
+* `ipv6_address_count`- (Optional) A number of IPv6 addresses to associate with the primary network interface. Amazon EC2 chooses the IPv6 addresses from the range of your subnet.
+* `ipv6_addresses` - (Optional) Specify one or more IPv6 addresses from the range of the subnet to associate with the primary network interface
 * `tags` - (Optional) A mapping of tags to assign to the resource.
 * `root_block_device` - (Optional) Customize details about the root block
   device of the instance. See [Block Devices](#block-devices) below for details.
@@ -96,7 +102,8 @@ The `root_block_device` mapping supports the following:
 * `volume_size` - (Optional) The size of the volume in gigabytes.
 * `iops` - (Optional) The amount of provisioned
   [IOPS](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-io-characteristics.html).
-  This must be set with a `volume_type` of `"io1"`.
+  This is only valid for `volume_type` of `"io1"`, and must be specified if
+  using that type
 * `delete_on_termination` - (Optional) Whether the volume should be destroyed
   on instance termination (Default: `true`).
 
@@ -126,9 +133,10 @@ Modifying any `ebs_block_device` currently requires resource replacement.
 Each `ephemeral_block_device` supports the following:
 
 * `device_name` - The name of the block device to mount on the instance.
-* `virtual_name` - The [Instance Store Device
+* `virtual_name` - (Optional) The [Instance Store Device
   Name](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/InstanceStorage.html#InstanceStoreDeviceNames)
-  (e.g. `"ephemeral0"`)
+  (e.g. `"ephemeral0"`).
+* `no_device` - (Optional) Suppresses the specified device included in the AMI's block device mapping.
 
 Each AWS Instance type has a different set of Instance Store block devices
 available for attachment. AWS [publishes a

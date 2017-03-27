@@ -142,6 +142,32 @@ func TestAccAWSEFSFileSystem_basic(t *testing.T) {
 	})
 }
 
+func TestAccAWSEFSFileSystem_pagedTags(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckEfsFileSystemDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccAWSEFSFileSystemConfigPagedTags,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						"aws_efs_file_system.foo",
+						"tags.%",
+						"11"),
+					//testAccCheckEfsFileSystem(
+					//	"aws_efs_file_system.foo",
+					//),
+					//testAccCheckEfsFileSystemPerformanceMode(
+					//	"aws_efs_file_system.foo",
+					//	"generalPurpose",
+					//),
+				),
+			},
+		},
+	})
+}
+
 func testAccCheckEfsFileSystemDestroy(s *terraform.State) error {
 	conn := testAccProvider.Meta().(*AWSClient).efsconn
 	for _, rs := range s.RootModule().Resources {
@@ -283,6 +309,25 @@ func testAccCheckEfsFileSystemPerformanceMode(resourceID string, expectedMode st
 const testAccAWSEFSFileSystemConfig = `
 resource "aws_efs_file_system" "foo" {
 	creation_token = "radeksimko"
+}
+`
+
+const testAccAWSEFSFileSystemConfigPagedTags = `
+resource "aws_efs_file_system" "foo" {
+	creation_token = "radeksimko"
+	tags {
+		Name = "foo-efs"
+		Another = "tag"
+		Test = "yes"
+		User = "root"
+		Page = "1"
+		Environment = "prod"
+		CostCenter = "terraform"
+		AcceptanceTest = "PagedTags"
+		CreationToken = "radek"
+		PerfMode = "max"
+		Region = "us-west-2"
+	}
 }
 `
 

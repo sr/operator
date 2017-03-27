@@ -64,18 +64,18 @@ docs, we'll assume you're within `${}`.
   * Unary `-` can be used for negative numbers. Example: `-10` or `-0.2`
 
   * Boolean values: `true`, `false`
-
-  * The following arithmetic operations are allowed: +, -, *, /, %.
+  
+  * The following arithmetic operations are allowed: +, -, *, /, %. 
 
   * Function calls are in the form of `name(arg1, arg2, ...)`. Example:
     `add(1, 5)`. Arguments can be any valid HIL expression, example:
     `add(1, var.foo)` or even nested function calls:
-    `add(1, get("some value"))`.
+    `add(1, get("some value"))`. 
 
   * Within strings, further interpolations can be opened with `${}`.
-    Example: `"Hello ${nested}"`. A full example including the
+    Example: `"Hello ${nested}"`. A full example including the 
     original `${}` (remember this list assumes were inside of one
-    already) could be: `foo ${func("hello ${var.foo}")}`.
+    already) could be: `foo ${func("hello ${var.foo}")}`. 
 
 ## Language Changes
 

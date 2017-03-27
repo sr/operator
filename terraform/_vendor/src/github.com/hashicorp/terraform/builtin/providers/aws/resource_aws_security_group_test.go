@@ -288,6 +288,39 @@ func TestAccAWSSecurityGroup_basic(t *testing.T) {
 	})
 }
 
+func TestAccAWSSecurityGroup_ipv6(t *testing.T) {
+	var group ec2.SecurityGroup
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:      func() { testAccPreCheck(t) },
+		IDRefreshName: "aws_security_group.web",
+		Providers:     testAccProviders,
+		CheckDestroy:  testAccCheckAWSSecurityGroupDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccAWSSecurityGroupConfigIpv6,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckAWSSecurityGroupExists("aws_security_group.web", &group),
+					resource.TestCheckResourceAttr(
+						"aws_security_group.web", "name", "terraform_acceptance_test_example"),
+					resource.TestCheckResourceAttr(
+						"aws_security_group.web", "description", "Used in the terraform acceptance tests"),
+					resource.TestCheckResourceAttr(
+						"aws_security_group.web", "ingress.2293451516.protocol", "tcp"),
+					resource.TestCheckResourceAttr(
+						"aws_security_group.web", "ingress.2293451516.from_port", "80"),
+					resource.TestCheckResourceAttr(
+						"aws_security_group.web", "ingress.2293451516.to_port", "8000"),
+					resource.TestCheckResourceAttr(
+						"aws_security_group.web", "ingress.2293451516.ipv6_cidr_blocks.#", "1"),
+					resource.TestCheckResourceAttr(
+						"aws_security_group.web", "ingress.2293451516.ipv6_cidr_blocks.0", "::/0"),
+				),
+			},
+		},
+	})
+}
+
 func TestAccAWSSecurityGroup_tagsCreatedFirst(t *testing.T) {
 	var group ec2.SecurityGroup
 
@@ -681,6 +714,32 @@ func TestAccAWSSecurityGroup_drift_complex(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"aws_security_group.web", "ingress.3629188364.cidr_blocks.0", "10.0.0.0/8"),
 				),
+			},
+		},
+	})
+}
+
+func TestAccAWSSecurityGroup_invalidCIDRBlock(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckAWSSecurityGroupDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config:      testAccAWSSecurityGroupInvalidIngressCidr,
+				ExpectError: regexp.MustCompile("invalid CIDR address: 1.2.3.4/33"),
+			},
+			{
+				Config:      testAccAWSSecurityGroupInvalidEgressCidr,
+				ExpectError: regexp.MustCompile("invalid CIDR address: 1.2.3.4/33"),
+			},
+			{
+				Config:      testAccAWSSecurityGroupInvalidIPv6IngressCidr,
+				ExpectError: regexp.MustCompile("invalid CIDR address: ::/244"),
+			},
+			{
+				Config:      testAccAWSSecurityGroupInvalidIPv6EgressCidr,
+				ExpectError: regexp.MustCompile("invalid CIDR address: ::/244"),
 			},
 		},
 	})
@@ -1148,6 +1207,36 @@ resource "aws_security_group" "web" {
 	}
 }`
 
+const testAccAWSSecurityGroupConfigIpv6 = `
+resource "aws_vpc" "foo" {
+  cidr_block = "10.1.0.0/16"
+}
+
+resource "aws_security_group" "web" {
+  name = "terraform_acceptance_test_example"
+  description = "Used in the terraform acceptance tests"
+  vpc_id = "${aws_vpc.foo.id}"
+
+  ingress {
+    protocol = "6"
+    from_port = 80
+    to_port = 8000
+    ipv6_cidr_blocks = ["::/0"]
+  }
+
+  egress {
+    protocol = "tcp"
+    from_port = 80
+    to_port = 8000
+    ipv6_cidr_blocks = ["::/0"]
+  }
+
+	tags {
+		Name = "tf-acc-test"
+	}
+}
+`
+
 const testAccAWSSecurityGroupConfig = `
 resource "aws_vpc" "foo" {
   cidr_block = "10.1.0.0/16"
@@ -1586,6 +1675,54 @@ resource "aws_security_group" "web" {
 }`, acctest.RandInt(), acctest.RandInt())
 }
 
+const testAccAWSSecurityGroupInvalidIngressCidr = `
+resource "aws_security_group" "foo" {
+  name = "testing-foo"
+  description = "foo-testing"
+  ingress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["1.2.3.4/33"]
+  }
+}`
+
+const testAccAWSSecurityGroupInvalidEgressCidr = `
+resource "aws_security_group" "foo" {
+  name = "testing-foo"
+  description = "foo-testing"
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["1.2.3.4/33"]
+  }
+}`
+
+const testAccAWSSecurityGroupInvalidIPv6IngressCidr = `
+resource "aws_security_group" "foo" {
+  name = "testing-foo"
+  description = "foo-testing"
+  ingress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    ipv6_cidr_blocks = ["::/244"]
+  }
+}`
+
+const testAccAWSSecurityGroupInvalidIPv6EgressCidr = `
+resource "aws_security_group" "foo" {
+  name = "testing-foo"
+  description = "foo-testing"
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    ipv6_cidr_blocks = ["::/244"]
+  }
+}`
+
 const testAccAWSSecurityGroupCombindCIDRandGroups = `
 resource "aws_vpc" "foo" {
 	cidr_block = "10.1.0.0/16"
@@ -1813,6 +1950,51 @@ resource "aws_security_group_rule" "allow_all-1" {
 }
 `
 
+const testAccAWSSecurityGroupConfig_importSourceSecurityGroup = `
+resource "aws_vpc" "foo" {
+  cidr_block = "10.1.0.0/16"
+
+  tags {
+    Name = "tf_sg_import_test"
+  }
+}
+
+resource "aws_security_group" "test_group_1" {
+  name        = "test group 1"
+  vpc_id      = "${aws_vpc.foo.id}"
+}
+
+resource "aws_security_group" "test_group_2" {
+  name        = "test group 2"
+  vpc_id      = "${aws_vpc.foo.id}"
+}
+
+resource "aws_security_group" "test_group_3" {
+  name        = "test group 3"
+  vpc_id      = "${aws_vpc.foo.id}"
+}
+
+resource "aws_security_group_rule" "allow_test_group_2" {
+  type      = "ingress"
+  from_port = 0
+  to_port   = 0
+  protocol  = "tcp"
+
+  source_security_group_id = "${aws_security_group.test_group_1.id}"
+  security_group_id = "${aws_security_group.test_group_2.id}"
+}
+
+resource "aws_security_group_rule" "allow_test_group_3" {
+  type      = "ingress"
+  from_port = 0
+  to_port   = 0
+  protocol  = "tcp"
+
+  source_security_group_id = "${aws_security_group.test_group_1.id}"
+  security_group_id = "${aws_security_group.test_group_3.id}"
+}
+`
+
 const testAccAWSSecurityGroupConfigPrefixListEgress = `
 resource "aws_vpc" "tf_sg_prefix_list_egress_test" {
     cidr_block = "10.0.0.0/16"
@@ -1826,10 +2008,10 @@ resource "aws_route_table" "default" {
 }
 
 resource "aws_vpc_endpoint" "s3-us-west-2" {
-	vpc_id = "${aws_vpc.tf_sg_prefix_list_egress_test.id}"
-	service_name = "com.amazonaws.us-west-2.s3"
-	route_table_ids = ["${aws_route_table.default.id}"]
-	policy = <<POLICY
+  	vpc_id = "${aws_vpc.tf_sg_prefix_list_egress_test.id}"
+  	service_name = "com.amazonaws.us-west-2.s3"
+  	route_table_ids = ["${aws_route_table.default.id}"]
+  	policy = <<POLICY
 {
 	"Version": "2012-10-17",
 	"Statement": [

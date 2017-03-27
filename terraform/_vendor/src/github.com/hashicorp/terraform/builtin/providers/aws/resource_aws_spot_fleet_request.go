@@ -2,9 +2,6 @@ package aws
 
 import (
 	"bytes"
-	"crypto/sha1"
-	"encoding/base64"
-	"encoding/hex"
 	"fmt"
 	"log"
 	"strconv"
@@ -33,6 +30,12 @@ func resourceAwsSpotFleetRequest() *schema.Resource {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
+			},
+			"replace_unhealthy_instances": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				ForceNew: true,
+				Default:  false,
 			},
 			// http://docs.aws.amazon.com/sdk-for-go/api/service/ec2.html#type-SpotFleetLaunchSpecification
 			// http://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_SpotFleetLaunchSpecification.html
@@ -168,6 +171,7 @@ func resourceAwsSpotFleetRequest() *schema.Resource {
 						"ebs_optimized": {
 							Type:     schema.TypeBool,
 							Optional: true,
+							Default:  false,
 						},
 						"iam_instance_profile": {
 							Type:     schema.TypeString,
@@ -194,6 +198,7 @@ func resourceAwsSpotFleetRequest() *schema.Resource {
 						"monitoring": {
 							Type:     schema.TypeBool,
 							Optional: true,
+							Default:  false,
 						},
 						"placement_group": {
 							Type:     schema.TypeString,
@@ -213,8 +218,7 @@ func resourceAwsSpotFleetRequest() *schema.Resource {
 							StateFunc: func(v interface{}) string {
 								switch v.(type) {
 								case string:
-									hash := sha1.Sum([]byte(v.(string)))
-									return hex.EncodeToString(hash[:])
+									return userDataHashSum(v.(string))
 								default:
 									return ""
 								}
@@ -323,8 +327,7 @@ func buildSpotFleetLaunchSpecification(d map[string]interface{}, meta interface{
 	}
 
 	if v, ok := d["user_data"]; ok {
-		opts.UserData = aws.String(
-			base64.StdEncoding.EncodeToString([]byte(v.(string))))
+		opts.UserData = aws.String(base64Encode([]byte(v.(string))))
 	}
 
 	if v, ok := d["key_name"]; ok {
@@ -339,21 +342,11 @@ func buildSpotFleetLaunchSpecification(d map[string]interface{}, meta interface{
 		opts.WeightedCapacity = aws.Float64(wc)
 	}
 
-	var groups []*string
-	if v, ok := d["security_groups"]; ok {
-		sgs := v.(*schema.Set).List()
-		for _, v := range sgs {
-			str := v.(string)
-			groups = append(groups, aws.String(str))
-		}
-	}
-
-	var groupIds []*string
+	var securityGroupIds []*string
 	if v, ok := d["vpc_security_group_ids"]; ok {
 		if s := v.(*schema.Set); s.Len() > 0 {
 			for _, v := range s.List() {
-				opts.SecurityGroups = append(opts.SecurityGroups, &ec2.GroupIdentifier{GroupId: aws.String(v.(string))})
-				groupIds = append(groupIds, aws.String(v.(string)))
+				securityGroupIds = append(securityGroupIds, aws.String(v.(string)))
 			}
 		}
 	}
@@ -375,13 +368,18 @@ func buildSpotFleetLaunchSpecification(d map[string]interface{}, meta interface{
 		// the same request
 		ni := &ec2.InstanceNetworkInterfaceSpecification{
 			AssociatePublicIpAddress: aws.Bool(true),
+			DeleteOnTermination:      aws.Bool(true),
 			DeviceIndex:              aws.Int64(int64(0)),
 			SubnetId:                 aws.String(subnetId.(string)),
-			Groups:                   groupIds,
+			Groups:                   securityGroupIds,
 		}
 
 		opts.NetworkInterfaces = []*ec2.InstanceNetworkInterfaceSpecification{ni}
 		opts.SubnetId = aws.String("")
+	} else {
+		for _, id := range securityGroupIds {
+			opts.SecurityGroups = append(opts.SecurityGroups, &ec2.GroupIdentifier{GroupId: id})
+		}
 	}
 
 	blockDevices, err := readSpotFleetBlockDeviceMappingsFromConfig(d, conn)
@@ -533,6 +531,7 @@ func resourceAwsSpotFleetRequestCreate(d *schema.ResourceData, meta interface{})
 		TargetCapacity:                   aws.Int64(int64(d.Get("target_capacity").(int))),
 		ClientToken:                      aws.String(resource.UniqueId()),
 		TerminateInstancesWithExpiration: aws.Bool(d.Get("terminate_instances_with_expiration").(bool)),
+		ReplaceUnhealthyInstances:        aws.Bool(d.Get("replace_unhealthy_instances").(bool)),
 	}
 
 	if v, ok := d.GetOk("excess_capacity_termination_policy"); ok {
@@ -657,7 +656,7 @@ func resourceAwsSpotFleetRequestRead(d *schema.ResourceData, meta interface{}) e
 		// If the spot request was not found, return nil so that we can show
 		// that it is gone.
 		ec2err, ok := err.(awserr.Error)
-		if ok && ec2err.Code() == "InvalidSpotFleetRequestID.NotFound" {
+		if ok && ec2err.Code() == "InvalidSpotFleetRequestId.NotFound" {
 			d.SetId("")
 			return nil
 		}
@@ -724,29 +723,26 @@ func resourceAwsSpotFleetRequestRead(d *schema.ResourceData, meta interface{}) e
 			aws.TimeValue(config.ValidUntil).Format(awsAutoscalingScheduleTimeLayout))
 	}
 
+	d.Set("replace_unhealthy_instances", config.ReplaceUnhealthyInstances)
 	d.Set("launch_specification", launchSpecsToSet(config.LaunchSpecifications, conn))
 
 	return nil
 }
 
-func launchSpecsToSet(ls []*ec2.SpotFleetLaunchSpecification, conn *ec2.EC2) *schema.Set {
-	specs := &schema.Set{F: hashLaunchSpecification}
-	for _, val := range ls {
-		dn, err := fetchRootDeviceName(aws.StringValue(val.ImageId), conn)
+func launchSpecsToSet(launchSpecs []*ec2.SpotFleetLaunchSpecification, conn *ec2.EC2) *schema.Set {
+	specSet := &schema.Set{F: hashLaunchSpecification}
+	for _, spec := range launchSpecs {
+		rootDeviceName, err := fetchRootDeviceName(aws.StringValue(spec.ImageId), conn)
 		if err != nil {
 			log.Panic(err)
-		} else {
-			ls := launchSpecToMap(val, dn)
-			specs.Add(ls)
 		}
+
+		specSet.Add(launchSpecToMap(spec, rootDeviceName))
 	}
-	return specs
+	return specSet
 }
 
-func launchSpecToMap(
-	l *ec2.SpotFleetLaunchSpecification,
-	rootDevName *string,
-) map[string]interface{} {
+func launchSpecToMap(l *ec2.SpotFleetLaunchSpecification, rootDevName *string) map[string]interface{} {
 	m := make(map[string]interface{})
 
 	m["root_block_device"] = rootBlockDeviceToSet(l.BlockDeviceMappings, rootDevName)
@@ -778,10 +774,7 @@ func launchSpecToMap(
 	}
 
 	if l.UserData != nil {
-		ud_dec, err := base64.StdEncoding.DecodeString(aws.StringValue(l.UserData))
-		if err == nil {
-			m["user_data"] = string(ud_dec)
-		}
+		m["user_data"] = userDataHashSum(aws.StringValue(l.UserData))
 	}
 
 	if l.KeyName != nil {
@@ -796,11 +789,23 @@ func launchSpecToMap(
 		m["subnet_id"] = aws.StringValue(l.SubnetId)
 	}
 
+	securityGroupIds := &schema.Set{F: schema.HashString}
+	if len(l.NetworkInterfaces) > 0 {
+		// This resource auto-creates one network interface when associate_public_ip_address is true
+		for _, group := range l.NetworkInterfaces[0].Groups {
+			securityGroupIds.Add(aws.StringValue(group))
+		}
+	} else {
+		for _, group := range l.SecurityGroups {
+			securityGroupIds.Add(aws.StringValue(group.GroupId))
+		}
+	}
+	m["vpc_security_group_ids"] = securityGroupIds
+
 	if l.WeightedCapacity != nil {
 		m["weighted_capacity"] = strconv.FormatFloat(*l.WeightedCapacity, 'f', 0, 64)
 	}
 
-	// m["security_groups"] = securityGroupsToSet(l.SecutiryGroups)
 	return m
 }
 
@@ -934,11 +939,12 @@ func resourceAwsSpotFleetRequestUpdate(d *schema.ResourceData, meta interface{})
 func resourceAwsSpotFleetRequestDelete(d *schema.ResourceData, meta interface{}) error {
 	// http://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_CancelSpotFleetRequests.html
 	conn := meta.(*AWSClient).ec2conn
+	terminateInstances := d.Get("terminate_instances_with_expiration").(bool)
 
 	log.Printf("[INFO] Cancelling spot fleet request: %s", d.Id())
 	resp, err := conn.CancelSpotFleetRequests(&ec2.CancelSpotFleetRequestsInput{
 		SpotFleetRequestIds: []*string{aws.String(d.Id())},
-		TerminateInstances:  aws.Bool(d.Get("terminate_instances_with_expiration").(bool)),
+		TerminateInstances:  aws.Bool(terminateInstances),
 	})
 
 	if err != nil {
@@ -955,6 +961,11 @@ func resourceAwsSpotFleetRequestDelete(d *schema.ResourceData, meta interface{})
 
 	if !found {
 		return fmt.Errorf("[ERR] Spot Fleet request (%s) was not found to be successfully canceled, dangling resources may exit", d.Id())
+	}
+
+	// Only wait for instance termination if requested
+	if !terminateInstances {
+		return nil
 	}
 
 	return resource.Retry(5*time.Minute, func() *resource.RetryError {
@@ -1002,7 +1013,6 @@ func hashLaunchSpecification(v interface{}) int {
 	}
 	buf.WriteString(fmt.Sprintf("%s-", m["instance_type"].(string)))
 	buf.WriteString(fmt.Sprintf("%s-", m["spot_price"].(string)))
-	buf.WriteString(fmt.Sprintf("%s-", m["user_data"].(string)))
 	return hashcode.String(buf.String())
 }
 

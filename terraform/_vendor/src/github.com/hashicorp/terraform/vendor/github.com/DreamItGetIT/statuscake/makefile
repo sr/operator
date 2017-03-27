@@ -8,3 +8,4 @@ lint:
 
 test:
 	go test ${GOTEST_ARGS} ./...
+

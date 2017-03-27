@@ -13,7 +13,7 @@ $ make test
 
 Configuration
 -------
-The SDK supports the following helpers for creating your configuration
+The SDK supports the following helpers for creating your configuration 
 
 
 Reading from the environment

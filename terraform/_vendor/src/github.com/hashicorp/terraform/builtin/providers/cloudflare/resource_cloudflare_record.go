@@ -88,6 +88,16 @@ func resourceCloudFlareRecordCreate(d *schema.ResourceData, meta interface{}) er
 		newRecord.TTL = ttl.(int)
 	}
 
+	// Validate value based on type
+	if err := validateRecordName(newRecord.Type, newRecord.Content); err != nil {
+		return fmt.Errorf("Error validating record name %q: %s", newRecord.Name, err)
+	}
+
+	// Validate type
+	if err := validateRecordType(newRecord.Type, newRecord.Proxied); err != nil {
+		return fmt.Errorf("Error validating record type %q: %s", newRecord.Type, err)
+	}
+
 	zoneId, err := client.ZoneIDByName(newRecord.ZoneName)
 	if err != nil {
 		return fmt.Errorf("Error finding zone %q: %s", newRecord.ZoneName, err)

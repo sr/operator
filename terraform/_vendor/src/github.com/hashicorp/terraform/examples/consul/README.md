@@ -46,3 +46,4 @@ application relies on ELB for routing, Terraform can update the application's
 configuration directly by setting the ELB address into Consul. Any resource
 attribute can be stored in Consul, allowing an operator to capture anything
 useful.
+

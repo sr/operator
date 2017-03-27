@@ -1,6 +1,7 @@
 package github
 
 import (
+	"context"
 	"fmt"
 	"testing"
 
@@ -68,7 +69,7 @@ func testAccCheckGithubIssueLabelExists(n string, label *github.Label) resource.
 		o := testAccProvider.Meta().(*Organization).name
 		r, n := parseTwoPartID(rs.Primary.ID)
 
-		githubLabel, _, err := conn.Issues.GetLabel(o, r, n)
+		githubLabel, _, err := conn.Issues.GetLabel(context.TODO(), o, r, n)
 		if err != nil {
 			return err
 		}
@@ -102,7 +103,7 @@ func testAccGithubIssueLabelDestroy(s *terraform.State) error {
 
 		o := testAccProvider.Meta().(*Organization).name
 		r, n := parseTwoPartID(rs.Primary.ID)
-		label, res, err := conn.Issues.GetLabel(o, r, n)
+		label, res, err := conn.Issues.GetLabel(context.TODO(), o, r, n)
 
 		if err == nil {
 			if label != nil &&
