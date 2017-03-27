@@ -2,7 +2,8 @@ FROM docker.dev.pardot.com/base/php:7.0.8
 
 ARG dist=el6
 ARG percona_major_version=55
-ARG nodejs_version=6.10.1
+ARG nodejs_version=4.8.1
+ARG nodejs_checksum=8eed258da756c77618c03b780eb15743726aedd260b3696e98ced313c57155b9
 ARG npm_version=3
 ARG yarn_version=0.21.3
 ARG yarn_checksum=0946a4d1abc106c131b700cc31e5c3aa5f2205eb3bb9d17411f8115354a97d5d
@@ -28,7 +29,11 @@ RUN yum install -y https://www.percona.com/downloads/percona-release/redhat/0.1-
   yum clean all
 
 # Node.JS and friends
-RUN curl -s "https://nodejs.org/dist/v${nodejs_version}/node-v${nodejs_version}-linux-x64.tar.xz" | tar -xJ -C /usr --strip-components=1 && \
+RUN cd /tmp && \
+  curl -Lo nodejs.tar.gz "https://nodejs.org/dist/v${nodejs_version}/node-v${nodejs_version}-linux-x64.tar.gz" && \
+  echo "${nodejs_checksum}  nodejs.tar.gz" | sha256sum -c - && \
+  tar --strip-components=1 -C /usr -xvf nodejs.tar.gz && \
+  rm -f /tmp/nodejs.tar.gz && \
   npm install -g npm@${npm_version} && \
   npm install -g bower@${bower_version} && \
   npm install -g bower-art-resolver@2.0.7 && \
