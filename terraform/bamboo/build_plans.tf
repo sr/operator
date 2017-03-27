@@ -9,7 +9,7 @@ resource "bamboo_build_plan" "BREAD-WAMJ" {
 
 resource "bamboo_build_plan" "BREAD-BREAD" {
   key                       = "BREAD-BREAD"
-  name                      = "bread"
+  name                      = "Infrastructure"
   default_repository_id     = "${bamboo_repository.infrastructure.id}"
   automatic_merging_enabled = false
 }
