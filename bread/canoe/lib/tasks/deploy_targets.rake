@@ -19,7 +19,6 @@ namespace :canoe do
       project.bamboo_project = "PDT"
       project.bamboo_plan = "CIM"
       project.repository = "Pardot/cimta-topology"
-      project.compliant_builds_required = false
       project.save!
     }.tap(&:save!)
     cimta.deploy_notifications.find_or_initialize_by(hipchat_room_id: MONGOOSES_HIPCHAT_ROOM_ID).tap(&:save!)
