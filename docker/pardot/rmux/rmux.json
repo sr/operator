@@ -1,0 +1,26 @@
+[
+  {
+    "socket": "/var/lib/rmux/rmux-master.sock",
+    "tcpConnections": [ "redis:6379" ],
+    "localTimeout": 500,
+    "remoteTimeout": 500
+  },
+  {
+    "socket": "/var/lib/rmux/rmux-slave.sock",
+    "tcpConnections": [ "redis:6379" ],
+    "localTimeout": 500,
+    "remoteTimeout": 500
+  },
+  {
+    "socket": "/var/lib/rmux/rmux-rules-master.sock",
+    "tcpConnections": [ "redis:6379" ],
+    "localTimeout": 500,
+    "remoteTimeout": 500
+  },
+  {
+    "socket": "/var/lib/rmux/rmux-rules-slave.sock",
+    "tcpConnections": [ "redis:6379" ],
+    "localTimeout": 500,
+    "remoteTimeout": 500
+  }
+]

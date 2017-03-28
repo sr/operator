@@ -1,0 +1,6 @@
+[remi-php70]
+name=Les RPM de remi de PHP 7.0 pour Enterprise Linux 6 - $basearch
+baseurl=https://artifactory.dev.pardot.com/artifactory/el6-remi-php70/
+enabled=0
+gpgcheck=1
+gpgkey=http://rpms.famillecollet.com/RPM-GPG-KEY-remi

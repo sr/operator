@@ -1,0 +1,26 @@
+version: "2"
+services:
+  app:
+    build: .
+    restart: always
+    ports:
+      - "8080:80"
+    links:
+      - db:db
+    environment:
+      - MYSQL_SERVER=db
+      - MYSQL_DATABASE=teampass
+      - MYSQL_PASSWORD=teampass
+      - MYSQL_USER=teampass
+      - CSRFP_TOKEN=13370773464604780578de4643d92d1d40a2ecd7530991d8ac54
+      - SALT=samplesalt
+      - artifactory_host=artifactory.dev.pardot.com
+
+  db:
+    restart: always
+    image: docker.dev.pardot.com/base/percona-server:5.5
+    environment:
+      - MYSQL_ROOT_PASSWORD=mypass
+      - MYSQL_DATABASE=teampass
+      - MYSQL_PASSWORD=teampass
+      - MYSQL_USER=teampass
