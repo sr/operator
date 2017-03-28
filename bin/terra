@@ -7,17 +7,15 @@
 #/        terra pull <account>
 #/        terra vendor <version>
 #/        terra validate
+set -euo pipefail
+
 if [ -n "${DEBUG:-""}" ]; then
   set -x
 fi
 unset CDPATH
 
-set -euo pipefail
-cd "$(dirname "$0")/.."
-
 : "${ROOT_DIR:="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"}"
-BREAD="${ROOT_DIR}/bread"
-export BREAD
+cd "${ROOT_DIR}"
 
 : "${PROGRAM:="$(basename "$0")"}"
 : "${HIPCHAT_TOKEN:=""}"
@@ -144,9 +142,18 @@ case "$action" in
         -testing=false
     fi
 
-    cd "${TERRAFORM_BASEDIR}" &&
-    make -f "${BREAD}/etc/mk/terraform.mk" "$action" |
-    grep -vi password
+    export ARTIFACTORY_USERNAME="$(sed 's,ARTIFACTORY.*=[[:space:]],,g' "$artifactoryenv" | head -1)"
+    export ARTIFACTORY_PASSWORD="$(sed 's,ARTIFACTORY.*=[[:space:]],,g' "$artifactoryenv" | tail -1)"
+
+    if [ "$action" = "pull" ]; then
+        cd "${TERRAFORM_DIR}"
+        exec "$TERRAFORM" state pull -var-file="${TERRAFORM_VAR_FILE}"
+    elif [ "$action" = "import" ]; then
+        cd "${TERRAFORM_DIR}"
+        exec "$TERRAFORM" import -var-file="$TERRAFORM_VAR_FILE" "$@"
+    fi
+
+    exit 1
     ;;
   fmt)
     find "${TERRAFORM_BASEDIR}" -type d -mindepth 1 -not -path "*/terraform/_vendor*" -print0 | xargs -0 -n1 "$TERRAFORM" fmt -write=true -list=false
