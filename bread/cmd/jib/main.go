@@ -112,6 +112,7 @@ func run() error {
 	jibServer := jib.New(log.New(os.Stdout, "", log.LstdFlags), gh, config.jib)
 	handlers := []jib.PullRequestHandler{
 		jibServer.Info,
+		jibServer.Fork,
 		jibServer.Stale,
 		jibServer.Merge,
 		jibServer.Notify,
