@@ -15,7 +15,8 @@ Gem::Specification.new do |spec|
   spec.description   = 'A knife plugin to support the PagerDuty Chef workflow'
   spec.homepage      = "https://confluence.dev.pardot.com/display/PTechops/Pull-based+Deployment+Overview"
 
-  spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
+  spec.files        += ["README.md", "LICENSE.txt"]
+  spec.files        += Dir.glob("lib/**/*")
   spec.require_paths = ['lib']
 
   spec.required_ruby_version = '>= 2.1.4'
