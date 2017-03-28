@@ -1,7 +1,7 @@
 module PullAgent
   module Deployers
-    class Murdoc
-      DeployerRegistry["murdoc"] = self
+    class CimtaTopology
+      DeployerRegistry["cimta-topology"] = self
 
       def initialize(environment, deploy)
         @environment = environment
@@ -19,7 +19,7 @@ module PullAgent
 
       def release_directory
         @release_directory ||=
-          ReleaseDirectory.new(ENV.fetch("RELEASE_DIRECTORY", "/opt/murdoc"))
+          ReleaseDirectory.new(ENV.fetch("RELEASE_DIRECTORY", "/opt/cimta-topology"))
       end
     end
   end
