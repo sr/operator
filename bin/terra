@@ -53,7 +53,7 @@ TERRAFORM_VAR_FILE="${TERRAFORM_BASEDIR}/terraform.tfvars"
 TERRAFORM="${TERRAFORM_VENDORDIR}/bin/terraform"
 export TERRAFORM TERRAFORM_DIR TERRAFORM_PLAN TERRAFORM_PROJECT TERRAFORM_VAR_FILE TERRAFORM_OPTS
 
-if test -z "${GOPATH:-""}" || test "$BREAD" != "${GOPATH}/src/git.dev.pardot.com/Pardot/infrastructure/bread"; then
+if test -z "${GOPATH:-""}" || test "${ROOT_DIR}" != "${GOPATH}/src/git.dev.pardot.com/Pardot/infrastructure"; then
     echo "Deploying Terraform changes requires a working Go environment:"
     echo
     echo "- Go must be installed. On macOS, 'brew install go' should just work"
@@ -63,10 +63,10 @@ if test -z "${GOPATH:-""}" || test "$BREAD" != "${GOPATH}/src/git.dev.pardot.com
     echo "To install Go and move the checkout to the correct location run the following commands:"
     echo
     echo "  brew install go"
-    echo "  export GOPATH=\$HOME BREAD=$(pwd)"
+    echo "  export GOPATH=\$HOME INFRA_REPO=$(pwd)"
     echo "  mkdir -p \$GOPATH/src/git.dev.pardot.com/Pardot"
-    echo "  cd .. && mv \$BREAD \$GOPATH/src/git.dev.pardot.com/Pardot/bread"
-    echo "  cd \$GOPATH/src/git.dev.pardot.com/Pardot/bread"
+    echo "  cd .. && mv \$INFRA_REPO \$GOPATH/src/git.dev.pardot.com/Pardot/infrastructure"
+    echo "  cd \$GOPATH/src/git.dev.pardot.com/Pardot/infrastructure"
     echo
     echo "If you need assistance getting setup, please ask your question in the Build & Automate room on HipChat and feel free to mention @sr."
     echo
