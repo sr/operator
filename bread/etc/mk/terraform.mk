@@ -22,10 +22,6 @@ import: $(TERRAFORM) $(TERRAFORM_DIR) $(TERRAFORM_VAR_FILE)
 	cd $(TERRAFORM_DIR) && \
 		$< import -var-file=$(TERRAFORM_VAR_FILE) $(TERRAFORM_OPTS)
 
-refresh: $(TERRAFORM) $(TERRAFORM_DIR) $(TERRAFORM_VAR_FILE)
-	$< refresh -var-file=$(TERRAFORM_VAR_FILE) $(TERRAFORM_OPTS) $(TERRAFORM_DIR)
-
 .PHONY: \
 	pull \
-	import \
-	refresh
+	import
