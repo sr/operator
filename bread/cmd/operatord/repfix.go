@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	"git.dev.pardot.com/Pardot/infrastructure/bread/pb/hal9000"
+	"git.dev.pardot.com/Pardot/infrastructure/bread/generated/pb/hal9000"
 )
 
 // NewRepfixHandler returns an http.HandlerFunc that receives request from

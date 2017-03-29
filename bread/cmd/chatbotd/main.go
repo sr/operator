@@ -18,15 +18,16 @@ import (
 
 	heroku "github.com/cyberdelia/heroku-go/v3"
 	"github.com/golang/protobuf/ptypes/empty"
-	"github.com/sr/operator/hipchat"
+	operatorhipchat "github.com/sr/operator/hipchat"
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2/clientcredentials"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 
 	"git.dev.pardot.com/Pardot/infrastructure/bread"
+	"git.dev.pardot.com/Pardot/infrastructure/bread/chatbot"
+	"git.dev.pardot.com/Pardot/infrastructure/bread/generated/pb"
 	"git.dev.pardot.com/Pardot/infrastructure/bread/hipchat"
-	"git.dev.pardot.com/Pardot/infrastructure/bread/pb"
 )
 
 const (
@@ -112,7 +113,7 @@ func run() error {
 		return err
 	}
 
-	authorizer, err := bread.NewAuthorizer(
+	authorizer, err := bread.NewLDAPAuthorizer(
 		ldapConfig,
 		bread.NewCanoeClient(parsedCanoeAPIURL, *canoeAPIKey),
 		bread.ACL,
@@ -120,8 +121,6 @@ func run() error {
 	if err != nil {
 		return err
 	}
-	interceptor := &bread.Interceptor{Authorizer: authorizer}
-
 	errC := make(chan error, 1)
 	// Start the gRPC server and establish a client connection to it.
 	grpcListener, err := net.Listen("tcp", grpcAddress)
@@ -129,7 +128,7 @@ func run() error {
 		return err
 	}
 
-	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(interceptor.UnaryServerInterceptor))
+	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(bread.GRPCServerInterceptor(authorizer)))
 	breadpb.RegisterPingerServer(grpcServer, &pingerServer{client})
 	go func() {
 		errC <- grpcServer.Serve(grpcListener)
@@ -146,12 +145,12 @@ func run() error {
 	}
 
 	// Channel used to by the event HTTP server to send chat commands to the workers.
-	chatCommands := make(chan *bread.ChatCommand, 100)
+	chatCommands := make(chan *chatbot.Command, 100)
 
 	// All chat messages are processed through these functions
-	messageHandlers := []bread.ChatMessageHandler{
-		bread.LogHandler(logger),
-		bread.ChatCommandHandler(defaultProtoPackage, chatCommands),
+	messageHandlers := []chatbot.MessageHandler{
+		chatbot.LogHandler(logger),
+		chatbot.GRPCMessageHandler(defaultProtoPackage, chatCommands),
 	}
 
 	mux := http.NewServeMux()
@@ -194,7 +193,7 @@ func run() error {
 				TokenURL:     fmt.Sprintf("%s/v2/oauth/token", bread.HipchatHost),
 				Scopes:       breadhipchat.DefaultScopes,
 			},
-			func(msg *bread.ChatMessage) error {
+			func(msg *chatbot.Message) error {
 				var fail bool
 				for _, handler := range messageHandlers {
 					if err := handler(msg); err != nil {
@@ -220,7 +219,7 @@ func run() error {
 		wg.Add(1)
 		go func() {
 			for cmd := range chatCommands {
-				if err := bread.HandleChatRPCCommand(client, Invoker, *timeout, conn, cmd); err != nil {
+				if err := chatbot.HandleCommand(client, Invoker, *timeout, conn, cmd); err != nil {
 					logger.Printf("command handler error: %s", err)
 				}
 			}
@@ -267,10 +266,13 @@ func run() error {
 }
 
 // Invoker is a generated function TODO(sr)
-func Invoker(ctx context.Context, conn *grpc.ClientConn, cmd *bread.ChatCommand) error {
-	if cmd.Package == "bread" {
-		if cmd.Service == "Pinger" {
-			if cmd.Method == "Ping" {
+func Invoker(ctx context.Context, conn *grpc.ClientConn, cmd *chatbot.Command) error {
+	if cmd.Call == nil {
+		return errors.New("requirement cmd struct field is nil: Call")
+	}
+	if cmd.Call.Package == "bread" {
+		if cmd.Call.Service == "Pinger" {
+			if cmd.Call.Method == "Ping" {
 				_, err := breadpb.NewPingerClient(conn).Ping(ctx, &empty.Empty{})
 				return err
 			}

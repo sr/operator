@@ -9,17 +9,17 @@ import (
 	"testing"
 
 	jose "github.com/square/go-jose"
-
-	"git.dev.pardot.com/Pardot/infrastructure/bread"
-	"git.dev.pardot.com/Pardot/infrastructure/bread/hipchat"
 	"golang.org/x/oauth2/clientcredentials"
+
+	"git.dev.pardot.com/Pardot/infrastructure/bread/chatbot"
+	"git.dev.pardot.com/Pardot/infrastructure/bread/hipchat"
 )
 
 type testMessageHandler struct {
 	lastMessage string
 }
 
-func (h *testMessageHandler) Handle(msg *bread.ChatMessage) error {
+func (h *testMessageHandler) Handle(msg *chatbot.Message) error {
 	h.lastMessage = msg.Text
 	return nil
 }

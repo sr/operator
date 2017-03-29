@@ -9,10 +9,10 @@ import (
 	"strings"
 
 	jose "github.com/square/go-jose"
-	"github.com/sr/operator/hipchat"
+	operatorhipchat "github.com/sr/operator/hipchat"
 	"golang.org/x/oauth2/clientcredentials"
 
-	"git.dev.pardot.com/Pardot/infrastructure/bread"
+	"git.dev.pardot.com/Pardot/infrastructure/bread/chatbot"
 )
 
 // https://www.hipchat.com/docs/apiv2/webhooks#room_message
@@ -25,18 +25,18 @@ type messagePayload struct {
 }
 
 type item struct {
-	Message *message    `json:"message"`
-	Room    *bread.Room `json:"room"`
+	Message *message      `json:"message"`
+	Room    *chatbot.Room `json:"room"`
 }
 
 type message struct {
-	Message string      `json:"message"`
-	From    *bread.User `json:"from"`
+	Message string        `json:"message"`
+	From    *chatbot.User `json:"from"`
 }
 
 // EventHandler is a HTTP handler that verifies the integrity of Hipchat
 // webhook requests and calls MessageHandler with every message received.
-func EventHandler(hipchat operatorhipchat.Client, creds *clientcredentials.Config, handler bread.ChatMessageHandler) (http.HandlerFunc, error) {
+func EventHandler(hipchat operatorhipchat.Client, creds *clientcredentials.Config, handler chatbot.MessageHandler) (http.HandlerFunc, error) {
 	if creds == nil {
 		return nil, errors.New("required argument is nil: creds")
 	}
@@ -73,7 +73,7 @@ func EventHandler(hipchat operatorhipchat.Client, creds *clientcredentials.Confi
 				http.Error(w, "payload does not have a user", http.StatusBadRequest)
 				return
 			}
-			msg := &bread.ChatMessage{
+			msg := &chatbot.Message{
 				Text: payload.Item.Message.Message,
 				Room: payload.Item.Room,
 				User: payload.Item.Message.From,

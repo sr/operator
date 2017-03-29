@@ -14,18 +14,19 @@ import (
 	"google.golang.org/grpc/metadata"
 
 	"github.com/go-ldap/ldap"
+	"github.com/sr/operator"
 	"golang.org/x/net/context"
 
 	"git.dev.pardot.com/Pardot/infrastructure/bread"
+	"git.dev.pardot.com/Pardot/infrastructure/bread/generated/pb"
 	"git.dev.pardot.com/Pardot/infrastructure/bread/generated/swagger/client/canoe"
 	"git.dev.pardot.com/Pardot/infrastructure/bread/generated/swagger/models"
-	"git.dev.pardot.com/Pardot/infrastructure/bread/pb"
 )
 
-var ldapEnabled bool
+var ldapRequired bool
 
 func init() {
-	flag.BoolVar(&ldapEnabled, "ldap", false, "")
+	flag.BoolVar(&ldapRequired, "ldap", false, "")
 	flag.Parse()
 }
 
@@ -63,10 +64,10 @@ func TestLDAPAuthorizer(t *testing.T) {
 		port = v
 	}
 	if host == "" || port == "" {
-		if ldapEnabled {
+		if ldapRequired {
 			t.Fatal("ldap flag set but LDAP_PORT_389_TCP_{ADDR,PORT} not set")
 		}
-		t.Skip("ldap flag set but LDAP_PORT_389_TCP_{ADDR,PORT} not set")
+		t.Skip("WARN: LDAP_PORT_389_TCP_{ADDR,PORT} not set")
 	}
 	ldapAddr := fmt.Sprintf("%s:%s", host, port)
 	var (
@@ -91,7 +92,7 @@ func TestLDAPAuthorizer(t *testing.T) {
 	}
 	defer conn.Close()
 	canoeClient := &fakeCanoeClient{}
-	auth, err := bread.NewAuthorizer(
+	auth, err := bread.NewLDAPAuthorizer(
 		&bread.LDAPConfig{Addr: ldapAddr},
 		canoeClient,
 		[]*bread.ACLEntry{
@@ -193,7 +194,24 @@ func (i *fakeAuthorizer) Authorize(ctx context.Context, call *bread.RPC, email s
 	return i.err
 }
 
-func TestInterceptor(t *testing.T) {
+type pingServer struct {
+	lastRoomID string
+}
+
+func (s *pingServer) Ping(ctx context.Context, req *breadpb.PingRequest) (*operator.Response, error) {
+	if md, ok := metadata.FromContext(ctx); ok {
+		if _, ok := md["hipchat_room_id"]; ok {
+			s.lastRoomID = md["hipchat_room_id"][0]
+		}
+	}
+	return &operator.Response{}, nil
+}
+
+func (s *pingServer) SlowLoris(ctx context.Context, req *breadpb.SlowLorisRequest) (*operator.Response, error) {
+	panic("not implemented")
+}
+
+func TestGRPCServerInterceptor(t *testing.T) {
 	listener, err := net.Listen("tcp", "localhost:0")
 	if err != nil {
 		t.Fatalf("failed to listen: %v", err)
@@ -201,8 +219,7 @@ func TestInterceptor(t *testing.T) {
 	defer listener.Close()
 
 	authorizer := &fakeAuthorizer{}
-	interceptor := &bread.Interceptor{Authorizer: authorizer}
-	server := grpc.NewServer(grpc.UnaryInterceptor(interceptor.UnaryServerInterceptor))
+	server := grpc.NewServer(grpc.UnaryInterceptor(bread.GRPCServerInterceptor(authorizer)))
 	defer server.GracefulStop()
 	ping := &pingServer{}
 	breadpb.RegisterPingServer(server, ping)

@@ -1,4 +1,4 @@
-package bread_test
+package chatbot_test
 
 import (
 	"fmt"
@@ -8,24 +8,24 @@ import (
 	"testing"
 	"time"
 
-	"golang.org/x/net/context"
-
 	"github.com/sr/operator"
-	"github.com/sr/operator/hipchat"
+	operatorhipchat "github.com/sr/operator/hipchat"
+	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 
 	"git.dev.pardot.com/Pardot/infrastructure/bread"
-	"git.dev.pardot.com/Pardot/infrastructure/bread/pb"
+	"git.dev.pardot.com/Pardot/infrastructure/bread/chatbot"
+	"git.dev.pardot.com/Pardot/infrastructure/bread/generated/pb"
 )
 
-func TestChatCommandHandler(t *testing.T) {
-	commands := make(chan *bread.ChatCommand, 1)
-	handler := bread.ChatCommandHandler("package", commands)
+func TestGRPCMessageHandler(t *testing.T) {
+	commands := make(chan *chatbot.Command, 1)
+	handler := chatbot.GRPCMessageHandler("package", commands)
 
 	for _, tc := range []struct {
 		message string
-		want    *bread.ChatCommand
+		want    *chatbot.Command
 	}{
 		{
 			"hello world",
@@ -37,10 +37,12 @@ func TestChatCommandHandler(t *testing.T) {
 		},
 		{
 			"!ping ping",
-			&bread.ChatCommand{
-				Package:   "package",
-				Service:   "Ping",
-				Method:    "Ping",
+			&chatbot.Command{
+				Call: &bread.RPC{
+					Package: "package",
+					Service: "Ping",
+					Method:  "Ping",
+				},
 				Args:      map[string]string{},
 				RoomID:    42,
 				UserEmail: "user@salesforce.com",
@@ -48,10 +50,12 @@ func TestChatCommandHandler(t *testing.T) {
 		},
 		{
 			"!ping ping-pong",
-			&bread.ChatCommand{
-				Package:   "package",
-				Service:   "Ping",
-				Method:    "PingPong",
+			&chatbot.Command{
+				Call: &bread.RPC{
+					Package: "package",
+					Service: "Ping",
+					Method:  "PingPong",
+				},
 				Args:      map[string]string{},
 				RoomID:    42,
 				UserEmail: "user@salesforce.com",
@@ -59,10 +63,12 @@ func TestChatCommandHandler(t *testing.T) {
 		},
 		{
 			"!ping ping",
-			&bread.ChatCommand{
-				Package:   "package",
-				Service:   "Ping",
-				Method:    "Ping",
+			&chatbot.Command{
+				Call: &bread.RPC{
+					Package: "package",
+					Service: "Ping",
+					Method:  "Ping",
+				},
 				Args:      map[string]string{},
 				RoomID:    42,
 				UserEmail: "user@salesforce.com",
@@ -70,10 +76,12 @@ func TestChatCommandHandler(t *testing.T) {
 		},
 		{
 			"!deploy trigger app=chatbot",
-			&bread.ChatCommand{
-				Package: "package",
-				Service: "Deploy",
-				Method:  "Trigger",
+			&chatbot.Command{
+				Call: &bread.RPC{
+					Package: "package",
+					Service: "Deploy",
+					Method:  "Trigger",
+				},
 				Args: map[string]string{
 					"app": "chatbot",
 				},
@@ -83,10 +91,12 @@ func TestChatCommandHandler(t *testing.T) {
 		},
 		{
 			"!deploy trigger app=chatbot env=\"boomtown\"",
-			&bread.ChatCommand{
-				Package: "package",
-				Service: "Deploy",
-				Method:  "Trigger",
+			&chatbot.Command{
+				Call: &bread.RPC{
+					Package: "package",
+					Service: "Deploy",
+					Method:  "Trigger",
+				},
 				Args: map[string]string{
 					"app": "chatbot",
 					"env": "boomtown",
@@ -96,12 +106,12 @@ func TestChatCommandHandler(t *testing.T) {
 			},
 		},
 	} {
-		msg := &bread.ChatMessage{
+		msg := &chatbot.Message{
 			Text: tc.message,
-			Room: &bread.Room{
+			Room: &chatbot.Room{
 				ID: 42,
 			},
-			User: &bread.User{
+			User: &chatbot.User{
 				Email: "user@salesforce.com",
 			},
 		}
@@ -152,10 +162,10 @@ func (s *pingServer) SlowLoris(ctx context.Context, req *breadpb.SlowLorisReques
 	panic("not implemented")
 }
 
-var invoker bread.ChatCommandInvoker = func(ctx context.Context, conn *grpc.ClientConn, cmd *bread.ChatCommand) error {
-	if cmd.Package == "bread" {
-		if cmd.Service == "bread" {
-			if cmd.Method == "ping" {
+var invoker chatbot.CommandInvoker = func(ctx context.Context, conn *grpc.ClientConn, cmd *chatbot.Command) error {
+	if cmd.Call.Package == "bread" {
+		if cmd.Call.Service == "bread" {
+			if cmd.Call.Method == "ping" {
 				client := breadpb.NewPingClient(conn)
 				_, err := client.Ping(ctx, &breadpb.PingRequest{})
 				return err
@@ -185,7 +195,8 @@ func TestHandleChatCommand(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer conn.Close()
-	if err := bread.HandleChatRPCCommand(&fakeHipchatClient{}, invoker, 1*time.Second, conn, &bread.ChatCommand{Package: "bread", Service: "bread", Method: "ping", RoomID: 42}); err != nil {
+	cmd := &chatbot.Command{Call: &bread.RPC{Package: "bread", Service: "bread", Method: "ping"}, RoomID: 42}
+	if err := chatbot.HandleCommand(&fakeHipchatClient{}, invoker, 1*time.Second, conn, cmd); err != nil {
 		t.Fatal(err)
 	}
 	if ping.lastRoomID != "42" {

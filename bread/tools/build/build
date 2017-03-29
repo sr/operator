@@ -64,12 +64,14 @@ if [ -z "$NOPULL" ]; then
 fi
 docker build $pullopts -f "${BREAD_DIR}/etc/docker/Dockerfile.build" -t build/build .
 
-# Build citool utility program
-docker run --rm -w /go \
-   -v "${GOBIN}:/go/bin" \
-   -v "${REPO_ROOT_DIR}:/go/src/${GO_PREFIX}" \
-   build/build \
-   go install -v "${GO_PREFIX_BREAD}/cmd/citool"
+# Build citool utility program on CI.
+if [ -n "${CI:=""}" ]; then
+    docker run --rm -w /go \
+    -v "${GOBIN}:/go/bin" \
+    -v "${REPO_ROOT_DIR}:/go/src/${GO_PREFIX}" \
+    build/build \
+    go install -v "${GO_PREFIX_BREAD}/cmd/citool"
+fi
 
 build_rubygem() {
     local gemname="$1"
@@ -247,18 +249,23 @@ case "$project" in
         fi
         ;;
     golang)
-        # Start a test LDAP server. This is used by test suite of the "bread" package
+        # Lint (first-party only) then build all Go code
+        docker run --rm -w /go \
+            -v "${GOBIN}:/go/bin" \
+            -v "${REPO_ROOT_DIR}:/go/src/${GO_PREFIX}" \
+            build/build \
+            make -f "/go/src/${GO_PREFIX_BREAD}/etc/mk/golang.mk"
+
+        # Run the LDAPAuthorizer test, which requires a running LDAP server.
         docker build $pullopts -f "${BREAD_DIR}/etc/docker/Dockerfile.ldap" -t bread/ldap "$BREAD_DIR"
         ldapcontainer="$(docker run -d -v "${BREAD_DIR}/etc/ldap.ldif:/data/ldap.ldif" bread/ldap)"
         trap 'docker stop -t3 $ldapcontainer >/dev/null 2>&1' EXIT
-
-        # Lint (first-party only) then build all Go code
         docker run --rm -w /go \
             -v "${GOBIN}:/go/bin" \
             -v "${REPO_ROOT_DIR}:/go/src/${GO_PREFIX}" \
             --link "$ldapcontainer:ldap" \
             build/build \
-            make -f "/go/src/${GO_PREFIX_BREAD}/etc/mk/golang.mk"
+            go test -v git.dev.pardot.com/Pardot/infrastructure/bread -ldap -run /LDAPAuth.*/
 
         if [ -n "$CI" ]; then
           pushd "$GOBIN"

@@ -8,8 +8,8 @@ import (
 	"sort"
 	"strings"
 
+	"git.dev.pardot.com/Pardot/infrastructure/bread/generated/pb"
 	"git.dev.pardot.com/Pardot/infrastructure/bread/jib/github"
-	"git.dev.pardot.com/Pardot/infrastructure/bread/pb"
 	"github.com/golang/protobuf/jsonpb"
 )
 

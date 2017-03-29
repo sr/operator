@@ -1,19 +1,20 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-: "${BREAD:="${GOPATH}/src/git.dev.pardot.com/Pardot/bread"}"
+: "${BREAD:="${GOPATH}/src/git.dev.pardot.com/Pardot/infrastructure/bread"}"
 : "${BREAD_PROTO_DIR:="${BREAD}/proto"}"
 : "${BREAD_PROTO_VENDOR_DIR:="${BREAD}/vendor/proto"}"
 : "${BREAD_HAL9000_DIR:="${BREAD}/hal9000"}"
 : "${BREAD_CANOE_DIR:="${BREAD}/canoe"}"
 : "${BREAD_CHANGELING_DIR:="${BREAD}/changeling"}"
 
-: "${BREAD_GO_PROTO_DIR:="${BREAD}/pb"}"
+: "${BREAD_GO_PROTO_DIR:="${BREAD}/generated/pb"}"
 : "${BREAD_GO_VENDOR_DIR:="${BREAD}/vendor"}"
-: "${BREAD_GO_SWAGGER_RELDIR:="generated/swagger"}"
+: "${BREAD_GO_SWAGGER_RELDIR:="bread/generated/swagger"}"
 
-: "${BREAD_GO_IMPORT_PATH:="git.dev.pardot.com/Pardot/bread"}"
-: "${BREAD_GO_PROTO_IMPORT_PATH:="${BREAD_GO_IMPORT_PATH}/pb"}"
+: "${BREAD_GO_IMPORT_PATH:="git.dev.pardot.com/Pardot/infrastructure/bread"}"
+: "${BREAD_GO_GENERATED_IMPORT_PATH:="${BREAD_GO_IMPORT_PATH}/generated"}"
+: "${BREAD_GO_PROTO_IMPORT_PATH:="${BREAD_GO_IMPORT_PATH}/generated/pb"}"
 : "${BREAD_GO_VENDOR_PATH:="${BREAD_GO_IMPORT_PATH}/vendor"}"
 
 if ! command -v protoc >/dev/null; then
@@ -38,9 +39,9 @@ fi
 
 # Install vendored protobuf generators
 go install -v \
+    "${BREAD_GO_IMPORT_PATH}/cmd/protoc-gen-bread" \
     "${BREAD_GO_VENDOR_PATH}/github.com/golang/protobuf/protoc-gen-go" \
     "${BREAD_GO_VENDOR_PATH}/github.com/sr/operator/cmd/protoc-gen-operatorctl" \
-    "${BREAD_GO_VENDOR_PATH}/github.com/sr/operator/cmd/protoc-gen-operatord" \
     "${BREAD_GO_VENDOR_PATH}/github.com/go-swagger/go-swagger/cmd/swagger" \
     "${BREAD_GO_VENDOR_PATH}/github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger" \
     "${BREAD_GO_IMPORT_PATH}/cmd/protoc-gen-operatorlitahelp"
@@ -52,8 +53,8 @@ protoc \
     -I"${BREAD_GO_VENDOR_DIR}" \
     -I"${BREAD_PROTO_DIR}" \
     -I"${BREAD_PROTO_VENDOR_DIR}/googleapis" \
+    --bread_out="import_path=${BREAD_GO_PROTO_IMPORT_PATH}:${BREAD}/generated" \
     --operatorctl_out="import_path=${BREAD_GO_PROTO_IMPORT_PATH}:${BREAD}/cmd/operatorctl" \
-    --operatord_out="import_path=${BREAD_GO_PROTO_IMPORT_PATH}:${BREAD}/cmd/operatord" \
     --operatorlitahelp_out="import_path=${BREAD_GO_PROTO_IMPORT_PATH}:${BREAD_HAL9000_DIR}/config" \
     --go_out="plugins=grpc,import_path=${BREAD_GO_PROTO_IMPORT_PATH},Moperator.proto=github.com/sr/operator,Mgoogle/protobuf/descriptor.proto=github.com/golang/protobuf/protoc-gen-go/descriptor,Mgoogle/protobuf/duration.proto=github.com/golang/protobuf/ptypes/duration:${BREAD_GO_PROTO_DIR}" \
     "${BREAD_PROTO_DIR}/"*.proto
