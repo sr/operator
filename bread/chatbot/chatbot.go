@@ -17,6 +17,7 @@ type MessageHandler func(*Message) error
 // A Message is a chat message sent by a User to a Room.
 type Message struct {
 	Text  string
+	HTML  string
 	Color string
 	Room  *Room
 	User  *User
@@ -65,22 +66,21 @@ func SendRoomMessage(ctx context.Context, client operatorhipchat.Client, msg *Me
 			}
 		}
 	}
-	email := EmailFromContext(ctx)
-	if email == "" {
-		return errors.New("no user email found in request")
-	}
 	if roomID == 0 {
 		return errors.New("no chat room ID found in request")
 	}
-	if msg.Color == "" {
-		msg.Color = "gray"
+	notif := &operatorhipchat.RoomNotification{RoomID: roomID}
+	if msg.Color != "" {
+		notif.MessageOptions = &operatorhipchat.MessageOptions{Color: msg.Color}
 	}
-	return client.SendRoomNotification(ctx, &operatorhipchat.RoomNotification{
-		Message:        msg.Text,
-		RoomID:         roomID,
-		MessageFormat:  "html",
-		MessageOptions: &operatorhipchat.MessageOptions{Color: msg.Color},
-	})
+	if msg.HTML != "" {
+		notif.MessageFormat = "html"
+		notif.Message = msg.HTML
+	} else {
+		notif.MessageFormat = "text"
+		notif.Message = msg.Text
+	}
+	return client.SendRoomNotification(ctx, notif)
 }
 
 func EmailFromContext(ctx context.Context) string {

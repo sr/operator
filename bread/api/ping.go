@@ -18,6 +18,6 @@ type PingerServer struct {
 func (s *PingerServer) Ping(ctx context.Context, req *breadpb.PingRequest) (*empty.Empty, error) {
 	email := chatbot.EmailFromContext(ctx)
 	return &empty.Empty{}, chatbot.SendRoomMessage(ctx, s.Hipchat, &chatbot.Message{
-		Text: fmt.Sprintf(`PONG <a href="mailto:%s">%s</a>`, email, email),
+		HTML: fmt.Sprintf(`PONG <a href="mailto:%s">%s</a>`, email, email),
 	})
 }

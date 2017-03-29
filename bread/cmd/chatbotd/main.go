@@ -27,12 +27,15 @@ import (
 	"git.dev.pardot.com/Pardot/infrastructure/bread/generated"
 	"git.dev.pardot.com/Pardot/infrastructure/bread/generated/pb"
 	"git.dev.pardot.com/Pardot/infrastructure/bread/hipchat"
+	"git.dev.pardot.com/Pardot/infrastructure/bread/jira"
 )
 
 const (
 	grpcAddress         = ":8443"
 	grpcDialTimeout     = 10 * time.Second
 	defaultProtoPackage = "breadpb"
+	defaultJIRAProject  = "BREAD"
+	defaultJIRAURL      = "https://jira.dev.pardot.com"
 )
 
 var (
@@ -44,6 +47,10 @@ var (
 	herokuAPIPassword  = flag.String("heroku-api-password", "", "")
 	canoeAPIURL        = flag.String("canoe-api-url", "https://canoe.dev.pardot.com", "")
 	canoeAPIKey        = flag.String("canoe-api-key", "", "Canoe API key")
+	jiraURL            = flag.String("jira-url", defaultJIRAURL, "URL of the JIRA installation.")
+	jiraProject        = flag.String("jira-project", defaultJIRAProject, "Key of the project to manage")
+	jiraUsername       = flag.String("jira-username", "", "JIRA username")
+	jiraPassword       = flag.String("jira-password", "", "JIRA password")
 
 	hipchatAddonConfig = &breadhipchat.AddonConfig{}
 	ldapConfig         = &bread.LDAPConfig{}
@@ -129,6 +136,13 @@ func run() error {
 
 	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(bread.GRPCServerInterceptor(authorizer)))
 	breadpb.RegisterPingerServer(grpcServer, &breadapi.PingerServer{Hipchat: client})
+
+	breadpb.RegisterTicketsServer(grpcServer, &breadapi.TicketsServer{
+		Hipchat: client,
+		Jira:    jira.NewClient(*jiraURL, *jiraUsername, *jiraPassword),
+		Project: *jiraProject,
+	})
+
 	go func() {
 		errC <- grpcServer.Serve(grpcListener)
 	}()

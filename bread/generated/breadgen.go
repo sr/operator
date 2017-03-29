@@ -186,29 +186,5 @@ func OperatorInvoker(ctx context.Context, conn *grpc.ClientConn, req *operator.R
 		}
 	}
 
-	if req.Call.Service == fmt.Sprintf("%s.Tickets", pkg) {
-		if req.Call.Method == "Mine" {
-			client := breadpb.NewTicketsClient(conn)
-			_, err := client.Mine(
-				ctx,
-				&breadpb.TicketRequest{
-					Request:         req,
-					IncludeResolved: req.Call.Args["include_resolved"],
-				},
-			)
-			return err
-		}
-		if req.Call.Method == "SprintStatus" {
-			client := breadpb.NewTicketsClient(conn)
-			_, err := client.SprintStatus(
-				ctx,
-				&breadpb.TicketRequest{
-					Request:         req,
-					IncludeResolved: req.Call.Args["include_resolved"],
-				},
-			)
-			return err
-		}
-	}
 	return fmt.Errorf("no such service: `%s %s`", req.Call.Service, req.Call.Method)
 }
