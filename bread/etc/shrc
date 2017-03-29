@@ -1,6 +1,12 @@
 #!/bin/sh
 #/ Usage: . etc/shrc
-#/ Setup the shell environment for working with the BREAD repo.
+#/ Setup the shell environment for working with the Pardot/infrastructure repo.
+
+# Directory where the Pardot/infrastructure is checked out.
+INFRA_REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+
+# Directory for BREAD-team specific projects
+BREAD_DIR="${INFRA_REPO_DIR}/bread"
 
 # Use the default (as of Go 1.8) GOPATH unless it is already set
 if [ -z "${GOPATH:-""}" ]; then
@@ -15,23 +21,20 @@ if [ -z "${HEROKU_ORGANIZATION:-""}" ]; then
     export HEROKU_ORGANIZATION
 fi
 
-: "${BREAD:="${GOPATH}/src/git.dev.pardot.com/Pardot/bread"}"
-export BREAD
-
 # Add utilities to the PATH
-PATH="${BREAD}/bin:$PATH"
+PATH="${INFRA_REPO_DIR}/bin:${BREAD_DIR}/bin:${PATH}"
 export PATH
 
-# Quickly cd into any subtree within the BREAD repository:
+# Quickly cd into any subtree within the infrastructure repository:
 #
 #   $ pwd
 #   /Users/srozet
 #   $ cd jib
-#   /Users/srozet/go/src/git.dev.pardot.com/Pardot/bread/jib
-CDPATH=".:${BREAD}"
+#   /Users/srozet/go/src/git.dev.pardot.com/Pardot/infrastructure/bread/jib
+CDPATH=".:${INFRA_REPO_DIR}"
 export CDPATH
 
-test -f "$BREAD/etc/secrets" &&
-. "$BREAD/etc/secrets"
+test -f "${BREAD_DIR}/etc/secrets" &&
+. "${BREAD_DIR}/etc/secrets"
 
 true
