@@ -76,6 +76,16 @@ func ChatCommandGRPCInvoker(ctx context.Context, conn *grpc.ClientConn, cmd *cha
 		}
 	}
 
+	if cmd.Call.Package == "breadpb" && cmd.Call.Service == "Pinger" {
+		if cmd.Call.Method == "Ping" {
+			_, err := breadpb.NewPingerClient(conn).Ping(
+				ctx,
+				&breadpb.PingRequest{},
+			)
+			return err
+		}
+	}
+
 	if cmd.Call.Package == "breadpb" && cmd.Call.Service == "Tickets" {
 		if cmd.Call.Method == "Mine" {
 			_, err := breadpb.NewTicketsClient(conn).Mine(
@@ -157,6 +167,19 @@ func OperatorInvoker(ctx context.Context, conn *grpc.ClientConn, req *operator.R
 				&breadpb.SlowLorisRequest{
 					Request: req,
 					Wait:    req.Call.Args["wait"],
+				},
+			)
+			return err
+		}
+	}
+
+	if req.Call.Service == fmt.Sprintf("%s.Pinger", pkg) {
+		if req.Call.Method == "Ping" {
+			client := breadpb.NewPingerClient(conn)
+			_, err := client.Ping(
+				ctx,
+				&breadpb.PingRequest{
+					Request: req,
 				},
 			)
 			return err

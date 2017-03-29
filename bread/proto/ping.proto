@@ -17,7 +17,8 @@ service Ping {
 }
 
 service Pinger {
-	rpc Ping(google.protobuf.Empty) returns (google.protobuf.Empty);
+	option (operator.enabled) = true;
+	rpc Ping(PingRequest) returns (google.protobuf.Empty);
 }
 
 message PingRequest {

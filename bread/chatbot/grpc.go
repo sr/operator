@@ -85,15 +85,7 @@ func HandleCommand(client operatorhipchat.Client, invoker CommandInvoker, timeou
 	}
 
 	ctx, cancel := context.WithTimeout(
-		metadata.NewContext(
-			context.TODO(),
-			metadata.Pairs(
-				hipchatRoomIDKey,
-				strconv.Itoa(cmd.RoomID),
-				bread.UserEmailKey,
-				cmd.UserEmail,
-			),
-		),
+		metadata.NewContext(context.Background(), newMetadata(cmd)),
 		timeout,
 	)
 	defer cancel()
@@ -122,6 +114,16 @@ func HandleCommand(client operatorhipchat.Client, invoker CommandInvoker, timeou
 		)
 	}
 	return err
+}
+
+// newMetadata returns gRPC metadata for the given chat command.
+func newMetadata(cmd *Command) metadata.MD {
+	return metadata.Pairs(
+		bread.UserEmailKey,
+		cmd.UserEmail,
+		hipchatRoomIDKey,
+		strconv.Itoa(cmd.RoomID),
+	)
 }
 
 func findCommand(msg string) *Command {
