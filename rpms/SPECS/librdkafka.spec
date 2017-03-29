@@ -32,7 +32,7 @@ librdkafka is the C/C++ client library implementation of the Apache Kafka protoc
 
 %package -n %{name}-devel
 Summary: The Apache Kafka C library (Development Environment)
-Group:   Development/Libraries/C and C++
+Group:   Development/Libraries
 Requires: %{name}%{soname} = %{version}
 
 %description -n %{name}-devel
@@ -42,7 +42,6 @@ This package contains headers and libraries required to build applications
 using librdkafka.
 
 %prep
-
 %setup -q
 
 %configure
