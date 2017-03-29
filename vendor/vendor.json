@@ -1,0 +1,11 @@
+{
+  "heroku": {
+    "install": [
+      "./bread/cmd/chatbotd",
+      "./bread/cmd/eventsd",
+      "./bread/cmd/jib"
+    ],
+    "goVersion": "go1.8"
+  },
+  "rootPath": "git.dev.pardot.com/Pardot/infrastructure"
+}
