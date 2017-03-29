@@ -102,7 +102,7 @@ func HandleCommand(client operatorhipchat.Client, invoker CommandInvoker, timeou
 	case err = <-errC:
 	}
 
-	if err != nil && !strings.Contains(err.Error(), "unhandleable command:") {
+	if err != nil && !strings.Contains(err.Error(), "unhandleable command:") && !strings.Contains(err.Error(), "unknown service") {
 		_ = client.SendRoomNotification(
 			context.TODO(),
 			&operatorhipchat.RoomNotification{
