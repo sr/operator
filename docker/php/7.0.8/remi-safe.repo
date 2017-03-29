@@ -1,0 +1,7 @@
+[remi-safe]
+name=Safe Remi's RPM repository for Enterprise Linux 6 - $basearch
+#baseurl=http://rpms.remirepo.net/enterprise/6/safe/$basearch/
+mirrorlist=http://rpms.remirepo.net/enterprise/6/safe/mirror
+enabled=1
+gpgcheck=1
+gpgkey=http://rpms.famillecollet.com/RPM-GPG-KEY-remi

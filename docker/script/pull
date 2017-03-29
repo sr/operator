@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+#/ Usage: pull
+#/ Pulls common images from the Docker registry
+set -euo pipefail
+set -x
+
+cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/.."; pwd)"
+exec rake pull["${MIRROR-}"]

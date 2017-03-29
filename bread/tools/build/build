@@ -228,6 +228,12 @@ case "$project" in
             build/build \
             go install -v "${GO_PREFIX_BREAD}/cmd/devenv"
         ;;
+    docker)
+        # This environment variable must be set.
+        : "$BAMBOO_CONFIGURATION_DIR"
+
+        cd docker && exec script/cibuild
+        ;;
     explorer)
         build-ruby "$project" "explorer"
 

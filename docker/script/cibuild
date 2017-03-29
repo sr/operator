@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+: "${CI:="${bamboo_planRepository_branch}"}"
+
+if [ -n "$CI" ]; then
+  export DOCKER_CONFIG="/etc/docker"
+
+  "$BAMBOO_CONFIGURATION_DIR"/bin/docker/cleanup -i
+  eval "$("$BAMBOO_CONFIGURATION_DIR"/bin/docker/ssh-agent)"
+fi
+
+cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/.."; pwd)"
+head="$(git rev-parse HEAD)"
+master="$(git rev-parse master || true)"
+
+if [ -n "$CI" ]; then
+  export ARTIFACTORY_HOST="artifactory-internal.dev.pardot.com"
+  # TODO: Replace with Vault when ready
+  export GIT_DEV_TOKEN="${bamboo_git_dev_password_token}"
+
+  if [ "$head" = "$master" ]; then
+    export PUSH="yes"
+  else
+    echo "HEAD is ${head}, but master is ${master}. Skipping push." 2>&1
+  fi
+fi
+
+exec rake
