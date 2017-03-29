@@ -8,15 +8,21 @@ RUN yum install -y epel-release && \
   yum install -y nginx && \
   yum install -y unzip supervisor && \
   curl -L 'https://github.com/progrium/entrykit/releases/download/v0.4.0/entrykit_0.4.0_Linux_x86_64.tgz' | tar -xzv -C /usr/bin && \
-  entrykit --symlink
+  entrykit --symlink && \
+  yum clean all
 
-COPY ca-pardot.crt /etc/pki/tls/certs/ca-pardot.crt
+COPY ca-pardot.crt ca-salesforce.crt /etc/pki/tls/certs/
 
 RUN keytool -keystore /etc/pki/java/cacerts \
   -import -file /etc/pki/tls/certs/ca-pardot.crt \
   -noprompt \
   -storepass 'changeit' \
   -alias ca-pardot
+RUN keytool -keystore /etc/pki/java/cacerts \
+  -import -file /etc/pki/tls/certs/ca-salesforce.crt \
+  -noprompt \
+  -storepass 'changeit' \
+  -alias ca-salesforce
 
 RUN mkdir /tmp/pwm && \
   cd /tmp/pwm && \
