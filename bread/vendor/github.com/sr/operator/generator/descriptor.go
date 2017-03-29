@@ -108,46 +108,20 @@ func describe(request *plugin.CodeGeneratorRequest) (*Descriptor, error) {
 				services[j].Methods[k].Input = inputName
 				services[j].Methods[k].Output = outputName
 				input, ok := messagesByName[inputName]
-				if !ok {
-					return nil, fmt.Errorf("No definition for input message %s", inputName)
+				if ok {
+					services[j].Methods[k].Arguments = make([]*Argument, len(input.Field))
+				} else {
+					services[j].Methods[k].Arguments = make([]*Argument, 0)
 				}
-				if err := validateMessageHasField(input, sourceField); err != nil {
-					return nil, err
-				}
-				services[j].Methods[k].Arguments = make([]*Argument, len(input.Field)-1)
-				if method.GetOutputType() != ".operator.Response" {
-					output, ok := messagesByName[outputName]
-					if !ok {
-						return nil, fmt.Errorf("No definition for output message %s", outputName)
-					}
-					if len(output.Field) == 0 {
-						return nil, fmt.Errorf("Output message '%s' has no field", output.GetName())
-					}
-					var field *descriptor.FieldDescriptorProto
-					ok = false
-					for _, f := range output.Field {
-						if f.GetNumber() == 1 {
-							ok = true
-							field = f
+				if input != nil {
+					for l, field := range input.Field {
+						services[j].Methods[k].Arguments[l] = &Argument{
+							Name:        field.GetName(),
+							Type:        field.GetType(),
+							Description: undocumentedPlaceholder,
+							fieldNum:    *field.Number,
+							messageIdx:  messagesIdxByName[input.GetName()],
 						}
-					}
-					if !ok {
-						return nil, fmt.Errorf("Output message '%s' has no field with ID = %d", output.GetName(), 1)
-					}
-					if field.GetType() != descriptor.FieldDescriptorProto_TYPE_STRING {
-						return nil, fmt.Errorf("field %s.message must be a string", output.GetName())
-					}
-				}
-				for l, field := range input.Field {
-					if field.GetName() == sourceField {
-						continue
-					}
-					services[j].Methods[k].Arguments[l-1] = &Argument{
-						Name:        field.GetName(),
-						Type:        field.GetType(),
-						Description: undocumentedPlaceholder,
-						fieldNum:    *field.Number,
-						messageIdx:  messagesIdxByName[input.GetName()],
 					}
 				}
 			}
