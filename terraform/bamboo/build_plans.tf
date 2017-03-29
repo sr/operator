@@ -32,7 +32,7 @@ resource "bamboo_build_plan" "BREAD-DJ" {
 resource "bamboo_build_plan" "BREAD-DBI" {
   key                       = "BREAD-DBI"
   name                      = "Docker Base Images"
-  default_repository_id     = "${bamboo_repository.docker-library.id}"
+  default_repository_id     = "${bamboo_repository.infrastructure.id}"
   automatic_merging_enabled = false
 }
 
