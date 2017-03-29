@@ -40,7 +40,6 @@ install -m755 %{soname} %{buildroot}%{_libdir}/php/modules/
 
 cat > %{buildroot}%{_sysconfdir}/php.d/%{inifile} << EOF
 extension = %{soname}
-tideways.auto_prepend_library=0
 EOF
 
 %clean
