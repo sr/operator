@@ -3,13 +3,13 @@
   "ignore": "test",
   "heroku": {
     "install": [
-      "./cmd/chatbotd",
-      "./cmd/eventsd",
-      "./cmd/jib"
+      "./bread/cmd/chatbotd",
+      "./bread/cmd/eventsd",
+      "./bread/cmd/jib"
     ],
     "goVersion": "go1.8",
     "sync": false
   },
   "package": [],
-  "rootPath": "git.dev.pardot.com/Pardot/bread"
+  "rootPath": "git.dev.pardot.com/Pardot/infrastructure"
 }
