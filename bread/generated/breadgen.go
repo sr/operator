@@ -3,14 +3,101 @@
 package breadgen
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/sr/operator"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
+	"git.dev.pardot.com/Pardot/infrastructure/bread/chatbot"
+
 	breadpb "git.dev.pardot.com/Pardot/infrastructure/bread/generated/pb"
 )
+
+func ChatCommandGRPCInvoker(ctx context.Context, conn *grpc.ClientConn, cmd *chatbot.Command) error {
+	if conn == nil {
+		return errors.New("required argument is nil: conn")
+	}
+	if cmd == nil {
+		return errors.New("required argument is nil: cmd")
+	}
+	if cmd.Call == nil {
+		return errors.New("required cmd struct field is nil: Call")
+	}
+
+	if cmd.Call.Package == "breadpb" && cmd.Call.Service == "Deploy" {
+		if cmd.Call.Method == "ListTargets" {
+			_, err := breadpb.NewDeployClient(conn).ListTargets(
+				ctx,
+				&breadpb.ListTargetsRequest{},
+			)
+			return err
+		}
+		if cmd.Call.Method == "ListBuilds" {
+			_, err := breadpb.NewDeployClient(conn).ListBuilds(
+				ctx,
+				&breadpb.ListBuildsRequest{
+					Target: cmd.Args["target"],
+					Branch: cmd.Args["branch"],
+				},
+			)
+			return err
+		}
+		if cmd.Call.Method == "Trigger" {
+			_, err := breadpb.NewDeployClient(conn).Trigger(
+				ctx,
+				&breadpb.TriggerRequest{
+					Target: cmd.Args["target"],
+					Build:  cmd.Args["build"],
+					Branch: cmd.Args["branch"],
+				},
+			)
+			return err
+		}
+	}
+
+	if cmd.Call.Package == "breadpb" && cmd.Call.Service == "Ping" {
+		if cmd.Call.Method == "Ping" {
+			_, err := breadpb.NewPingClient(conn).Ping(
+				ctx,
+				&breadpb.PingRequest{},
+			)
+			return err
+		}
+		if cmd.Call.Method == "SlowLoris" {
+			_, err := breadpb.NewPingClient(conn).SlowLoris(
+				ctx,
+				&breadpb.SlowLorisRequest{
+					Wait: cmd.Args["wait"],
+				},
+			)
+			return err
+		}
+	}
+
+	if cmd.Call.Package == "breadpb" && cmd.Call.Service == "Tickets" {
+		if cmd.Call.Method == "Mine" {
+			_, err := breadpb.NewTicketsClient(conn).Mine(
+				ctx,
+				&breadpb.TicketRequest{
+					IncludeResolved: cmd.Args["include_resolved"],
+				},
+			)
+			return err
+		}
+		if cmd.Call.Method == "SprintStatus" {
+			_, err := breadpb.NewTicketsClient(conn).SprintStatus(
+				ctx,
+				&breadpb.TicketRequest{
+					IncludeResolved: cmd.Args["include_resolved"],
+				},
+			)
+			return err
+		}
+	}
+	return fmt.Errorf("unhandleable command: %+v", cmd)
+}
 
 func OperatorInvoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, pkg string) error {
 
