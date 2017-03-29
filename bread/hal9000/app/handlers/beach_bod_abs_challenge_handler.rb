@@ -6,7 +6,7 @@ class BeachBodAbsChallenge < ApplicationHandler
 
   def exercise_time(request)
     exercise = exercises[rand(0..exercises.length - 1)]
-    request.reply "Beach Bod Ab Challenge: #{exercise[:phrase]} 30 reps. Do it! \n #{exercise[:gif]}"
+    request.reply "Beach Bod Ab Challenge: #{exercise[:phrase]} 30 reps. Do it! \n#{exercise[:gif]}"
   end
 
   def exercises
