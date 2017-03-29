@@ -9,9 +9,9 @@ import (
 
 var (
 	forkedPrReply = template.Must(template.New("").Parse(strings.TrimSpace(`
-@{{.User.Login}} Due to a weakness in our Continuous Integration server, pull requests originating from forked repositories are not allowed because we cannot run tests against forked repositories.
+@{{.User.Login}} Due to a weakness in our Continuous Integration server, pull requests originating from forked repositories are not mergeable because we cannot run tests against them.
 
-Please push your code to a branch on the organization repository, then reopen the pull request against that branch.
+Please push your code to a branch on the main repository, then reopen the pull request against that branch.
 `)))
 )
 
