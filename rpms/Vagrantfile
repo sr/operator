@@ -33,6 +33,13 @@ Vagrant.configure(2) do |config|
     rpm -Uvh "http://rpms.famillecollet.com/enterprise/remi-release-${REDHAT_RELEASE}.rpm"
     yum-config-manager --enable remi-php70
 
+    echo "[remi-php70]" > /etc/yum.repos.d/remi-php70.repo
+    echo "name=Internal Remi PHP 7.0 RPM repo for CentOS 6" >> /etc/yum.repos.d/remi-php70.repo
+    echo "baseurl=https://artifactory.dev.pardot.com/artifactory/el6-remi-php70/" >> /etc/yum.repos.d/remi-php70.repo
+    echo "enabled=1" >> /etc/yum.repos.d/remi-php70.repo
+    echo "gpgcheck=1" >> /etc/yum.repos.d/remi-php70.repo
+    echo "gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-remi" >> /etc/yum.repos.d/remi-php70.repo
+
     echo "[pardot_stacki]" > /etc/yum.repos.d/pardot_stacki.repo
     echo "name=Pardot Stacki repo" >> /etc/yum.repos.d/pardot_stacki.repo
     echo "baseurl=https://artifactory.dev.pardot.com/artifactory/pd-stacki/" >> /etc/yum.repos.d/pardot_stacki.repo
