@@ -41,12 +41,13 @@ resource "bamboo_repository" "bread" {
 }
 
 resource "bamboo_repository" "infrastructure" {
-  name           = "infrastructure"
-  username       = "${var.bamboo_git_username}"
-  password       = "${var.bamboo_git_password}"
-  repository     = "Pardot/infrastructure"
-  shallow_clones = false
-  use_submodules = false
+  name                   = "infrastructure"
+  username               = "${var.bamboo_git_username}"
+  password               = "${var.bamboo_git_password}"
+  repository             = "Pardot/infrastructure"
+  shallow_clones         = false
+  use_submodules         = false
+  fetch_whole_repository = true
 }
 
 resource "bamboo_repository" "chef" {
@@ -64,15 +65,6 @@ resource "bamboo_repository" "cimta-topology" {
   password       = "${var.bamboo_git_password}"
   repository     = "Pardot/cimta-topology"
   shallow_clones = true
-}
-
-resource "bamboo_repository" "docker-library" {
-  name                   = "docker-library"
-  username               = "${var.bamboo_git_username}"
-  password               = "${var.bamboo_git_password}"
-  repository             = "Pardot/docker-library"
-  shallow_clones         = false
-  fetch_whole_repository = true
 }
 
 resource "bamboo_repository" "engage-campaign-reports" {
