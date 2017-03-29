@@ -12,7 +12,7 @@ fi
 
 cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/.."; pwd)"
 head="$(git rev-parse HEAD)"
-master="$(git rev-parse master)"
+master="$(git rev-parse master || true)"
 
 if [ -n "$CI" ]; then
   export ARTIFACTORY_HOST="artifactory-internal.dev.pardot.com"
