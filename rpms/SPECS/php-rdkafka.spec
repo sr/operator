@@ -1,6 +1,7 @@
 %define modname rdkafka
 %define phpver 7.0.8
 %define srcver 3.0.1
+%define minlibrdkafkaver 0.9.4
 %define soname %{modname}.so
 %define inifile 20-%{modname}.ini
 
@@ -12,9 +13,10 @@ Group:      Development/Languages
 License:    Apache License
 URL:        https://github.com/arnaud-lb/php-rdkafka
 Source0:    https://github.com/arnaud-lb/php-rdkafka/archive/%{srcver}.zip
+Requires:       librdkafka1 >= %{minlibrdkafkaver}
 BuildRequires:  php-cli%{?_isa} = %{version}
 BuildRequires:  php-devel%{?_isa} = %{version}
-BuildRequires:  librdkafka-devel
+BuildRequires:  librdkafka-devel >= %{minlibrdkafkaver}
 BuildRequires:  re2c
 BuildRoot:  %{_tmppath}/%name-root
 
