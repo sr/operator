@@ -12,7 +12,6 @@ To create a plan, Privet requires a list of test files to be run. This list can 
 {"filename": "path/to/test1.php", "suite": "foo", "fingerprint": "b5bb9d8014a0f9b1d61e21e796d78dccdf1352f23cd32812f4850b878ae4944c"}
 {"filename": "path/to/test2.php", "suite": "foo", "fingerprint": "c739918a22764c87ac849e5c5ab4a681ca6d19c2748e434e1817df436b671f81"}
 {"filename": "path/to/test2.php", "suite": "foo", "fingerprint": "9f767b0b078d25ab01b7e887c3abe03df60943d2b7f4a6fb218e99685db3b30a"}
-"}
 ```
 
 The keys for each line of JSON are:
