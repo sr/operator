@@ -1,8 +1,8 @@
 require "active_support/all"
 
-class BeachBodAbsChallenge < ApplicationHandler
+class BeachBodAbsChallengeHandler < ApplicationHandler
 
-  route(/^beachbod$/i, :exercise_time, command: false, help: { "beach_bod_abs_challenge_time" => "returns a random ab exercise and a time-based intensity" })
+  route(/^beach bod time$/i, :exercise_time, command: false, help: { "beach_bod_abs_challenge_time" => "returns a random ab exercise and a time-based intensity" })
 
   def exercise_time(request)
     exercise = exercises[rand(0..exercises.length - 1)]
