@@ -11,12 +11,14 @@ service Tickets {
 	option (operator.enabled) = true;
 
 	// List in-progress issues assigned to the current user
-	rpc Mine(TicketRequest) returns (operator.Response);
+	rpc Mine(TicketRequest) returns (TicketResponse);
 	// Show the state of all tickets in the current sprint
-	rpc SprintStatus(TicketRequest) returns (operator.Response);
+	rpc SprintStatus(TicketRequest) returns (TicketResponse);
+}
+
+message TicketResponse {
 }
 
 message TicketRequest {
-	operator.Request request = 1;
 	string include_resolved = 2;
 }

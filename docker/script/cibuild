@@ -15,6 +15,21 @@ head="$(git rev-parse HEAD)"
 master="$(git rev-parse master || true)"
 
 if [ -n "$CI" ]; then
+  # On CI, this job only runs if something changed in the docker/ folder because
+  # this is a very expensive build that also invalidates all of the existing
+  # base images.
+  if [ "${bamboo_repository_git_branch-}" = "master" ]; then
+    revlist="${bamboo_repository_previous_revision_number}...${bamboo_repository_revision_number}"
+  else
+    revlist="master...${bamboo_repository_revision_number}"
+  fi
+
+  if ! git diff --name-only "$revlist" | grep -Eq '^docker/'; then
+    echo "Nothing changed in docker/ since the previous build."
+    echo "The Docker build does not need to run."
+    exit 0
+  fi
+
   export ARTIFACTORY_HOST="artifactory-internal.dev.pardot.com"
   # TODO: Replace with Vault when ready
   export GIT_DEV_TOKEN="${bamboo_git_dev_password_token}"

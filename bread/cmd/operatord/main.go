@@ -24,23 +24,16 @@ import (
 	"git.dev.pardot.com/Pardot/infrastructure/bread/generated"
 	"git.dev.pardot.com/Pardot/infrastructure/bread/generated/pb"
 	"git.dev.pardot.com/Pardot/infrastructure/bread/generated/pb/hal9000"
-	"git.dev.pardot.com/Pardot/infrastructure/bread/jira"
 )
 
 const (
-	grpcTimeout        = 10 * time.Second
-	defaultJIRAProject = "BREAD"
-	defaultJIRAURL     = "https://jira.dev.pardot.com"
+	grpcTimeout = 10 * time.Second
 )
 
 type config struct {
-	afy          *bread.ArtifactoryConfig
-	canoe        *bread.CanoeConfig
-	ecs          *bread.ECSConfig
-	jiraURL      string
-	jiraUsername string
-	jiraPassword string
-	jiraProject  string
+	afy   *bread.ArtifactoryConfig
+	canoe *bread.CanoeConfig
+	ecs   *bread.ECSConfig
 
 	dev             bool
 	devRoomID       int
@@ -92,10 +85,6 @@ func run(invoker operator.InvokerFunc) error {
 	flags.StringVar(&config.canoe.URL, "canoe-url", "https://canoe.dev.pardot.com", "")
 	flags.StringVar(&config.canoe.APIKey, "canoe-api-key", "", "Canoe API key")
 	flags.StringVar(&config.ecs.AWSRegion, "ecs-aws-region", "us-east-1", "AWS Region")
-	flag.StringVar(&config.jiraURL, "jira-url", defaultJIRAURL, "URL of the JIRA installation.")
-	flag.StringVar(&config.jiraProject, "jira-project", defaultJIRAProject, "Key of the project to manage")
-	flag.StringVar(&config.jiraUsername, "jira-username", "", "JIRA username")
-	flag.StringVar(&config.jiraPassword, "jira-password", "", "JIRA password")
 	flags.DurationVar(&config.ecs.Timeout, "ecs-deploy-timeout", 5*time.Minute, "Time to wait for new ECS task definitions to come up")
 	// Allow setting flags via environment variables
 	flags.VisitAll(func(f *flag.Flag) {
@@ -215,13 +204,6 @@ func run(invoker operator.InvokerFunc) error {
 	}
 	breadpb.RegisterPingServer(grpcServer, bread.NewPingServer(sender))
 	breadpb.RegisterDeployServer(grpcServer, deployServer)
-
-	jiraClient := jira.NewClient(config.jiraURL, config.jiraUsername, config.jiraPassword)
-	ticketsServer, err := bread.NewTicketsServer(sender, jiraClient, config.jiraProject)
-	if err != nil {
-		return fmt.Errorf("bread.NewTicketsServer: %s", err)
-	}
-	breadpb.RegisterTicketsServer(grpcServer, ticketsServer)
 
 	errC := make(chan error)
 	grpcList, err := net.Listen("tcp", config.grpcAddr)

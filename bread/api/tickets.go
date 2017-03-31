@@ -1,42 +1,33 @@
-package bread
+package breadapi
 
 import (
 	"bytes"
 	"errors"
 	"fmt"
 
+	"git.dev.pardot.com/Pardot/infrastructure/bread/chatbot"
 	"git.dev.pardot.com/Pardot/infrastructure/bread/jira"
-	"github.com/sr/operator"
+	operatorhipchat "github.com/sr/operator/hipchat"
 	"golang.org/x/net/context"
 
 	"git.dev.pardot.com/Pardot/infrastructure/bread/generated/pb"
 )
 
-type ticketsServer struct {
-	operator.Sender
-	jira    jira.Client
-	project string
+type TicketsServer struct {
+	Hipchat operatorhipchat.Client
+	Jira    jira.Client
+	Project string
 }
 
-func NewTicketsServer(sender operator.Sender, jira jira.Client, project string) (breadpb.TicketsServer, error) {
-	if jira == nil {
-		return nil, errors.New("requirement argument 'jira' is nil")
-	}
-	if project == "" {
-		return nil, errors.New("requirement argument 'project' is nil")
-	}
-	return &ticketsServer{sender, jira, project}, nil
-}
-
-func (s *ticketsServer) SprintStatus(ctx context.Context, req *breadpb.TicketRequest) (*operator.Response, error) {
+func (s *TicketsServer) SprintStatus(ctx context.Context, req *breadpb.TicketRequest) (*breadpb.TicketResponse, error) {
 	var query string
 	if req.IncludeResolved == "true" {
-		query = fmt.Sprintf("project = '%s' AND Sprint IN openSprints() ORDER BY status ASC", s.project)
+		query = fmt.Sprintf("project = '%s' AND Sprint IN openSprints() ORDER BY status ASC", s.Project)
 	} else {
-		query = fmt.Sprintf("project = '%s' AND Sprint IN openSprints() AND Resolution IS NULL ORDER BY status ASC", s.project)
+		query = fmt.Sprintf("project = '%s' AND Sprint IN openSprints() AND Resolution IS NULL ORDER BY status ASC", s.Project)
 	}
 
-	tickets, err := s.jira.Search(
+	tickets, err := s.Jira.Search(
 		ctx,
 		query,
 		[]string{"key", "summary", "status", "assignee"},
@@ -72,18 +63,21 @@ func (s *ticketsServer) SprintStatus(ctx context.Context, req *breadpb.TicketReq
 			summary,
 		)
 	}
-	return operator.Reply(ctx, s, req, &operator.Message{Text: txt.String(), HTML: html.String()})
+	return &breadpb.TicketResponse{}, chatbot.SendRoomMessage(ctx, s.Hipchat, &chatbot.Message{
+		Text: txt.String(),
+		HTML: html.String(),
+	})
 }
 
-func (s *ticketsServer) Mine(ctx context.Context, req *breadpb.TicketRequest) (*operator.Response, error) {
-	email := operator.GetUserEmail(req)
+func (s *TicketsServer) Mine(ctx context.Context, req *breadpb.TicketRequest) (*breadpb.TicketResponse, error) {
+	email := chatbot.EmailFromContext(ctx)
 	if email == "" {
 		return nil, errors.New("unable to retrieve list of assigned tickets without and email address")
 	}
 
-	tickets, err := s.jira.Search(
+	tickets, err := s.Jira.Search(
 		ctx,
-		fmt.Sprintf("project = '%s' AND Resolution IS NULL AND assignee = '%s' ORDER BY status ASC", s.project, email),
+		fmt.Sprintf("project = '%s' AND Resolution IS NULL AND assignee = '%s' ORDER BY status ASC", s.Project, email),
 		[]string{"key", "summary", "status"},
 		100,
 	)
@@ -105,5 +99,8 @@ func (s *ticketsServer) Mine(ctx context.Context, req *breadpb.TicketRequest) (*
 			issue.Fields.Summary,
 		)
 	}
-	return operator.Reply(ctx, s, req, &operator.Message{Text: txt.String(), HTML: html.String()})
+	return &breadpb.TicketResponse{}, chatbot.SendRoomMessage(ctx, s.Hipchat, &chatbot.Message{
+		Text: txt.String(),
+		HTML: html.String(),
+	})
 }
