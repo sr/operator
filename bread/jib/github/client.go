@@ -41,8 +41,11 @@ type PullRequest struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 
-	HeadSHA string
-	HeadRef string
+	HeadSHA  string
+	HeadRef  string
+	HeadUser string
+
+	BaseUser string
 
 	// Mergeable is either true (mergeable), false (not mergeable), or null (not computed yet)
 	Mergeable *bool
@@ -508,6 +511,10 @@ func wrapPullRequest(org, repo string, pullRequest *gogithub.PullRequest) (*Pull
 		return nil, fmt.Errorf("pull request head SHA was nil: %+v", pullRequest)
 	} else if pullRequest.Head.Ref == nil {
 		return nil, fmt.Errorf("pull request head ref was nil: %+v", pullRequest)
+	} else if pullRequest.Head.User == nil {
+		return nil, fmt.Errorf("pull request head user was nil: %+v", pullRequest)
+	} else if pullRequest.Base.User == nil {
+		return nil, fmt.Errorf("pull request base user was nil: %+v", pullRequest)
 	} else if pullRequest.User == nil {
 		return nil, fmt.Errorf("pull request user was nil: %+v", pullRequest)
 	}
@@ -534,6 +541,8 @@ func wrapPullRequest(org, repo string, pullRequest *gogithub.PullRequest) (*Pull
 		UpdatedAt:  *pullRequest.UpdatedAt,
 		HeadSHA:    *pullRequest.Head.SHA,
 		HeadRef:    *pullRequest.Head.Ref,
+		HeadUser:   *pullRequest.Head.User.Login,
+		BaseUser:   *pullRequest.Base.User.Login,
 		Mergeable:  pullRequest.Mergeable,
 	}
 	return wrapped, nil

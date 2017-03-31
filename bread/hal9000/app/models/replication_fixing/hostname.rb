@@ -43,15 +43,15 @@ module ReplicationFixing
 
     def parse_hostname
       if /\Apardot0-(?<type>dbshard|whoisdb)(?<cluster_id>\d+)-(?<shard_id>\d+)-(?<datacenter>[^-]+)\z/ =~ @hostname
-        prefix = \
-          case type
-          when "whoisdb"
-            "whoisdb"
-          else
-            "db"
-          end
-
-        shard_id = shard_id.to_i
+        case type
+        when "whoisdb"
+          # whoisdb cluster_id/shard_id are reversed from the usual
+          prefix = "whoisdb"
+          shard_id, cluster_id = cluster_id.to_i, shard_id.to_i
+        else
+          prefix = "db"
+          shard_id, cluster_id = shard_id.to_i, cluster_id.to_i
+        end
 
         @shard = Shard.new(prefix, shard_id, datacenter)
         @cluster_id = cluster_id.to_i
