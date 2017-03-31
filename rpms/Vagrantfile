@@ -1,0 +1,49 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure(2) do |config|
+  config.vm.define "el6" do |el6|
+    el6.vm.box = "bento/centos-6.7"
+  end
+
+  config.vm.define "el7" do |el6|
+    el6.vm.box = "bento/centos-7.2"
+  end
+
+  config.vm.provider "virtualbox" do |vb|
+    vb.memory = "1024"
+  end
+
+  config.vm.synced_folder "script", "/home/vagrant/rpmbuild/script"
+  config.vm.synced_folder "SPECS", "/home/vagrant/rpmbuild/SPECS"
+  config.vm.synced_folder "RPMS", "/home/vagrant/rpmbuild/RPMS"
+  config.vm.synced_folder "SRPMS", "/home/vagrant/rpmbuild/SRPMS"
+  config.vm.synced_folder "SOURCES", "/home/vagrant/rpmbuild/SOURCES"
+
+  config.vm.provision "shell", inline: <<-SHELL
+    yum install -y epel-release
+    yum clean metadata
+    yum install -y rpmdevtools rpmlint yum-utils
+    yum groupinstall -y "Development Tools"
+
+    mkdir -p /home/vagrant/rpmbuild/{BUILD,BUILDROOT}
+    chown -R vagrant: /home/vagrant/rpmbuild
+
+    REDHAT_RELEASE=$(awk '{ print $3 }' /etc/redhat-release | cut -d. -f1)
+    rpm -Uvh "http://rpms.famillecollet.com/enterprise/remi-release-${REDHAT_RELEASE}.rpm"
+    yum-config-manager --enable remi-php70
+
+    echo "[remi-php70]" > /etc/yum.repos.d/remi-php70.repo
+    echo "name=Internal Remi PHP 7.0 RPM repo for CentOS 6" >> /etc/yum.repos.d/remi-php70.repo
+    echo "baseurl=https://artifactory.dev.pardot.com/artifactory/el6-remi-php70/" >> /etc/yum.repos.d/remi-php70.repo
+    echo "enabled=1" >> /etc/yum.repos.d/remi-php70.repo
+    echo "gpgcheck=1" >> /etc/yum.repos.d/remi-php70.repo
+    echo "gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-remi" >> /etc/yum.repos.d/remi-php70.repo
+
+    echo "[pardot_stacki]" > /etc/yum.repos.d/pardot_stacki.repo
+    echo "name=Pardot Stacki repo" >> /etc/yum.repos.d/pardot_stacki.repo
+    echo "baseurl=https://artifactory.dev.pardot.com/artifactory/pd-stacki/" >> /etc/yum.repos.d/pardot_stacki.repo
+    echo "enabled=1" >> /etc/yum.repos.d/pardot_stacki.repo
+    echo "gpgcheck=0" >> /etc/yum.repos.d/pardot_stacki.repo
+  SHELL
+end
