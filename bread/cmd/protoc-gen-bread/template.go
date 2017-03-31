@@ -9,15 +9,51 @@ package breadgen
 
 import (
 	"fmt"
+	"errors"
 
 	"github.com/sr/operator"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
+	"git.dev.pardot.com/Pardot/infrastructure/bread/chatbot"
 {{range $k, $v := .Imports}}
 	{{$k}} "{{$v}}"
 {{end}}
 )
+
+func ChatCommandGRPCInvoker(ctx context.Context, conn *grpc.ClientConn, cmd *chatbot.Command) error {
+	if conn == nil {
+		return errors.New("required argument is nil: conn")
+	}
+	if cmd == nil {
+		return errors.New("required argument is nil: cmd")
+	}
+	if cmd.Call == nil {
+		return errors.New("required cmd struct field is nil: Call")
+	}
+{{- range .Services}}
+{{if .Enabled }}
+	{{- $pkg := .Package }}
+	{{- $svc := .Name }}
+	if cmd.Call.Package == "{{$pkg}}" && cmd.Call.Service == "{{$svc}}" {
+	{{- range .Methods }}
+		if cmd.Call.Method == "{{.Name}}" {
+			_, err := {{$pkg}}.New{{$svc}}Client(conn).{{.Name}}(
+				ctx,
+				&{{$pkg}}.{{.Input}}{
+					{{- range .Arguments}}
+					{{inputField .Name}}: cmd.Args["{{.Name}}"],
+					{{- end}}
+				},
+			)
+			return err
+		}
+	{{- end }}
+	}
+{{- end }}
+{{- end }}
+	return fmt.Errorf("unhandleable command: %+v", cmd)
+}
 
 func OperatorInvoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, pkg string) error {
 {{- range .Services}}

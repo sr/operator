@@ -33,6 +33,7 @@ It has these top-level messages:
 	SlowLorisRequest
 	RepositoryConfig
 	RepositoryWatchlist
+	TicketResponse
 	TicketRequest
 */
 package breadpb

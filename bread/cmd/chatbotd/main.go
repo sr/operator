@@ -11,29 +11,31 @@ import (
 	"net/url"
 	"os"
 	"os/signal"
-	"strconv"
 	"strings"
 	"sync"
 	"time"
 
 	heroku "github.com/cyberdelia/heroku-go/v3"
-	"github.com/golang/protobuf/ptypes/empty"
 	operatorhipchat "github.com/sr/operator/hipchat"
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2/clientcredentials"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/metadata"
 
 	"git.dev.pardot.com/Pardot/infrastructure/bread"
+	"git.dev.pardot.com/Pardot/infrastructure/bread/api"
 	"git.dev.pardot.com/Pardot/infrastructure/bread/chatbot"
+	"git.dev.pardot.com/Pardot/infrastructure/bread/generated"
 	"git.dev.pardot.com/Pardot/infrastructure/bread/generated/pb"
 	"git.dev.pardot.com/Pardot/infrastructure/bread/hipchat"
+	"git.dev.pardot.com/Pardot/infrastructure/bread/jira"
 )
 
 const (
 	grpcAddress         = ":8443"
 	grpcDialTimeout     = 10 * time.Second
-	defaultProtoPackage = "bread"
+	defaultProtoPackage = "breadpb"
+	defaultJIRAProject  = "BREAD"
+	defaultJIRAURL      = "https://jira.dev.pardot.com"
 )
 
 var (
@@ -45,6 +47,10 @@ var (
 	herokuAPIPassword  = flag.String("heroku-api-password", "", "")
 	canoeAPIURL        = flag.String("canoe-api-url", "https://canoe.dev.pardot.com", "")
 	canoeAPIKey        = flag.String("canoe-api-key", "", "Canoe API key")
+	jiraURL            = flag.String("jira-url", defaultJIRAURL, "URL of the JIRA installation.")
+	jiraProject        = flag.String("jira-project", defaultJIRAProject, "Key of the project to manage")
+	jiraUsername       = flag.String("jira-username", "", "JIRA username")
+	jiraPassword       = flag.String("jira-password", "", "JIRA password")
 
 	hipchatAddonConfig = &breadhipchat.AddonConfig{}
 	ldapConfig         = &bread.LDAPConfig{}
@@ -129,7 +135,14 @@ func run() error {
 	}
 
 	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(bread.GRPCServerInterceptor(authorizer)))
-	breadpb.RegisterPingerServer(grpcServer, &pingerServer{client})
+	breadpb.RegisterPingerServer(grpcServer, &breadapi.PingerServer{Hipchat: client})
+
+	breadpb.RegisterTicketsServer(grpcServer, &breadapi.TicketsServer{
+		Hipchat: client,
+		Jira:    jira.NewClient(*jiraURL, *jiraUsername, *jiraPassword),
+		Project: *jiraProject,
+	})
+
 	go func() {
 		errC <- grpcServer.Serve(grpcListener)
 	}()
@@ -219,7 +232,7 @@ func run() error {
 		wg.Add(1)
 		go func() {
 			for cmd := range chatCommands {
-				if err := chatbot.HandleCommand(client, Invoker, *timeout, conn, cmd); err != nil {
+				if err := chatbot.HandleCommand(client, breadgen.ChatCommandGRPCInvoker, *timeout, conn, cmd); err != nil {
 					logger.Printf("command handler error: %s", err)
 				}
 			}
@@ -263,63 +276,4 @@ func run() error {
 	case err := <-errC:
 		return err
 	}
-}
-
-// Invoker is a generated function TODO(sr)
-func Invoker(ctx context.Context, conn *grpc.ClientConn, cmd *chatbot.Command) error {
-	if cmd.Call == nil {
-		return errors.New("requirement cmd struct field is nil: Call")
-	}
-	if cmd.Call.Package == "bread" {
-		if cmd.Call.Service == "Pinger" {
-			if cmd.Call.Method == "Ping" {
-				_, err := breadpb.NewPingerClient(conn).Ping(ctx, &empty.Empty{})
-				return err
-			}
-		}
-	}
-	return fmt.Errorf("unhandleable command: %+v", cmd)
-}
-
-// TODO(sr) Move this out of the main.
-type pingerServer struct {
-	hipchat operatorhipchat.Client
-}
-
-func (s *pingerServer) Ping(ctx context.Context, req *empty.Empty) (*empty.Empty, error) {
-	var (
-		email  string
-		roomID int64
-	)
-	// TODO(sr) Abstract this into a chatbot.Reply(context.Context) function or similar
-	if md, ok := metadata.FromContext(ctx); ok {
-		if val, ok := md["user_email"]; ok {
-			if len(val) == 1 {
-				email = val[0]
-			}
-		}
-		if val, ok := md["hipchat_room_id"]; ok {
-			if len(val) == 1 {
-				if i, err := strconv.Atoi(val[0]); err == nil {
-					roomID = int64(i)
-				}
-			}
-		}
-	}
-	if email == "" {
-		return nil, errors.New("no user email found in request")
-	}
-	if roomID == 0 {
-		return nil, errors.New("no hipchat room ID found in request")
-	}
-	return &empty.Empty{},
-		s.hipchat.SendRoomNotification(ctx, &operatorhipchat.RoomNotification{
-			Message:       fmt.Sprintf(`PONG <a href="mailto:%s">%s</a>`, email, email),
-			RoomID:        roomID,
-			MessageFormat: "html",
-			MessageOptions: &operatorhipchat.MessageOptions{
-				Color: "gray",
-				From:  "pinger.Ping",
-			},
-		})
 }
