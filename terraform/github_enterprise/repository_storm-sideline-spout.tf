@@ -1,6 +1,6 @@
 resource "github_repository" "storm-sideline-spout" {
   name          = "storm-sideline-spout"
-  description   = "A Kafka (0.10.0.x) based spout for Apache Storm (1.0.x) that provides the ability to dynamically "sideline" or skip specific messages to be replayed at a later time based on a set of filter criteria."
+  description   = "A Kafka (0.10.0.x) based spout for Apache Storm (1.0.x) that provides the ability to dynamically 'sideline' or skip specific messages to be replayed at a later time based on a set of filter criteria."
   homepage_url  = ""
   private       = false
   has_issues    = false
