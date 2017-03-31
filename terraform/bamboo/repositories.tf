@@ -236,6 +236,14 @@ resource "bamboo_repository" "vagrant-dev" {
   use_submodules = false
 }
 
+resource "bamboo_repository" "storm-sideline-spout" {
+  name           = "storm-sideline-spout"
+  username       = "${var.bamboo_git_username}"
+  password       = "${var.bamboo_git_password}"
+  repository     = "Pardot/storm-sideline-spout"
+  shallow_clones = true
+}
+
 resource "bamboo_repository" "symfony" {
   name           = "symfony"
   username       = "${var.bamboo_git_username}"
