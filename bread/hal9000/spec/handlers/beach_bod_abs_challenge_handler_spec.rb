@@ -2,10 +2,9 @@ require "spec_helper"
 
 describe BeachBodAbsChallengeHandler, lita_handler: true do
   describe "!beach bod time" do
-    it "returns a link to this commit for pardot" do
+    it "returns beach bod command" do
       send_command("beach bod time")
-      expect(check_validity(replies.last)).to be_truthy
-      expect(replies.last.split.last.to_i).to be > 0
+      expect(replies[0]).to match(/.*30 reps. Do it!.*/)
     end
   end
 
