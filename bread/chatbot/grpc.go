@@ -14,7 +14,6 @@ import (
 	"google.golang.org/grpc/metadata"
 
 	"git.dev.pardot.com/Pardot/infrastructure/bread"
-	"git.dev.pardot.com/Pardot/infrastructure/bread/hipchat"
 )
 
 // hipchatRoomIDKey is the grpc metadata.MD key used for injecting the source
@@ -61,9 +60,9 @@ func GRPCMessageHandler(defaultPackage string, c chan<- *Command) MessageHandler
 	}
 }
 
-func HandleCommand(client *breadhipchat.Client, invoker CommandInvoker, timeout time.Duration, conn *grpc.ClientConn, cmd *Command) error {
-	if client == nil {
-		return errors.New("required argument is nil: client")
+func HandleCommand(messenger Messenger, invoker CommandInvoker, timeout time.Duration, conn *grpc.ClientConn, cmd *Command) error {
+	if messenger == nil {
+		return errors.New("required argument is nil: messenger")
 	}
 	if invoker == nil {
 		return errors.New("required argument is nil: invoker")
@@ -103,15 +102,11 @@ func HandleCommand(client *breadhipchat.Client, invoker CommandInvoker, timeout 
 	}
 
 	if err != nil && !strings.Contains(err.Error(), "unhandleable command:") && !strings.Contains(err.Error(), "unknown service") {
-		_ = client.SendRoomNotification(
-			context.TODO(),
-			&breadhipchat.RoomNotification{
-				RoomID:         int64(cmd.RoomID),
-				MessageFormat:  "html",
-				Message:        fmt.Sprintf("Request failed: <code>%s</code>", grpc.ErrorDesc(err)),
-				MessageOptions: &breadhipchat.MessageOptions{Color: "red"},
-			},
-		)
+		_ = messenger(context.TODO(), &Message{
+			Room:  &Room{ID: cmd.RoomID},
+			HTML:  fmt.Sprintf("Request failed: <code>%s</code>", grpc.ErrorDesc(err)),
+			Color: "red",
+		})
 	}
 	return err
 }

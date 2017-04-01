@@ -1,7 +1,6 @@
 package chatbot
 
 import (
-	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -10,6 +9,7 @@ import (
 
 	heroku "github.com/cyberdelia/heroku-go/v3"
 	jose "github.com/square/go-jose"
+	"golang.org/x/net/context"
 	"golang.org/x/oauth2/clientcredentials"
 
 	"git.dev.pardot.com/Pardot/infrastructure/bread/hipchat"
@@ -32,6 +32,32 @@ type item struct {
 type message struct {
 	Message string `json:"message"`
 	From    *User  `json:"from"`
+}
+
+func HipchatMessenger(hipchat *breadhipchat.Client) (Messenger, error) {
+	if hipchat == nil {
+		return nil, errors.New("required argument is nil: hipchat")
+	}
+	return func(ctx context.Context, msg *Message) error {
+		if msg == nil {
+			return errors.New("required argument is nil: msg")
+		}
+		if msg.Room == nil {
+			return errors.New("required msg struct field is nil: Room")
+		}
+		notif := &breadhipchat.RoomNotification{RoomID: int64(msg.Room.ID)}
+		if msg.Color != "" {
+			notif.MessageOptions = &breadhipchat.MessageOptions{Color: msg.Color}
+		}
+		if msg.HTML != "" {
+			notif.MessageFormat = "html"
+			notif.Message = msg.HTML
+		} else {
+			notif.MessageFormat = "text"
+			notif.Message = msg.Text
+		}
+		return hipchat.SendRoomNotification(ctx, notif)
+	}, nil
 }
 
 // HipchatEventHandler is a HTTP handler that verifies the integrity of Hipchat

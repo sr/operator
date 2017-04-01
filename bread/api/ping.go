@@ -8,16 +8,15 @@ import (
 
 	"git.dev.pardot.com/Pardot/infrastructure/bread/chatbot"
 	"git.dev.pardot.com/Pardot/infrastructure/bread/generated/pb"
-	"git.dev.pardot.com/Pardot/infrastructure/bread/hipchat"
 )
 
 type PingerServer struct {
-	Hipchat *breadhipchat.Client
+	chatbot.Messenger
 }
 
 func (s *PingerServer) Ping(ctx context.Context, req *breadpb.PingRequest) (*empty.Empty, error) {
 	email := chatbot.EmailFromContext(ctx)
-	return &empty.Empty{}, chatbot.SendRoomMessage(ctx, s.Hipchat, &chatbot.Message{
+	return &empty.Empty{}, chatbot.SendRoomMessage(ctx, s.Messenger, &chatbot.Message{
 		HTML: fmt.Sprintf(`PONG <a href="mailto:%s">%s</a>`, email, email),
 	})
 }

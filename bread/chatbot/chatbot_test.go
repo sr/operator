@@ -16,7 +16,6 @@ import (
 	"git.dev.pardot.com/Pardot/infrastructure/bread"
 	"git.dev.pardot.com/Pardot/infrastructure/bread/chatbot"
 	"git.dev.pardot.com/Pardot/infrastructure/bread/generated/pb"
-	"git.dev.pardot.com/Pardot/infrastructure/bread/hipchat"
 )
 
 func TestGRPCMessageHandler(t *testing.T) {
@@ -132,19 +131,6 @@ func TestGRPCMessageHandler(t *testing.T) {
 	}
 }
 
-type fakeHipchatClient struct{}
-
-func (c *fakeHipchatClient) GetUser(_ context.Context, id int) (*breadhipchat.User, error) {
-	return &breadhipchat.User{
-		ID:    id,
-		Email: "jane@salesforce.com",
-	}, nil
-}
-
-func (c *fakeHipchatClient) SendRoomNotification(_ context.Context, _ *breadhipchat.RoomNotification) error {
-	return nil
-}
-
 type pingServer struct {
 	lastRoomID string
 }
@@ -196,7 +182,7 @@ func TestHandleChatCommand(t *testing.T) {
 	}
 	defer conn.Close()
 	cmd := &chatbot.Command{Call: &bread.RPC{Package: "bread", Service: "bread", Method: "ping"}, RoomID: 42}
-	if err := chatbot.HandleCommand(&fakeHipchatClient{}, invoker, 1*time.Second, conn, cmd); err != nil {
+	if err := chatbot.HandleCommand(func(context.Context, *chatbot.Message) error { return nil }, invoker, 1*time.Second, conn, cmd); err != nil {
 		t.Fatal(err)
 	}
 	if ping.lastRoomID != "42" {

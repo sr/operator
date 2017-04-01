@@ -9,12 +9,11 @@ import (
 
 	"git.dev.pardot.com/Pardot/infrastructure/bread/chatbot"
 	"git.dev.pardot.com/Pardot/infrastructure/bread/generated/pb"
-	"git.dev.pardot.com/Pardot/infrastructure/bread/hipchat"
 	"git.dev.pardot.com/Pardot/infrastructure/bread/jira"
 )
 
 type TicketsServer struct {
-	Hipchat *breadhipchat.Client
+	chatbot.Messenger
 	Jira    jira.Client
 	Project string
 }
@@ -63,7 +62,7 @@ func (s *TicketsServer) SprintStatus(ctx context.Context, req *breadpb.TicketReq
 			summary,
 		)
 	}
-	return &breadpb.TicketResponse{}, chatbot.SendRoomMessage(ctx, s.Hipchat, &chatbot.Message{
+	return &breadpb.TicketResponse{}, chatbot.SendRoomMessage(ctx, s.Messenger, &chatbot.Message{
 		Text: txt.String(),
 		HTML: html.String(),
 	})
@@ -99,7 +98,7 @@ func (s *TicketsServer) Mine(ctx context.Context, req *breadpb.TicketRequest) (*
 			issue.Fields.Summary,
 		)
 	}
-	return &breadpb.TicketResponse{}, chatbot.SendRoomMessage(ctx, s.Hipchat, &chatbot.Message{
+	return &breadpb.TicketResponse{}, chatbot.SendRoomMessage(ctx, s.Messenger, &chatbot.Message{
 		Text: txt.String(),
 		HTML: html.String(),
 	})

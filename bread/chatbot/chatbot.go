@@ -8,11 +8,13 @@ import (
 	"google.golang.org/grpc/metadata"
 
 	"git.dev.pardot.com/Pardot/infrastructure/bread"
-	"git.dev.pardot.com/Pardot/infrastructure/bread/hipchat"
 )
 
 // A MessageHandler handles chat messages.
 type MessageHandler func(*Message) error
+
+// A Messenger sends messages to a chat room.
+type Messenger func(context.Context, *Message) error
 
 // A Message is a chat message sent by a User to a Room.
 type Message struct {
@@ -46,41 +48,30 @@ func LogHandler(logger bread.Logger) MessageHandler {
 	}
 }
 
-func SendRoomMessage(ctx context.Context, client *breadhipchat.Client, msg *Message) error {
+func SendRoomMessage(ctx context.Context, messenger Messenger, msg *Message) error {
 	if ctx == nil {
 		return errors.New("required argument is nil: ctx")
 	}
-	if client == nil {
-		return errors.New("required argument is nil: client")
+	if messenger == nil {
+		return errors.New("required argument is nil: messenger")
 	}
 	if msg == nil {
 		return errors.New("required argument is nil: msg")
 	}
-	var roomID int64
+	msg.Room = &Room{}
 	if md, ok := metadata.FromContext(ctx); ok {
 		if val, ok := md[hipchatRoomIDKey]; ok {
 			if len(val) == 1 {
 				if i, err := strconv.Atoi(val[0]); err == nil {
-					roomID = int64(i)
+					msg.Room.ID = i
 				}
 			}
 		}
 	}
-	if roomID == 0 {
+	if msg.Room.ID == 0 {
 		return errors.New("no chat room ID found in request")
 	}
-	notif := &breadhipchat.RoomNotification{RoomID: roomID}
-	if msg.Color != "" {
-		notif.MessageOptions = &breadhipchat.MessageOptions{Color: msg.Color}
-	}
-	if msg.HTML != "" {
-		notif.MessageFormat = "html"
-		notif.Message = msg.HTML
-	} else {
-		notif.MessageFormat = "text"
-		notif.Message = msg.Text
-	}
-	return client.SendRoomNotification(ctx, notif)
+	return messenger(ctx, msg)
 }
 
 func EmailFromContext(ctx context.Context) string {

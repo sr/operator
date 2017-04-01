@@ -117,6 +117,10 @@ func run() error {
 	if err != nil {
 		return err
 	}
+	messenger, err := chatbot.HipchatMessenger(hipchat)
+	if err != nil {
+		return err
+	}
 
 	authorizer, err := bread.NewLDAPAuthorizer(
 		ldapConfig,
@@ -134,12 +138,12 @@ func run() error {
 	}
 
 	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(bread.GRPCServerInterceptor(authorizer)))
-	breadpb.RegisterPingerServer(grpcServer, &breadapi.PingerServer{Hipchat: hipchat})
+	breadpb.RegisterPingerServer(grpcServer, &breadapi.PingerServer{Messenger: messenger})
 
 	breadpb.RegisterTicketsServer(grpcServer, &breadapi.TicketsServer{
-		Hipchat: hipchat,
-		Jira:    jira.NewClient(*jiraURL, *jiraUsername, *jiraPassword),
-		Project: *jiraProject,
+		Messenger: messenger,
+		Jira:      jira.NewClient(*jiraURL, *jiraUsername, *jiraPassword),
+		Project:   *jiraProject,
 	})
 
 	go func() {
@@ -231,7 +235,7 @@ func run() error {
 		wg.Add(1)
 		go func() {
 			for cmd := range chatCommands {
-				if err := chatbot.HandleCommand(hipchat, breadgen.ChatCommandGRPCInvoker, *timeout, conn, cmd); err != nil {
+				if err := chatbot.HandleCommand(messenger, breadgen.ChatCommandGRPCInvoker, *timeout, conn, cmd); err != nil {
 					logger.Printf("command handler error: %s", err)
 				}
 			}
