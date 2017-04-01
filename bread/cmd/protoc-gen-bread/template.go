@@ -11,7 +11,6 @@ import (
 	"fmt"
 	"errors"
 
-	"github.com/sr/operator"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
@@ -53,32 +52,5 @@ func ChatCommandGRPCInvoker(ctx context.Context, conn *grpc.ClientConn, cmd *cha
 {{- end }}
 {{- end }}
 	return fmt.Errorf("unhandleable command: %+v", cmd)
-}
-
-func OperatorInvoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, pkg string) error {
-{{- range .Services}}
-{{if .Enabled }}
-	{{- $pkg := .Package }}
-	{{- $svc := .Name }}
-	if req.Call.Service == fmt.Sprintf("%s.{{.Name}}", pkg) {
-	{{- range .Methods }}
-		if req.Call.Method == "{{.Name}}" {
-			client := {{$pkg}}.New{{$svc}}Client(conn)
-			_, err := client.{{.Name}}(
-				ctx,
-				&{{$pkg}}.{{.Input}}{
-					Request: req,
-					{{- range .Arguments}}
-					{{inputField .Name}}: req.Call.Args["{{.Name}}"],
-					{{- end}}
-				},
-			)
-			return err
-		}
-	{{- end }}
-	}
-{{- end }}
-{{- end }}
-	return fmt.Errorf("no such service: `+"`"+"%s %s"+"`"+`", req.Call.Service, req.Call.Method)
 }
 `)
