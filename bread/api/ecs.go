@@ -17,7 +17,6 @@ import (
 	"golang.org/x/net/context/ctxhttp"
 
 	"git.dev.pardot.com/Pardot/infrastructure/bread"
-	"git.dev.pardot.com/Pardot/infrastructure/bread/chatbot"
 )
 
 type ArtifactoryConfig struct {
@@ -100,7 +99,7 @@ func (d *ecsDeployer) ListBuilds(ctx context.Context, t *DeployTarget, branch st
 	return builds, nil
 }
 
-func (d *ecsDeployer) Deploy(ctx context.Context, messenger chatbot.Messenger, req *DeployRequest) (*chatbot.Message, error) {
+func (d *ecsDeployer) Deploy(ctx context.Context, messenger Messenger, req *DeployRequest) (*ChatMessage, error) {
 	if err := bread.AuthenticatePhone(d.canoe, req.UserEmail, fmt.Sprintf("Deploy %s", req.Target.Name)); err != nil {
 		return nil, err
 	}
@@ -181,7 +180,7 @@ func (d *ecsDeployer) Deploy(ctx context.Context, messenger chatbot.Messenger, r
 			d.timeout,
 		)
 	}
-	_ = chatbot.SendRoomMessage(ctx, messenger, &chatbot.Message{
+	_ = SendRoomMessage(ctx, messenger, &ChatMessage{
 		Text:  *newTask.TaskDefinition.TaskDefinitionArn,
 		HTML:  html,
 		Color: "yellow",
@@ -221,7 +220,7 @@ func (d *ecsDeployer) Deploy(ctx context.Context, messenger chatbot.Messenger, r
 	case <-ctx.Done():
 		return nil, fmt.Errorf("Deploy of build %s@%s failed. Service did not rollover within %s", req.Target.Name, req.Build.GetID(), d.timeout)
 	case <-okC:
-		return &chatbot.Message{
+		return &ChatMessage{
 			Text: fmt.Sprintf("Deployed build %s@%s to %s", req.Target.Name, req.Build.GetID(), req.Target.ECSCluster),
 			HTML: fmt.Sprintf(
 				"Deployed build %s to ECS service <code>%s@%s</code>",

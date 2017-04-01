@@ -14,7 +14,6 @@ import (
 	"golang.org/x/net/context/ctxhttp"
 
 	"git.dev.pardot.com/Pardot/infrastructure/bread"
-	"git.dev.pardot.com/Pardot/infrastructure/bread/chatbot"
 	"git.dev.pardot.com/Pardot/infrastructure/bread/generated/swagger/client/canoe"
 	"git.dev.pardot.com/Pardot/infrastructure/bread/generated/swagger/models"
 )
@@ -91,7 +90,7 @@ func (d *canoeDeployer) ListBuilds(ctx context.Context, t *DeployTarget, branch 
 
 const canoeProductionTarget = "production"
 
-func (d *canoeDeployer) Deploy(ctx context.Context, messenger chatbot.Messenger, req *DeployRequest) (*chatbot.Message, error) {
+func (d *canoeDeployer) Deploy(ctx context.Context, messenger Messenger, req *DeployRequest) (*ChatMessage, error) {
 	if req.UserEmail == "" {
 		return nil, errors.New("unable to deploy without a user")
 	}
@@ -110,7 +109,7 @@ func (d *canoeDeployer) Deploy(ctx context.Context, messenger chatbot.Messenger,
 		return nil, errors.New(resp.Payload.Message)
 	}
 	deployURL := fmt.Sprintf("%s/projects/%s/deploys/%d?watching=1", d.canoe.URL, req.Target.Name, resp.Payload.DeployID)
-	return &chatbot.Message{
+	return &ChatMessage{
 		Text: deployURL,
 		HTML: fmt.Sprintf(
 			`Deployment of %s (branch %s) to %s progress. Follow along here: <a href="%s">#%d</a>`,

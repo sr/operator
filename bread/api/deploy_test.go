@@ -11,7 +11,6 @@ import (
 	"google.golang.org/grpc/metadata"
 
 	"git.dev.pardot.com/Pardot/infrastructure/bread/api"
-	"git.dev.pardot.com/Pardot/infrastructure/bread/chatbot"
 	"git.dev.pardot.com/Pardot/infrastructure/bread/generated/pb"
 )
 
@@ -87,8 +86,8 @@ func (d *fakeDeployer) ListBuilds(ctx context.Context, t *breadapi.DeployTarget,
 	return builds, nil
 }
 
-func (d *fakeDeployer) Deploy(ctx context.Context, m chatbot.Messenger, req *breadapi.DeployRequest) (*chatbot.Message, error) {
-	return &chatbot.Message{
+func (d *fakeDeployer) Deploy(ctx context.Context, m breadapi.Messenger, req *breadapi.DeployRequest) (*breadapi.ChatMessage, error) {
+	return &breadapi.ChatMessage{
 		Text: fmt.Sprintf(
 			"deployed target=%s build=%s branch=%s",
 			req.Target.Name,
@@ -99,7 +98,7 @@ func (d *fakeDeployer) Deploy(ctx context.Context, m chatbot.Messenger, req *bre
 }
 
 func TestDeployServer(t *testing.T) {
-	messenger := func(ctx context.Context, msg *chatbot.Message) error {
+	messenger := func(ctx context.Context, msg *breadapi.ChatMessage) error {
 		return nil
 	}
 	deployer := &fakeDeployer{

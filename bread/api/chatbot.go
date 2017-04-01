@@ -1,4 +1,4 @@
-package chatbot
+package breadapi
 
 import (
 	"errors"
@@ -10,14 +10,14 @@ import (
 	"git.dev.pardot.com/Pardot/infrastructure/bread"
 )
 
-// A MessageHandler handles chat messages.
-type MessageHandler func(*Message) error
+// A ChatMessageHandler handles chat messages.
+type ChatMessageHandler func(*ChatMessage) error
 
 // A Messenger sends messages to a chat room.
-type Messenger func(context.Context, *Message) error
+type Messenger func(context.Context, *ChatMessage) error
 
-// A Message is a chat message sent by a User to a Room.
-type Message struct {
+// A ChatMessage is a chat message sent by a User to a Room.
+type ChatMessage struct {
 	Text  string
 	HTML  string
 	Color string
@@ -41,14 +41,14 @@ type User struct {
 }
 
 // LogHandler is a dummy MessageHandler that logs all messages.
-func LogHandler(logger bread.Logger) MessageHandler {
-	return func(msg *Message) error {
+func LogHandler(logger bread.Logger) ChatMessageHandler {
+	return func(msg *ChatMessage) error {
 		logger.Printf("received message: %s", msg.Text)
 		return nil
 	}
 }
 
-func SendRoomMessage(ctx context.Context, messenger Messenger, msg *Message) error {
+func SendRoomMessage(ctx context.Context, messenger Messenger, msg *ChatMessage) error {
 	if ctx == nil {
 		return errors.New("required argument is nil: ctx")
 	}
@@ -74,7 +74,7 @@ func SendRoomMessage(ctx context.Context, messenger Messenger, msg *Message) err
 	return messenger(ctx, msg)
 }
 
-func EmailFromContext(ctx context.Context) string {
+func emailFromContext(ctx context.Context) string {
 	if ctx == nil {
 		return ""
 	}

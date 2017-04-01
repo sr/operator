@@ -11,7 +11,6 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"golang.org/x/net/context"
 
-	"git.dev.pardot.com/Pardot/infrastructure/bread/chatbot"
 	"git.dev.pardot.com/Pardot/infrastructure/bread/generated/pb"
 )
 
@@ -77,7 +76,7 @@ var ECSDeployTargets = []*DeployTarget{
 type Deployer interface {
 	ListTargets(context.Context) ([]*DeployTarget, error)
 	ListBuilds(context.Context, *DeployTarget, string) ([]Build, error)
-	Deploy(context.Context, chatbot.Messenger, *DeployRequest) (*chatbot.Message, error)
+	Deploy(context.Context, Messenger, *DeployRequest) (*ChatMessage, error)
 }
 
 // A DeployTarget is a running service that can be deployed.
@@ -118,7 +117,7 @@ type CanoeConfig struct {
 }
 
 type deployAPIServer struct {
-	chatbot.Messenger
+	Messenger
 	ecs   Deployer
 	canoe Deployer
 	tz    *time.Location
@@ -127,7 +126,7 @@ type deployAPIServer struct {
 // NewDeployServer returns a gRPC server that implements the bread.Deploy protobuf
 // server interface and supports deploying to both Amazon EC2 Container Service (ECS)
 // and Canoe.
-func NewDeployServer(messenger chatbot.Messenger, ecs Deployer, canoe Deployer, tz *time.Location) (breadpb.DeployServer, error) {
+func NewDeployServer(messenger Messenger, ecs Deployer, canoe Deployer, tz *time.Location) (breadpb.DeployServer, error) {
 	if messenger == nil {
 		return nil, errors.New("required argument is nil: messenger")
 	}
@@ -150,7 +149,7 @@ func (s *deployAPIServer) ListTargets(ctx context.Context, req *breadpb.ListTarg
 		names[i] = t.Name
 	}
 	sort.Strings(names)
-	return &breadpb.ListTargetsResponse{}, chatbot.SendRoomMessage(ctx, s.Messenger, &chatbot.Message{
+	return &breadpb.ListTargetsResponse{}, SendRoomMessage(ctx, s.Messenger, &ChatMessage{
 		HTML: "Deployment targets: " + strings.Join(names, ", "),
 		Text: strings.Join(names, " "),
 	})
@@ -204,7 +203,7 @@ func (s *deployAPIServer) ListBuilds(ctx context.Context, req *breadpb.ListBuild
 		i++
 	}
 	return &breadpb.ListBuildsResponse{},
-		chatbot.SendRoomMessage(ctx, s.Messenger, &chatbot.Message{Text: txt.String(), HTML: html.String()})
+		SendRoomMessage(ctx, s.Messenger, &ChatMessage{Text: txt.String(), HTML: html.String()})
 }
 
 var eggs = map[string]string{
@@ -216,7 +215,7 @@ var eggs = map[string]string{
 func (s *deployAPIServer) Trigger(ctx context.Context, req *breadpb.TriggerRequest) (*breadpb.TriggerResponse, error) {
 	if v, ok := eggs[req.Target]; ok {
 		return &breadpb.TriggerResponse{},
-			chatbot.SendRoomMessage(ctx, s.Messenger, &chatbot.Message{
+			SendRoomMessage(ctx, s.Messenger, &ChatMessage{
 				Text:  v,
 				Color: "green",
 			})
@@ -229,7 +228,7 @@ func (s *deployAPIServer) Trigger(ctx context.Context, req *breadpb.TriggerReque
 	}
 	var (
 		target *DeployTarget
-		msg    *chatbot.Message
+		msg    *ChatMessage
 	)
 	targets := s.listTargets(ctx)
 	for _, t := range targets {
@@ -270,7 +269,7 @@ func (s *deployAPIServer) Trigger(ctx context.Context, req *breadpb.TriggerReque
 	deploy := &DeployRequest{
 		Target:    target,
 		Build:     build,
-		UserEmail: chatbot.EmailFromContext(ctx),
+		UserEmail: emailFromContext(ctx),
 	}
 	if target.Canoe {
 		msg, err = s.canoe.Deploy(ctx, s.Messenger, deploy)
@@ -280,7 +279,7 @@ func (s *deployAPIServer) Trigger(ctx context.Context, req *breadpb.TriggerReque
 	if err != nil {
 		return nil, err
 	}
-	return &breadpb.TriggerResponse{Message: msg.Text}, chatbot.SendRoomMessage(ctx, s.Messenger, msg)
+	return &breadpb.TriggerResponse{Message: msg.Text}, SendRoomMessage(ctx, s.Messenger, msg)
 }
 
 var ecsRunning = aws.String("RUNNING")
@@ -290,7 +289,7 @@ func (s *deployAPIServer) listTargets(ctx context.Context) (targets []*DeployTar
 	if t, err := s.canoe.ListTargets(ctx); err == nil {
 		targets = append(targets, t...)
 	} else {
-		_ = chatbot.SendRoomMessage(ctx, s.Messenger, &chatbot.Message{
+		_ = SendRoomMessage(ctx, s.Messenger, &ChatMessage{
 			Text:  fmt.Sprintf("Could not get list of projects from Canoe: %v", err),
 			HTML:  fmt.Sprintf("Could not get list of projects from Canoe: <code>%v</code>", err),
 			Color: "red",

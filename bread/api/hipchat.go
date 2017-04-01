@@ -1,4 +1,4 @@
-package chatbot
+package breadapi
 
 import (
 	"encoding/json"
@@ -25,20 +25,20 @@ type messagePayload struct {
 }
 
 type item struct {
-	Message *message `json:"message"`
-	Room    *Room    `json:"room"`
+	ChatMessage *message `json:"message"`
+	Room        *Room    `json:"room"`
 }
 
 type message struct {
-	Message string `json:"message"`
-	From    *User  `json:"from"`
+	ChatMessage string `json:"message"`
+	From        *User  `json:"from"`
 }
 
 func HipchatMessenger(hipchat *breadhipchat.Client) (Messenger, error) {
 	if hipchat == nil {
 		return nil, errors.New("required argument is nil: hipchat")
 	}
-	return func(ctx context.Context, msg *Message) error {
+	return func(ctx context.Context, msg *ChatMessage) error {
 		if msg == nil {
 			return errors.New("required argument is nil: msg")
 		}
@@ -62,7 +62,7 @@ func HipchatMessenger(hipchat *breadhipchat.Client) (Messenger, error) {
 
 // HipchatEventHandler is a HTTP handler that verifies the integrity of Hipchat
 // webhook requests and calls MessageHandler with every message received.
-func HipchatEventHandler(hipchat *breadhipchat.Client, creds *clientcredentials.Config, handler MessageHandler) (http.HandlerFunc, error) {
+func HipchatEventHandler(hipchat *breadhipchat.Client, creds *clientcredentials.Config, handler ChatMessageHandler) (http.HandlerFunc, error) {
 	if creds == nil {
 		return nil, errors.New("required argument is nil: creds")
 	}
@@ -94,20 +94,20 @@ func HipchatEventHandler(hipchat *breadhipchat.Client, creds *clientcredentials.
 		// Normally we should **only** receive event_message payloads but
 		// check anyway in case the integration setup is weird.
 		if payload.Event == eventRoomMessage {
-			if payload.Item == nil || payload.Item.Message == nil ||
-				payload.Item.Message.From == nil || payload.Item.Message.From.ID == 0 {
+			if payload.Item == nil || payload.Item.ChatMessage == nil ||
+				payload.Item.ChatMessage.From == nil || payload.Item.ChatMessage.From.ID == 0 {
 				http.Error(w, "payload does not have a user", http.StatusBadRequest)
 				return
 			}
-			msg := &Message{
-				Text: payload.Item.Message.Message,
+			msg := &ChatMessage{
+				Text: payload.Item.ChatMessage.ChatMessage,
 				Room: payload.Item.Room,
-				User: payload.Item.Message.From,
+				User: payload.Item.ChatMessage.From,
 			}
 			// Unfortunately the payload normally does not include the sender's email
 			// address so we have to get using the API.
-			if payload.Item.Message.From.Email == "" && hipchat != nil {
-				user, err := hipchat.GetUser(context.Background(), payload.Item.Message.From.ID)
+			if payload.Item.ChatMessage.From.Email == "" && hipchat != nil {
+				user, err := hipchat.GetUser(context.Background(), payload.Item.ChatMessage.From.ID)
 				if err != nil {
 					http.Error(w, fmt.Sprintf("error fetching user: %s", err), http.StatusBadRequest)
 					return
@@ -147,7 +147,7 @@ func verifySignature(jwtToken string, clientID string, secretKey string) error {
 	return nil
 }
 
-type AddonConfig struct {
+type HipchatAddonConfig struct {
 	Name        string
 	Key         string
 	Homepage    string
@@ -201,7 +201,7 @@ type consumerAvatar struct {
 }
 
 // HipchatAddonHandler is a HTTP handler that implements the Hipchat addon installation flow.
-func HipchatAddonHandler(heroku *heroku.Service, config *AddonConfig) (http.HandlerFunc, error) {
+func HipchatAddonHandler(heroku *heroku.Service, config *HipchatAddonConfig) (http.HandlerFunc, error) {
 	if heroku == nil {
 		return nil, errors.New("required argument is nil: heroku")
 	}

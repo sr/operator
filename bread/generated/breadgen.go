@@ -9,12 +9,11 @@ import (
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
-	"git.dev.pardot.com/Pardot/infrastructure/bread/chatbot"
-
+	"git.dev.pardot.com/Pardot/infrastructure/bread/api"
 	breadpb "git.dev.pardot.com/Pardot/infrastructure/bread/generated/pb"
 )
 
-func ChatCommandGRPCInvoker(ctx context.Context, conn *grpc.ClientConn, cmd *chatbot.Command) error {
+func ChatCommandGRPCInvoker(ctx context.Context, conn *grpc.ClientConn, cmd *breadapi.ChatCommand) error {
 	if conn == nil {
 		return errors.New("required argument is nil: conn")
 	}

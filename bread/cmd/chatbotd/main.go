@@ -26,7 +26,6 @@ import (
 
 	"git.dev.pardot.com/Pardot/infrastructure/bread"
 	"git.dev.pardot.com/Pardot/infrastructure/bread/api"
-	"git.dev.pardot.com/Pardot/infrastructure/bread/chatbot"
 	"git.dev.pardot.com/Pardot/infrastructure/bread/generated"
 	"git.dev.pardot.com/Pardot/infrastructure/bread/generated/pb"
 	"git.dev.pardot.com/Pardot/infrastructure/bread/hipchat"
@@ -64,7 +63,7 @@ var (
 
 	afy                = &breadapi.ArtifactoryConfig{}
 	canoe              = &breadapi.CanoeConfig{}
-	hipchatAddonConfig = &chatbot.AddonConfig{}
+	hipchatAddonConfig = &breadapi.HipchatAddonConfig{}
 	ldapConfig         = &bread.LDAPConfig{}
 )
 
@@ -161,7 +160,7 @@ func run() error {
 		return err
 	}
 
-	messenger, err := chatbot.HipchatMessenger(hipchat)
+	messenger, err := breadapi.HipchatMessenger(hipchat)
 	if err != nil {
 		return err
 	}
@@ -238,12 +237,12 @@ func run() error {
 	}
 
 	// Channel used to by the event HTTP server to send chat commands to the workers.
-	chatCommands := make(chan *chatbot.Command, 100)
+	chatCommands := make(chan *breadapi.ChatCommand, 100)
 
 	// All chat messages are processed through these functions
-	messageHandlers := []chatbot.MessageHandler{
-		chatbot.LogHandler(logger),
-		chatbot.GRPCMessageHandler(defaultProtoPackage, chatCommands),
+	messageHandlers := []breadapi.ChatMessageHandler{
+		breadapi.LogHandler(logger),
+		breadapi.GRPCMessageHandler(defaultProtoPackage, chatCommands),
 	}
 
 	mux := http.NewServeMux()
@@ -259,7 +258,7 @@ func run() error {
 			return fmt.Errorf("required flag missing: heroku-api-password")
 		}
 
-		handler, err := chatbot.HipchatAddonHandler(
+		handler, err := breadapi.HipchatAddonHandler(
 			heroku.NewService(&http.Client{
 				Transport: &heroku.Transport{
 					Username: *herokuAPIUsername,
@@ -278,7 +277,7 @@ func run() error {
 			return err
 		}
 
-		handler, err := chatbot.HipchatEventHandler(
+		handler, err := breadapi.HipchatEventHandler(
 			hipchat,
 			&clientcredentials.Config{
 				ClientID:     *hipchatOAuthID,
@@ -286,7 +285,7 @@ func run() error {
 				TokenURL:     fmt.Sprintf("%s/v2/oauth/token", bread.HipchatHost),
 				Scopes:       breadhipchat.DefaultScopes,
 			},
-			func(msg *chatbot.Message) error {
+			func(msg *breadapi.ChatMessage) error {
 				var fail bool
 				for _, handler := range messageHandlers {
 					if err := handler(msg); err != nil {
@@ -312,7 +311,7 @@ func run() error {
 		wg.Add(1)
 		go func() {
 			for cmd := range chatCommands {
-				if err := chatbot.HandleCommand(messenger, breadgen.ChatCommandGRPCInvoker, *timeout, conn, cmd); err != nil {
+				if err := breadapi.HandleChatCommand(messenger, breadgen.ChatCommandGRPCInvoker, *timeout, conn, cmd); err != nil {
 					logger.Printf("command handler error: %s", err)
 				}
 			}

@@ -10,12 +10,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/sr/operator"
 	"golang.org/x/oauth2/clientcredentials"
 	"google.golang.org/grpc"
 
 	"git.dev.pardot.com/Pardot/infrastructure/bread"
-	"git.dev.pardot.com/Pardot/infrastructure/bread/chatbot"
+	"git.dev.pardot.com/Pardot/infrastructure/bread/api"
 	"git.dev.pardot.com/Pardot/infrastructure/bread/generated/pb/hal9000"
 	"git.dev.pardot.com/Pardot/infrastructure/bread/hipchat"
 )
@@ -29,7 +28,7 @@ var (
 	hipchatOAuthSecret = flag.String("hipchat-oauth-secret", "", "")
 )
 
-func run(invoker operator.InvokerFunc) error {
+func run() error {
 	flags := flag.CommandLine
 	// Allow setting flags via environment variables
 	flags.VisitAll(func(f *flag.Flag) {
@@ -79,7 +78,7 @@ func run(invoker operator.InvokerFunc) error {
 	}
 
 	robot := hal9000.NewRobotClient(conn)
-	handler, err := chatbot.HipchatEventHandler(
+	handler, err := breadapi.HipchatEventHandler(
 		hipchat,
 		&clientcredentials.Config{
 			ClientID:     *hipchatOAuthID,
@@ -87,7 +86,7 @@ func run(invoker operator.InvokerFunc) error {
 			TokenURL:     fmt.Sprintf("%s/v2/oauth/token", bread.HipchatHost),
 			Scopes:       breadhipchat.DefaultScopes,
 		},
-		chatbot.HAL9000Handler(logger, robot),
+		hal9000MessageHandler(logger, robot),
 	)
 	if err != nil {
 		return err
@@ -101,7 +100,7 @@ func run(invoker operator.InvokerFunc) error {
 }
 
 func main() {
-	if err := run(nil); err != nil {
+	if err := run(); err != nil {
 		fmt.Fprintf(os.Stderr, "operatord: %s\n", err)
 		os.Exit(1)
 	}

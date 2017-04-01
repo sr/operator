@@ -1,4 +1,4 @@
-package chatbot_test
+package breadapi_test
 
 import (
 	"fmt"
@@ -11,14 +11,14 @@ import (
 	jose "github.com/square/go-jose"
 	"golang.org/x/oauth2/clientcredentials"
 
-	"git.dev.pardot.com/Pardot/infrastructure/bread/chatbot"
+	"git.dev.pardot.com/Pardot/infrastructure/bread/api"
 )
 
 type testMessageHandler struct {
 	lastMessage string
 }
 
-func (h *testMessageHandler) Handle(msg *chatbot.Message) error {
+func (h *testMessageHandler) Handle(msg *breadapi.ChatMessage) error {
 	h.lastMessage = msg.Text
 	return nil
 }
@@ -39,7 +39,7 @@ func TestHipchatEventHandler(t *testing.T) {
 	t.Run("successful request", func(t *testing.T) {
 		creds := &clientcredentials.Config{ClientID: "client ID", ClientSecret: "client secret"}
 		handler := &testMessageHandler{}
-		eventHandler, err := chatbot.HipchatEventHandler(nil, creds, handler.Handle)
+		eventHandler, err := breadapi.HipchatEventHandler(nil, creds, handler.Handle)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -80,7 +80,7 @@ func TestHipchatEventHandler(t *testing.T) {
 	t.Run("invalid JWT signature", func(t *testing.T) {
 		creds := &clientcredentials.Config{ClientID: "client ID", ClientSecret: "client secret"}
 		handler := &testMessageHandler{}
-		eventHandler, err := chatbot.HipchatEventHandler(nil, creds, handler.Handle)
+		eventHandler, err := breadapi.HipchatEventHandler(nil, creds, handler.Handle)
 		if err != nil {
 			t.Fatal(err)
 		}
