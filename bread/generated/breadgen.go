@@ -56,25 +56,6 @@ func ChatCommandGRPCInvoker(ctx context.Context, conn *grpc.ClientConn, cmd *cha
 		}
 	}
 
-	if cmd.Call.Package == "breadpb" && cmd.Call.Service == "Ping" {
-		if cmd.Call.Method == "Ping" {
-			_, err := breadpb.NewPingClient(conn).Ping(
-				ctx,
-				&breadpb.PingRequest{},
-			)
-			return err
-		}
-		if cmd.Call.Method == "SlowLoris" {
-			_, err := breadpb.NewPingClient(conn).SlowLoris(
-				ctx,
-				&breadpb.SlowLorisRequest{
-					Wait: cmd.Args["wait"],
-				},
-			)
-			return err
-		}
-	}
-
 	if cmd.Call.Package == "breadpb" && cmd.Call.Service == "Pinger" {
 		if cmd.Call.Method == "Ping" {
 			_, err := breadpb.NewPingerClient(conn).Ping(

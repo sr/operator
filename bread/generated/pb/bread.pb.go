@@ -33,7 +33,6 @@ It has these top-level messages:
 	TriggerRequest
 	TriggerResponse
 	PingRequest
-	SlowLorisRequest
 	RepositoryConfig
 	RepositoryWatchlist
 	TicketResponse

@@ -202,7 +202,6 @@ func run(invoker operator.InvokerFunc) error {
 	if err != nil {
 		return fmt.Errorf("bread.NewDeployServer: %s", err)
 	}
-	breadpb.RegisterPingServer(grpcServer, bread.NewPingServer(sender))
 	breadpb.RegisterDeployServer(grpcServer, deployServer)
 
 	errC := make(chan error)

@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/sr/operator"
+	"github.com/golang/protobuf/ptypes/empty"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
@@ -135,24 +135,20 @@ type pingServer struct {
 	lastRoomID string
 }
 
-func (s *pingServer) Ping(ctx context.Context, req *breadpb.PingRequest) (*operator.Response, error) {
+func (s *pingServer) Ping(ctx context.Context, req *breadpb.PingRequest) (*empty.Empty, error) {
 	if md, ok := metadata.FromContext(ctx); ok {
 		if _, ok := md["chat_room_id"]; ok {
 			s.lastRoomID = md["chat_room_id"][0]
 		}
 	}
-	return &operator.Response{}, nil
-}
-
-func (s *pingServer) SlowLoris(ctx context.Context, req *breadpb.SlowLorisRequest) (*operator.Response, error) {
-	panic("not implemented")
+	return &empty.Empty{}, nil
 }
 
 var invoker chatbot.CommandInvoker = func(ctx context.Context, conn *grpc.ClientConn, cmd *chatbot.Command) error {
 	if cmd.Call.Package == "bread" {
 		if cmd.Call.Service == "bread" {
 			if cmd.Call.Method == "ping" {
-				client := breadpb.NewPingClient(conn)
+				client := breadpb.NewPingerClient(conn)
 				_, err := client.Ping(ctx, &breadpb.PingRequest{})
 				return err
 			}
@@ -165,7 +161,7 @@ func TestHandleChatCommand(t *testing.T) {
 	server := grpc.NewServer()
 	defer server.GracefulStop()
 	ping := &pingServer{}
-	breadpb.RegisterPingServer(server, ping)
+	breadpb.RegisterPingerServer(server, ping)
 	listener, err := net.Listen("tcp", "localhost:0")
 	if err != nil {
 		t.Fatalf("failed to listen: %v", err)
