@@ -15,6 +15,10 @@ import (
 	"sync"
 	"time"
 
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/ecs"
 	heroku "github.com/cyberdelia/heroku-go/v3"
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2/clientcredentials"
@@ -42,6 +46,11 @@ var (
 	timeout  = flag.Duration("command-timeout", 10*time.Minute, "")
 	timezone = flag.String("timezone", "America/New_York", "Display dates and times in this timezone")
 
+	ecsRegion          = flag.String("deploy-ecs-aws-region", "us-east-1", "AWS Region")
+	ecsAccessKeyID     = flag.String("deploy-ecs-aws-access-key-id", "", "")
+	ecsAccessKeySecret = flag.String("deploy-ecs-aws-access-key-secret", "", "")
+	ecsDeployTimeout   = flag.Duration("deploy-ecs-deploy-timeout", 5*time.Minute, "Time to wait for new ECS task definitions to come up")
+
 	hipchatOAuthID     = flag.String("hipchat-oauth-id", "", "")
 	hipchatOAuthSecret = flag.String("hipchat-oauth-secret", "", "")
 
@@ -55,7 +64,6 @@ var (
 
 	afy                = &breadapi.ArtifactoryConfig{}
 	canoe              = &breadapi.CanoeConfig{}
-	ecs                = &breadapi.ECSConfig{}
 	hipchatAddonConfig = &chatbot.AddonConfig{}
 	ldapConfig         = &bread.LDAPConfig{}
 )
@@ -66,8 +74,6 @@ func init() {
 	flag.StringVar(&afy.Repo, "deploy-artifactory-repo", "pd-docker", "Name of the Artifactory repository where deployable artifacts are stored")
 	flag.StringVar(&canoe.URL, "deploy-canoe-url", "https://canoe.dev.pardot.com", "")
 	flag.StringVar(&canoe.APIKey, "deploy-canoe-api-key", "", "Canoe API key")
-	flag.StringVar(&ecs.AWSRegion, "deploy-ecs-aws-region", "us-east-1", "AWS Region")
-	flag.DurationVar(&ecs.Timeout, "deploy-ecs-deploy-timeout", 5*time.Minute, "Time to wait for new ECS task definitions to come up")
 
 	flag.StringVar(&hipchatAddonConfig.Name, "hipchat-addon-name", "", "")
 	flag.StringVar(&hipchatAddonConfig.Key, "hipchat-addon-key", "", "")
@@ -167,7 +173,24 @@ func run() error {
 	})
 
 	canoeAPI := bread.NewCanoeClient(parsedCanoeAPIURL, canoe.APIKey)
-	ecsDeployer, err := breadapi.NewECSDeployer(ecs, afy, breadapi.ECSDeployTargets, canoeAPI)
+	ecsDeployer, err := breadapi.NewECSDeployer(
+		ecs.New(
+			session.New(
+				&aws.Config{
+					Region: ecsRegion,
+					Credentials: credentials.NewStaticCredentials(
+						*ecsAccessKeyID,
+						*ecsAccessKeySecret,
+						"",
+					),
+				},
+			),
+		),
+		afy,
+		breadapi.ECSDeployTargets,
+		canoeAPI,
+		*ecsDeployTimeout,
+	)
 	if err != nil {
 		return err
 	}

@@ -12,7 +12,6 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ecs"
 	"golang.org/x/net/context"
 	"golang.org/x/net/context/ctxhttp"
@@ -20,11 +19,6 @@ import (
 	"git.dev.pardot.com/Pardot/infrastructure/bread"
 	"git.dev.pardot.com/Pardot/infrastructure/bread/chatbot"
 )
-
-type ECSConfig struct {
-	AWSRegion string
-	Timeout   time.Duration
-}
 
 type ArtifactoryConfig struct {
 	URL    string
@@ -54,9 +48,9 @@ type property struct {
 }
 
 // NewECSDeployer returns a Deployer that deploys to Amazon EC2 Container Service.
-func NewECSDeployer(config *ECSConfig, afy *ArtifactoryConfig, targets []*DeployTarget, canoeAPI bread.CanoeClient) (Deployer, error) {
-	if config == nil {
-		return nil, errors.New("required argument is nil: config")
+func NewECSDeployer(ecs *ecs.ECS, afy *ArtifactoryConfig, targets []*DeployTarget, canoeAPI bread.CanoeClient, timeout time.Duration) (Deployer, error) {
+	if ecs == nil {
+		return nil, errors.New("required argument is nil: ecs")
 	}
 	if afy == nil {
 		return nil, errors.New("required argument is nil: afy")
@@ -68,15 +62,9 @@ func NewECSDeployer(config *ECSConfig, afy *ArtifactoryConfig, targets []*Deploy
 		return nil, errors.New("required argument is nil: canoeAPI")
 	}
 	return &ecsDeployer{
-		ecs.New(
-			session.New(
-				&aws.Config{
-					Region: aws.String(config.AWSRegion),
-				},
-			),
-		),
+		ecs,
 		afy,
-		config.Timeout,
+		timeout,
 		targets,
 		canoeAPI,
 	}, nil
