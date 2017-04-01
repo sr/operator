@@ -69,6 +69,7 @@ var (
 )
 
 func init() {
+	flag.StringVar(&afy.URL, "deploy-artifactory-url", "https://artifactory.dev.pardot.com/artifactory", "Artifactory URL")
 	flag.StringVar(&afy.User, "deploy-artifactory-user", "", "Artifactory username")
 	flag.StringVar(&afy.APIKey, "deploy-artifactory-api-key", "", "Artifactory API key")
 	flag.StringVar(&afy.Repo, "deploy-artifactory-repo", "pd-docker", "Name of the Artifactory repository where deployable artifacts are stored")
@@ -114,8 +115,26 @@ func run() error {
 	if err != nil {
 		return fmt.Errorf("required flag deploy-canoe-url is invalid: %s", err)
 	}
+	if afy.URL == "" {
+		return errors.New("required flag missing: deploy-artifactory-url")
+	}
+	if afy.User == "" {
+		return errors.New("required flag missing: deploy-artifactory-user")
+	}
+	if afy.APIKey == "" {
+		return errors.New("required flag missing: deploy-artifactory-api-key")
+	}
 	if canoe.APIKey == "" {
 		return errors.New("required flag missing: deploy-canoe-api-key")
+	}
+	if *ecsRegion == "" {
+		return errors.New("required flag missing: deploy-ecs-aws-region")
+	}
+	if *ecsAccessKeyID == "" {
+		return errors.New("required flag missing: deploy-ecs-access-key-id")
+	}
+	if *ecsAccessKeySecret == "" {
+		return errors.New("required flag missing: deploy-ecs-access-key-secret")
 	}
 	if v, ok := os.LookupEnv("LDAP_CA_CERT"); ok {
 		ldapConfig.CACert = []byte(v)
