@@ -1,4 +1,4 @@
-package bread_test
+package breadapi_test
 
 import (
 	"errors"
@@ -7,10 +7,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/sr/operator"
 	"golang.org/x/net/context"
+	"google.golang.org/grpc/metadata"
 
-	"git.dev.pardot.com/Pardot/infrastructure/bread"
+	"git.dev.pardot.com/Pardot/infrastructure/bread/api"
+	"git.dev.pardot.com/Pardot/infrastructure/bread/chatbot"
 	"git.dev.pardot.com/Pardot/infrastructure/bread/generated/pb"
 )
 
@@ -59,23 +60,17 @@ func (b *fakeBuild) GetCreated() time.Time {
 	return b.Created
 }
 
-type fakeSender struct{}
-
-func (c *fakeSender) Send(_ context.Context, _ *operator.Source, _ string, _ *operator.Message) error {
-	return nil
-}
-
 type fakeDeployer struct {
-	builds  []bread.Build
-	targets []*bread.DeployTarget
+	builds  []breadapi.Build
+	targets []*breadapi.DeployTarget
 }
 
-func (d *fakeDeployer) ListTargets(context.Context) ([]*bread.DeployTarget, error) {
+func (d *fakeDeployer) ListTargets(context.Context) ([]*breadapi.DeployTarget, error) {
 	return d.targets, nil
 }
 
-func (d *fakeDeployer) ListBuilds(ctx context.Context, t *bread.DeployTarget, branch string) ([]bread.Build, error) {
-	var builds []bread.Build
+func (d *fakeDeployer) ListBuilds(ctx context.Context, t *breadapi.DeployTarget, branch string) ([]breadapi.Build, error) {
+	var builds []breadapi.Build
 	if branch == "" {
 		for _, b := range d.builds {
 			if b.GetRepoURL() == "" || b.GetRepoURL() == t.Name {
@@ -92,8 +87,8 @@ func (d *fakeDeployer) ListBuilds(ctx context.Context, t *bread.DeployTarget, br
 	return builds, nil
 }
 
-func (d *fakeDeployer) Deploy(ctx context.Context, s *operator.RequestSender, req *bread.DeployRequest) (*operator.Message, error) {
-	return &operator.Message{
+func (d *fakeDeployer) Deploy(ctx context.Context, m chatbot.Messenger, req *breadapi.DeployRequest) (*chatbot.Message, error) {
+	return &chatbot.Message{
 		Text: fmt.Sprintf(
 			"deployed target=%s build=%s branch=%s",
 			req.Target.Name,
@@ -104,9 +99,11 @@ func (d *fakeDeployer) Deploy(ctx context.Context, s *operator.RequestSender, re
 }
 
 func TestDeployServer(t *testing.T) {
-	sender := &fakeSender{}
+	messenger := func(ctx context.Context, msg *chatbot.Message) error {
+		return nil
+	}
 	deployer := &fakeDeployer{
-		targets: []*bread.DeployTarget{
+		targets: []*breadapi.DeployTarget{
 			{
 				Name: "pardot",
 			},
@@ -114,7 +111,7 @@ func TestDeployServer(t *testing.T) {
 				Name: "hal9000",
 			},
 		},
-		builds: []bread.Build{
+		builds: []breadapi.Build{
 			&fakeBuild{
 				ID:      "1",
 				Branch:  "master",
@@ -134,7 +131,7 @@ func TestDeployServer(t *testing.T) {
 			},
 		},
 	}
-	server, err := bread.NewDeployServer(sender, deployer, deployer, nil)
+	server, err := breadapi.NewDeployServer(messenger, deployer, deployer, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -155,15 +152,21 @@ func TestDeployServer(t *testing.T) {
 		{"pardot", "", "not-found", "", errors.New("No build found for branch not-found")},
 	} {
 		t.Run(fmt.Sprintf("%s_%s_%s", tc.target, tc.build, tc.branch), func(t *testing.T) {
-			resp, err := server.Trigger(context.Background(), &breadpb.TriggerRequest{
-				Request: &operator.Request{Source: &operator.Source{}},
-				Target:  tc.target,
-				Build:   tc.build,
-				Branch:  tc.branch,
-			})
+
+			resp, err := server.Trigger(
+				metadata.NewContext(
+					context.Background(),
+					metadata.MD{"chat_room_id": []string{"1"}},
+				),
+				&breadpb.TriggerRequest{
+					Target: tc.target,
+					Build:  tc.build,
+					Branch: tc.branch,
+				},
+			)
 			if tc.err == nil {
 				if err != nil {
-					t.Errorf("expected no error bit got %s", err)
+					t.Errorf("expected no error but got %s", err)
 				} else if !strings.Contains(resp.Message, tc.resp) {
 					t.Errorf("expected response message `%s` but got %s", tc.resp, resp.Message)
 				}

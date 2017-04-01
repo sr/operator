@@ -60,7 +60,7 @@ func SendRoomMessage(ctx context.Context, messenger Messenger, msg *Message) err
 	}
 	msg.Room = &Room{}
 	if md, ok := metadata.FromContext(ctx); ok {
-		if val, ok := md[hipchatRoomIDKey]; ok {
+		if val, ok := md[chatRoomIDKey]; ok {
 			if len(val) == 1 {
 				if i, err := strconv.Atoi(val[0]); err == nil {
 					msg.Room.ID = i

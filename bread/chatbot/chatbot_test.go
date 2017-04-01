@@ -137,8 +137,8 @@ type pingServer struct {
 
 func (s *pingServer) Ping(ctx context.Context, req *breadpb.PingRequest) (*operator.Response, error) {
 	if md, ok := metadata.FromContext(ctx); ok {
-		if _, ok := md["hipchat_room_id"]; ok {
-			s.lastRoomID = md["hipchat_room_id"][0]
+		if _, ok := md["chat_room_id"]; ok {
+			s.lastRoomID = md["chat_room_id"][0]
 		}
 	}
 	return &operator.Response{}, nil

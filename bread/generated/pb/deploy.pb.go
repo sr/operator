@@ -7,7 +7,7 @@ package breadpb
 import proto "github.com/golang/protobuf/proto"
 import fmt "fmt"
 import math "math"
-import operator "github.com/sr/operator"
+import _ "github.com/sr/operator"
 
 import (
 	context "golang.org/x/net/context"
@@ -20,7 +20,6 @@ var _ = fmt.Errorf
 var _ = math.Inf
 
 type ListTargetsRequest struct {
-	Request *operator.Request `protobuf:"bytes,1,opt,name=request" json:"request,omitempty"`
 }
 
 func (m *ListTargetsRequest) Reset()                    { *m = ListTargetsRequest{} }
@@ -28,30 +27,23 @@ func (m *ListTargetsRequest) String() string            { return proto.CompactTe
 func (*ListTargetsRequest) ProtoMessage()               {}
 func (*ListTargetsRequest) Descriptor() ([]byte, []int) { return fileDescriptor2, []int{0} }
 
-func (m *ListTargetsRequest) GetRequest() *operator.Request {
-	if m != nil {
-		return m.Request
-	}
-	return nil
+type ListTargetsResponse struct {
 }
 
+func (m *ListTargetsResponse) Reset()                    { *m = ListTargetsResponse{} }
+func (m *ListTargetsResponse) String() string            { return proto.CompactTextString(m) }
+func (*ListTargetsResponse) ProtoMessage()               {}
+func (*ListTargetsResponse) Descriptor() ([]byte, []int) { return fileDescriptor2, []int{1} }
+
 type ListBuildsRequest struct {
-	Request *operator.Request `protobuf:"bytes,1,opt,name=request" json:"request,omitempty"`
-	Target  string            `protobuf:"bytes,2,opt,name=target" json:"target,omitempty"`
-	Branch  string            `protobuf:"bytes,3,opt,name=branch" json:"branch,omitempty"`
+	Target string `protobuf:"bytes,1,opt,name=target" json:"target,omitempty"`
+	Branch string `protobuf:"bytes,2,opt,name=branch" json:"branch,omitempty"`
 }
 
 func (m *ListBuildsRequest) Reset()                    { *m = ListBuildsRequest{} }
 func (m *ListBuildsRequest) String() string            { return proto.CompactTextString(m) }
 func (*ListBuildsRequest) ProtoMessage()               {}
-func (*ListBuildsRequest) Descriptor() ([]byte, []int) { return fileDescriptor2, []int{1} }
-
-func (m *ListBuildsRequest) GetRequest() *operator.Request {
-	if m != nil {
-		return m.Request
-	}
-	return nil
-}
+func (*ListBuildsRequest) Descriptor() ([]byte, []int) { return fileDescriptor2, []int{2} }
 
 func (m *ListBuildsRequest) GetTarget() string {
 	if m != nil {
@@ -67,24 +59,24 @@ func (m *ListBuildsRequest) GetBranch() string {
 	return ""
 }
 
+type ListBuildsResponse struct {
+}
+
+func (m *ListBuildsResponse) Reset()                    { *m = ListBuildsResponse{} }
+func (m *ListBuildsResponse) String() string            { return proto.CompactTextString(m) }
+func (*ListBuildsResponse) ProtoMessage()               {}
+func (*ListBuildsResponse) Descriptor() ([]byte, []int) { return fileDescriptor2, []int{3} }
+
 type TriggerRequest struct {
-	Request *operator.Request `protobuf:"bytes,1,opt,name=request" json:"request,omitempty"`
-	Target  string            `protobuf:"bytes,2,opt,name=target" json:"target,omitempty"`
-	Build   string            `protobuf:"bytes,3,opt,name=build" json:"build,omitempty"`
-	Branch  string            `protobuf:"bytes,4,opt,name=branch" json:"branch,omitempty"`
+	Target string `protobuf:"bytes,1,opt,name=target" json:"target,omitempty"`
+	Build  string `protobuf:"bytes,2,opt,name=build" json:"build,omitempty"`
+	Branch string `protobuf:"bytes,3,opt,name=branch" json:"branch,omitempty"`
 }
 
 func (m *TriggerRequest) Reset()                    { *m = TriggerRequest{} }
 func (m *TriggerRequest) String() string            { return proto.CompactTextString(m) }
 func (*TriggerRequest) ProtoMessage()               {}
-func (*TriggerRequest) Descriptor() ([]byte, []int) { return fileDescriptor2, []int{2} }
-
-func (m *TriggerRequest) GetRequest() *operator.Request {
-	if m != nil {
-		return m.Request
-	}
-	return nil
-}
+func (*TriggerRequest) Descriptor() ([]byte, []int) { return fileDescriptor2, []int{4} }
 
 func (m *TriggerRequest) GetTarget() string {
 	if m != nil {
@@ -107,10 +99,29 @@ func (m *TriggerRequest) GetBranch() string {
 	return ""
 }
 
+type TriggerResponse struct {
+	Message string `protobuf:"bytes,1,opt,name=message" json:"message,omitempty"`
+}
+
+func (m *TriggerResponse) Reset()                    { *m = TriggerResponse{} }
+func (m *TriggerResponse) String() string            { return proto.CompactTextString(m) }
+func (*TriggerResponse) ProtoMessage()               {}
+func (*TriggerResponse) Descriptor() ([]byte, []int) { return fileDescriptor2, []int{5} }
+
+func (m *TriggerResponse) GetMessage() string {
+	if m != nil {
+		return m.Message
+	}
+	return ""
+}
+
 func init() {
 	proto.RegisterType((*ListTargetsRequest)(nil), "bread.ListTargetsRequest")
+	proto.RegisterType((*ListTargetsResponse)(nil), "bread.ListTargetsResponse")
 	proto.RegisterType((*ListBuildsRequest)(nil), "bread.ListBuildsRequest")
+	proto.RegisterType((*ListBuildsResponse)(nil), "bread.ListBuildsResponse")
 	proto.RegisterType((*TriggerRequest)(nil), "bread.TriggerRequest")
+	proto.RegisterType((*TriggerResponse)(nil), "bread.TriggerResponse")
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -125,11 +136,11 @@ const _ = grpc.SupportPackageIsVersion4
 
 type DeployClient interface {
 	// List what can be deployed
-	ListTargets(ctx context.Context, in *ListTargetsRequest, opts ...grpc.CallOption) (*operator.Response, error)
+	ListTargets(ctx context.Context, in *ListTargetsRequest, opts ...grpc.CallOption) (*ListTargetsResponse, error)
 	// List the ten most recent builds for a given target
-	ListBuilds(ctx context.Context, in *ListBuildsRequest, opts ...grpc.CallOption) (*operator.Response, error)
+	ListBuilds(ctx context.Context, in *ListBuildsRequest, opts ...grpc.CallOption) (*ListBuildsResponse, error)
 	// Trigger a deploy of a build to given target
-	Trigger(ctx context.Context, in *TriggerRequest, opts ...grpc.CallOption) (*operator.Response, error)
+	Trigger(ctx context.Context, in *TriggerRequest, opts ...grpc.CallOption) (*TriggerResponse, error)
 }
 
 type deployClient struct {
@@ -140,8 +151,8 @@ func NewDeployClient(cc *grpc.ClientConn) DeployClient {
 	return &deployClient{cc}
 }
 
-func (c *deployClient) ListTargets(ctx context.Context, in *ListTargetsRequest, opts ...grpc.CallOption) (*operator.Response, error) {
-	out := new(operator.Response)
+func (c *deployClient) ListTargets(ctx context.Context, in *ListTargetsRequest, opts ...grpc.CallOption) (*ListTargetsResponse, error) {
+	out := new(ListTargetsResponse)
 	err := grpc.Invoke(ctx, "/bread.Deploy/ListTargets", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
@@ -149,8 +160,8 @@ func (c *deployClient) ListTargets(ctx context.Context, in *ListTargetsRequest, 
 	return out, nil
 }
 
-func (c *deployClient) ListBuilds(ctx context.Context, in *ListBuildsRequest, opts ...grpc.CallOption) (*operator.Response, error) {
-	out := new(operator.Response)
+func (c *deployClient) ListBuilds(ctx context.Context, in *ListBuildsRequest, opts ...grpc.CallOption) (*ListBuildsResponse, error) {
+	out := new(ListBuildsResponse)
 	err := grpc.Invoke(ctx, "/bread.Deploy/ListBuilds", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
@@ -158,8 +169,8 @@ func (c *deployClient) ListBuilds(ctx context.Context, in *ListBuildsRequest, op
 	return out, nil
 }
 
-func (c *deployClient) Trigger(ctx context.Context, in *TriggerRequest, opts ...grpc.CallOption) (*operator.Response, error) {
-	out := new(operator.Response)
+func (c *deployClient) Trigger(ctx context.Context, in *TriggerRequest, opts ...grpc.CallOption) (*TriggerResponse, error) {
+	out := new(TriggerResponse)
 	err := grpc.Invoke(ctx, "/bread.Deploy/Trigger", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
@@ -171,11 +182,11 @@ func (c *deployClient) Trigger(ctx context.Context, in *TriggerRequest, opts ...
 
 type DeployServer interface {
 	// List what can be deployed
-	ListTargets(context.Context, *ListTargetsRequest) (*operator.Response, error)
+	ListTargets(context.Context, *ListTargetsRequest) (*ListTargetsResponse, error)
 	// List the ten most recent builds for a given target
-	ListBuilds(context.Context, *ListBuildsRequest) (*operator.Response, error)
+	ListBuilds(context.Context, *ListBuildsRequest) (*ListBuildsResponse, error)
 	// Trigger a deploy of a build to given target
-	Trigger(context.Context, *TriggerRequest) (*operator.Response, error)
+	Trigger(context.Context, *TriggerRequest) (*TriggerResponse, error)
 }
 
 func RegisterDeployServer(s *grpc.Server, srv DeployServer) {
@@ -260,23 +271,23 @@ var _Deploy_serviceDesc = grpc.ServiceDesc{
 func init() { proto.RegisterFile("deploy.proto", fileDescriptor2) }
 
 var fileDescriptor2 = []byte{
-	// 273 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xe2, 0x49, 0x49, 0x2d, 0xc8,
-	0xc9, 0xaf, 0xd4, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0x62, 0x4d, 0x2a, 0x4a, 0x4d, 0x4c, 0x91,
-	0x52, 0x4d, 0xcf, 0x2c, 0xc9, 0x28, 0x4d, 0xd2, 0x4b, 0xce, 0xcf, 0xd5, 0x2f, 0x2e, 0xd2, 0xcf,
-	0x2f, 0x48, 0x2d, 0x4a, 0x2c, 0xc9, 0x47, 0x30, 0x20, 0xaa, 0x95, 0x1c, 0xb9, 0x84, 0x7c, 0x32,
-	0x8b, 0x4b, 0x42, 0x12, 0x8b, 0xd2, 0x53, 0x4b, 0x8a, 0x83, 0x52, 0x0b, 0x4b, 0x53, 0x8b, 0x4b,
-	0x84, 0xb4, 0xb9, 0xd8, 0x8b, 0x20, 0x4c, 0x09, 0x46, 0x05, 0x46, 0x0d, 0x6e, 0x23, 0x41, 0x3d,
-	0xb8, 0x3e, 0xa8, 0x9a, 0x20, 0x98, 0x0a, 0xa5, 0x02, 0x2e, 0x41, 0x90, 0x11, 0x4e, 0xa5, 0x99,
-	0x39, 0x29, 0x64, 0x99, 0x20, 0x24, 0xc6, 0xc5, 0x56, 0x02, 0x76, 0x80, 0x04, 0x93, 0x02, 0xa3,
-	0x06, 0x67, 0x10, 0x94, 0x07, 0x12, 0x4f, 0x2a, 0x4a, 0xcc, 0x4b, 0xce, 0x90, 0x60, 0x86, 0x88,
-	0x43, 0x78, 0x4a, 0xcd, 0x8c, 0x5c, 0x7c, 0x21, 0x45, 0x99, 0xe9, 0xe9, 0xa9, 0x45, 0x54, 0xb5,
-	0x4f, 0x84, 0x8b, 0x35, 0x09, 0xe4, 0x0b, 0xa8, 0x75, 0x10, 0x0e, 0x92, 0x2b, 0x58, 0x90, 0x5d,
-	0x61, 0xb4, 0x8f, 0x91, 0x8b, 0xcd, 0x05, 0x1c, 0xf2, 0x42, 0x36, 0x5c, 0xdc, 0x48, 0xa1, 0x28,
-	0x24, 0xa9, 0x07, 0x8e, 0x03, 0x3d, 0xcc, 0x90, 0x95, 0x12, 0x42, 0x76, 0x56, 0x71, 0x41, 0x7e,
-	0x5e, 0x71, 0xaa, 0x90, 0x15, 0x17, 0x17, 0x22, 0x00, 0x85, 0x24, 0x90, 0x34, 0xa3, 0x84, 0x29,
-	0x56, 0xbd, 0x26, 0x5c, 0xec, 0xd0, 0x90, 0x10, 0x12, 0x85, 0x6a, 0x44, 0x0d, 0x19, 0x6c, 0xba,
-	0xa4, 0x58, 0x66, 0x34, 0x49, 0x32, 0x3a, 0x71, 0x46, 0xb1, 0x83, 0x75, 0x14, 0x24, 0x25, 0xb1,
-	0x81, 0x53, 0x83, 0x31, 0x20, 0x00, 0x00, 0xff, 0xff, 0x63, 0xeb, 0x76, 0x3b, 0x4b, 0x02, 0x00,
-	0x00,
+	// 287 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x84, 0x51, 0x41, 0x4b, 0x33, 0x31,
+	0x14, 0x64, 0xbf, 0xcf, 0xee, 0xd2, 0xa7, 0x28, 0xc6, 0xb6, 0xec, 0xe6, 0x24, 0x0b, 0x82, 0x20,
+	0x6c, 0x41, 0x2f, 0x5e, 0xad, 0x3d, 0x7a, 0x2a, 0xc5, 0x83, 0xb7, 0xa4, 0xfb, 0x48, 0x17, 0xda,
+	0x26, 0x26, 0xd9, 0x83, 0x57, 0x7f, 0x85, 0x7f, 0xcb, 0x7f, 0x24, 0x9b, 0x64, 0xed, 0xae, 0x16,
+	0xbc, 0x65, 0xe6, 0xcd, 0x9b, 0xe1, 0x4d, 0xe0, 0xa4, 0x44, 0xb5, 0x91, 0x6f, 0x85, 0xd2, 0xd2,
+	0x4a, 0x32, 0xe0, 0x1a, 0x59, 0x49, 0xaf, 0x44, 0x65, 0xd7, 0x35, 0x2f, 0x56, 0x72, 0x3b, 0x35,
+	0x7a, 0x2a, 0x15, 0x6a, 0x66, 0xe5, 0xfe, 0xe1, 0xd5, 0xf9, 0x08, 0xc8, 0x53, 0x65, 0xec, 0x92,
+	0x69, 0x81, 0xd6, 0x2c, 0xf0, 0xb5, 0x46, 0x63, 0xf3, 0x31, 0x5c, 0xf4, 0x58, 0xa3, 0xe4, 0xce,
+	0x60, 0xfe, 0x08, 0xe7, 0x0d, 0x3d, 0xab, 0xab, 0x4d, 0xd9, 0x6a, 0xc9, 0x04, 0x62, 0xeb, 0x74,
+	0x69, 0x74, 0x19, 0x5d, 0x0f, 0x17, 0x01, 0x35, 0x3c, 0xd7, 0x6c, 0xb7, 0x5a, 0xa7, 0xff, 0x3c,
+	0xef, 0x51, 0x9b, 0xd8, 0x9a, 0x04, 0xeb, 0x67, 0x38, 0x5d, 0xea, 0x4a, 0x08, 0xd4, 0x7f, 0xf9,
+	0x8e, 0x60, 0xc0, 0x9b, 0xdd, 0x60, 0xeb, 0x41, 0x27, 0xed, 0x7f, 0x2f, 0xed, 0x06, 0xce, 0xbe,
+	0x7d, 0x7d, 0x14, 0x49, 0x21, 0xd9, 0xa2, 0x31, 0x4c, 0x60, 0x70, 0x6e, 0xe1, 0xed, 0x67, 0x04,
+	0xf1, 0xdc, 0x75, 0x49, 0xe6, 0x70, 0xdc, 0x69, 0x80, 0x64, 0x85, 0x6b, 0xb5, 0xf8, 0xdd, 0x15,
+	0xa5, 0x87, 0x46, 0x21, 0xea, 0x01, 0x60, 0x7f, 0x2b, 0x49, 0x3b, 0xca, 0x5e, 0x87, 0x34, 0x3b,
+	0x30, 0x09, 0x16, 0xf7, 0x90, 0x84, 0x03, 0xc8, 0x38, 0xa8, 0xfa, 0x45, 0xd1, 0xc9, 0x4f, 0xda,
+	0x6f, 0xd2, 0xa3, 0x8f, 0xf7, 0x2c, 0x9a, 0x0d, 0x5f, 0x12, 0x37, 0x56, 0x9c, 0xc7, 0xee, 0xcb,
+	0xef, 0xbe, 0x02, 0x00, 0x00, 0xff, 0xff, 0x21, 0xe9, 0xad, 0x29, 0x30, 0x02, 0x00, 0x00,
 }

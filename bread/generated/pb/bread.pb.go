@@ -27,8 +27,11 @@ It has these top-level messages:
 	PhoneAuthenticationRequest
 	PhoneAuthenticationResponse
 	ListTargetsRequest
+	ListTargetsResponse
 	ListBuildsRequest
+	ListBuildsResponse
 	TriggerRequest
+	TriggerResponse
 	PingRequest
 	SlowLorisRequest
 	RepositoryConfig

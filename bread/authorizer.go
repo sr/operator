@@ -117,7 +117,7 @@ func (a *ldapAuthorizer) Authorize(ctx context.Context, req *RPC, email string) 
 		return fmt.Errorf("service `%s %s` requires to be a member of LDAP group `%s`", req.Service, req.Method, entry.Group)
 	}
 	if !entry.PhoneAuthOptional {
-		if err := authenticatePhone(a.canoe, email, "Chat command"); err != nil {
+		if err := AuthenticatePhone(a.canoe, email, "Chat command"); err != nil {
 			return err
 		}
 	}
@@ -180,7 +180,7 @@ func (a *ldapAuthorizer) getLDAPUserGroups(email string) ([]string, error) {
 	return groups, nil
 }
 
-func authenticatePhone(canoeAPI CanoeClient, email, action string) error {
+func AuthenticatePhone(canoeAPI CanoeClient, email, action string) error {
 	resp, err := canoeAPI.PhoneAuthentication(
 		canoe.NewPhoneAuthenticationParams().
 			WithTimeout(CanoeTimeout).

@@ -16,10 +16,10 @@ import (
 	"git.dev.pardot.com/Pardot/infrastructure/bread"
 )
 
-// hipchatRoomIDKey is the grpc metadata.MD key used for injecting the source
+// chatRoomIDKey is the grpc metadata.MD key used for injecting the source
 // of chat commands into gRPC requests so that the server can send notifications
 // to the right place.
-const hipchatRoomIDKey = "hipchat_room_id"
+const chatRoomIDKey = "chat_room_id"
 
 // commandMatcher is used to find commands in chat messages, e.g. !deploy trigger target=events
 var commandMatcher = regexp.MustCompile(`\A!(?P<service>[\w|-]+)\s+(?P<method>[\w|\-]+)(?:\s+(?P<options>.*))?\z`)
@@ -116,7 +116,7 @@ func newMetadata(cmd *Command) metadata.MD {
 	return metadata.Pairs(
 		bread.UserEmailKey,
 		cmd.UserEmail,
-		hipchatRoomIDKey,
+		chatRoomIDKey,
 		strconv.Itoa(cmd.RoomID),
 	)
 }
