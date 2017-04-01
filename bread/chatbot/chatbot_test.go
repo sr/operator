@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/sr/operator"
-	operatorhipchat "github.com/sr/operator/hipchat"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
@@ -17,6 +16,7 @@ import (
 	"git.dev.pardot.com/Pardot/infrastructure/bread"
 	"git.dev.pardot.com/Pardot/infrastructure/bread/chatbot"
 	"git.dev.pardot.com/Pardot/infrastructure/bread/generated/pb"
+	"git.dev.pardot.com/Pardot/infrastructure/bread/hipchat"
 )
 
 func TestGRPCMessageHandler(t *testing.T) {
@@ -134,14 +134,14 @@ func TestGRPCMessageHandler(t *testing.T) {
 
 type fakeHipchatClient struct{}
 
-func (c *fakeHipchatClient) GetUser(_ context.Context, id int) (*operatorhipchat.User, error) {
-	return &operatorhipchat.User{
+func (c *fakeHipchatClient) GetUser(_ context.Context, id int) (*breadhipchat.User, error) {
+	return &breadhipchat.User{
 		ID:    id,
 		Email: "jane@salesforce.com",
 	}, nil
 }
 
-func (c *fakeHipchatClient) SendRoomNotification(_ context.Context, _ *operatorhipchat.RoomNotification) error {
+func (c *fakeHipchatClient) SendRoomNotification(_ context.Context, _ *breadhipchat.RoomNotification) error {
 	return nil
 }
 

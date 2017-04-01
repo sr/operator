@@ -4,11 +4,11 @@ import (
 	"errors"
 	"strconv"
 
-	operatorhipchat "github.com/sr/operator/hipchat"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc/metadata"
 
 	"git.dev.pardot.com/Pardot/infrastructure/bread"
+	"git.dev.pardot.com/Pardot/infrastructure/bread/hipchat"
 )
 
 // A MessageHandler handles chat messages.
@@ -46,7 +46,7 @@ func LogHandler(logger bread.Logger) MessageHandler {
 	}
 }
 
-func SendRoomMessage(ctx context.Context, client operatorhipchat.Client, msg *Message) error {
+func SendRoomMessage(ctx context.Context, client *breadhipchat.Client, msg *Message) error {
 	if ctx == nil {
 		return errors.New("required argument is nil: ctx")
 	}
@@ -69,9 +69,9 @@ func SendRoomMessage(ctx context.Context, client operatorhipchat.Client, msg *Me
 	if roomID == 0 {
 		return errors.New("no chat room ID found in request")
 	}
-	notif := &operatorhipchat.RoomNotification{RoomID: roomID}
+	notif := &breadhipchat.RoomNotification{RoomID: roomID}
 	if msg.Color != "" {
-		notif.MessageOptions = &operatorhipchat.MessageOptions{Color: msg.Color}
+		notif.MessageOptions = &breadhipchat.MessageOptions{Color: msg.Color}
 	}
 	if msg.HTML != "" {
 		notif.MessageFormat = "html"

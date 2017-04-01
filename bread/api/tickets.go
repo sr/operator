@@ -5,16 +5,16 @@ import (
 	"errors"
 	"fmt"
 
-	"git.dev.pardot.com/Pardot/infrastructure/bread/chatbot"
-	"git.dev.pardot.com/Pardot/infrastructure/bread/jira"
-	operatorhipchat "github.com/sr/operator/hipchat"
 	"golang.org/x/net/context"
 
+	"git.dev.pardot.com/Pardot/infrastructure/bread/chatbot"
 	"git.dev.pardot.com/Pardot/infrastructure/bread/generated/pb"
+	"git.dev.pardot.com/Pardot/infrastructure/bread/hipchat"
+	"git.dev.pardot.com/Pardot/infrastructure/bread/jira"
 )
 
 type TicketsServer struct {
-	Hipchat operatorhipchat.Client
+	Hipchat *breadhipchat.Client
 	Jira    jira.Client
 	Project string
 }

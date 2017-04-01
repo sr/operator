@@ -16,7 +16,6 @@ import (
 	"time"
 
 	heroku "github.com/cyberdelia/heroku-go/v3"
-	operatorhipchat "github.com/sr/operator/hipchat"
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2/clientcredentials"
 	"google.golang.org/grpc"
@@ -52,7 +51,7 @@ var (
 	jiraUsername       = flag.String("jira-username", "", "JIRA username")
 	jiraPassword       = flag.String("jira-password", "", "JIRA password")
 
-	hipchatAddonConfig = &breadhipchat.AddonConfig{}
+	hipchatAddonConfig = &chatbot.AddonConfig{}
 	ldapConfig         = &bread.LDAPConfig{}
 )
 
@@ -104,12 +103,12 @@ func run() error {
 
 	logger := log.New(os.Stderr, "chatbotd: ", 0)
 
-	client, err := operatorhipchat.NewClient(
+	hipchat, err := breadhipchat.NewClient(
 		context.TODO(),
-		&operatorhipchat.ClientConfig{
+		&breadhipchat.ClientConfig{
 			Hostname: bread.HipchatHost,
 			Scopes:   breadhipchat.DefaultScopes,
-			Credentials: &operatorhipchat.ClientCredentials{
+			Credentials: &breadhipchat.ClientCredentials{
 				ID:     *hipchatOAuthID,
 				Secret: *hipchatOAuthSecret,
 			},
@@ -135,10 +134,10 @@ func run() error {
 	}
 
 	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(bread.GRPCServerInterceptor(authorizer)))
-	breadpb.RegisterPingerServer(grpcServer, &breadapi.PingerServer{Hipchat: client})
+	breadpb.RegisterPingerServer(grpcServer, &breadapi.PingerServer{Hipchat: hipchat})
 
 	breadpb.RegisterTicketsServer(grpcServer, &breadapi.TicketsServer{
-		Hipchat: client,
+		Hipchat: hipchat,
 		Jira:    jira.NewClient(*jiraURL, *jiraUsername, *jiraPassword),
 		Project: *jiraProject,
 	})
@@ -179,7 +178,7 @@ func run() error {
 			return fmt.Errorf("required flag missing: heroku-api-password")
 		}
 
-		handler, err := breadhipchat.AddonHandler(
+		handler, err := chatbot.HipchatAddonHandler(
 			heroku.NewService(&http.Client{
 				Transport: &heroku.Transport{
 					Username: *herokuAPIUsername,
@@ -198,8 +197,8 @@ func run() error {
 			return err
 		}
 
-		handler, err := breadhipchat.EventHandler(
-			client,
+		handler, err := chatbot.HipchatEventHandler(
+			hipchat,
 			&clientcredentials.Config{
 				ClientID:     *hipchatOAuthID,
 				ClientSecret: *hipchatOAuthSecret,
@@ -232,7 +231,7 @@ func run() error {
 		wg.Add(1)
 		go func() {
 			for cmd := range chatCommands {
-				if err := chatbot.HandleCommand(client, breadgen.ChatCommandGRPCInvoker, *timeout, conn, cmd); err != nil {
+				if err := chatbot.HandleCommand(hipchat, breadgen.ChatCommandGRPCInvoker, *timeout, conn, cmd); err != nil {
 					logger.Printf("command handler error: %s", err)
 				}
 			}
