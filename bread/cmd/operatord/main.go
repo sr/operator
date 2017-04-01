@@ -21,8 +21,7 @@ import (
 	"google.golang.org/grpc"
 
 	"git.dev.pardot.com/Pardot/infrastructure/bread"
-	"git.dev.pardot.com/Pardot/infrastructure/bread/generated"
-	"git.dev.pardot.com/Pardot/infrastructure/bread/generated/pb"
+	"git.dev.pardot.com/Pardot/infrastructure/bread/api"
 	"git.dev.pardot.com/Pardot/infrastructure/bread/generated/pb/hal9000"
 )
 
@@ -31,9 +30,7 @@ const (
 )
 
 type config struct {
-	afy   *bread.ArtifactoryConfig
-	canoe *bread.CanoeConfig
-	ecs   *bread.ECSConfig
+	canoe *breadapi.CanoeConfig
 
 	dev             bool
 	devRoomID       int
@@ -43,7 +40,6 @@ type config struct {
 	halAddr  string
 	httpAddr string
 	timeout  time.Duration
-	timezone string
 
 	ldap *bread.LDAPConfig
 
@@ -57,9 +53,7 @@ type config struct {
 
 func run(invoker operator.InvokerFunc) error {
 	config := &config{
-		afy:   &bread.ArtifactoryConfig{},
-		canoe: &bread.CanoeConfig{},
-		ecs:   &bread.ECSConfig{},
+		canoe: &breadapi.CanoeConfig{},
 		ldap:  &bread.LDAPConfig{},
 	}
 	flags := flag.CommandLine
@@ -67,7 +61,6 @@ func run(invoker operator.InvokerFunc) error {
 	flags.StringVar(&config.halAddr, "addr-hal9000", "", "Address of the HAL9000 gRPC server")
 	flags.StringVar(&config.httpAddr, "addr-http", ":8080", "Listen address of the HipChat addon and webhook HTTP server")
 	flags.DurationVar(&config.timeout, "timeout", 10*time.Minute, "Timeout for gRPC requests")
-	flags.StringVar(&config.timezone, "timezone", "America/New_York", "Display dates and times in this timezone")
 	flags.BoolVar(&config.dev, "dev", false, "Enable development mode")
 	flags.IntVar(&config.devRoomID, "dev-room-id", bread.TestingRoom, "Room ID where to send messages")
 	flags.StringVar(&config.devHipchatToken, "dev-hipchat-token", "", "HipChat user token")
@@ -78,14 +71,8 @@ func run(invoker operator.InvokerFunc) error {
 	flags.StringVar(&config.hipchatNamespace, "hipchat-namespace", "com.pardot.dev.operator", "Namespace used for all installations created via this server")
 	flags.StringVar(&config.hipchatAddonURL, "hipchat-addon-url", "https://operator.dev.pardot.com/hipchat/addon", "HipChat addon installation endpoint URL")
 	flags.StringVar(&config.hipchatWebhookURL, "hipchat-webhook-url", "https://operator.dev.pardot.com/hipchat/webhook", "HipChat webhook endpoint URL")
-	flags.StringVar(&config.afy.URL, "artifactory-url", "https://artifactory.dev.pardot.com/artifactory", "Artifactory URL")
-	flags.StringVar(&config.afy.User, "artifactory-user", "", "Artifactory username")
-	flags.StringVar(&config.afy.APIKey, "artifactory-api-key", "", "Artifactory API key")
-	flags.StringVar(&config.afy.Repo, "artifactory-repo", "pd-docker", "Name of the Artifactory repository where deployable artifacts are stored")
 	flags.StringVar(&config.canoe.URL, "canoe-url", "https://canoe.dev.pardot.com", "")
 	flags.StringVar(&config.canoe.APIKey, "canoe-api-key", "", "Canoe API key")
-	flags.StringVar(&config.ecs.AWSRegion, "ecs-aws-region", "us-east-1", "AWS Region")
-	flags.DurationVar(&config.ecs.Timeout, "ecs-deploy-timeout", 5*time.Minute, "Time to wait for new ECS task definitions to come up")
 	// Allow setting flags via environment variables
 	flags.VisitAll(func(f *flag.Flag) {
 		k := strings.ToUpper(strings.Replace(f.Name, "-", "_", -1))
@@ -183,26 +170,9 @@ func run(invoker operator.InvokerFunc) error {
 			return err
 		}
 	}
-	tz, err := time.LoadLocation(config.timezone)
-	if err != nil {
-		return err
-	}
 
 	var grpcServer *grpc.Server
 	grpcServer = grpc.NewServer(grpc.UnaryInterceptor(bread.NewUnaryServerInterceptor(logger, &jsonpb.Marshaler{}, auth)))
-	ecsDeployer, err := bread.NewECSDeployer(config.ecs, config.afy, bread.ECSDeployTargets, canoeAPI)
-	if err != nil {
-		return fmt.Errorf("bread.NewECSDeployer: %s", err)
-	}
-	canoeDeployer, err := bread.NewCanoeDeployer(canoeAPI, config.canoe)
-	if err != nil {
-		return fmt.Errorf("bread.NewCanoeDeployer: %s", err)
-	}
-	deployServer, err := bread.NewDeployServer(sender, ecsDeployer, canoeDeployer, tz)
-	if err != nil {
-		return fmt.Errorf("bread.NewDeployServer: %s", err)
-	}
-	breadpb.RegisterDeployServer(grpcServer, deployServer)
 
 	errC := make(chan error)
 	grpcList, err := net.Listen("tcp", config.grpcAddr)
@@ -292,7 +262,7 @@ func run(invoker operator.InvokerFunc) error {
 }
 
 func main() {
-	if err := run(breadgen.OperatorInvoker); err != nil {
+	if err := run(nil); err != nil {
 		fmt.Fprintf(os.Stderr, "operatord: %s\n", err)
 		os.Exit(1)
 	}
