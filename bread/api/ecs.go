@@ -1,4 +1,4 @@
-package bread
+package breadapi
 
 import (
 	"encoding/json"
@@ -12,18 +12,12 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ecs"
-	"github.com/sr/operator"
-	"github.com/sr/operator/hipchat"
 	"golang.org/x/net/context"
 	"golang.org/x/net/context/ctxhttp"
-)
 
-type ECSConfig struct {
-	AWSRegion string
-	Timeout   time.Duration
-}
+	"git.dev.pardot.com/Pardot/infrastructure/bread"
+)
 
 type ArtifactoryConfig struct {
 	URL    string
@@ -37,7 +31,7 @@ type ecsDeployer struct {
 	afy     *ArtifactoryConfig
 	timeout time.Duration
 	targets []*DeployTarget
-	canoe   CanoeClient
+	canoe   bread.CanoeClient
 }
 
 type afyItem struct {
@@ -53,9 +47,9 @@ type property struct {
 }
 
 // NewECSDeployer returns a Deployer that deploys to Amazon EC2 Container Service.
-func NewECSDeployer(config *ECSConfig, afy *ArtifactoryConfig, targets []*DeployTarget, canoeAPI CanoeClient) (Deployer, error) {
-	if config == nil {
-		return nil, errors.New("required argument is nil: config")
+func NewECSDeployer(ecs *ecs.ECS, afy *ArtifactoryConfig, targets []*DeployTarget, canoeAPI bread.CanoeClient, timeout time.Duration) (Deployer, error) {
+	if ecs == nil {
+		return nil, errors.New("required argument is nil: ecs")
 	}
 	if afy == nil {
 		return nil, errors.New("required argument is nil: afy")
@@ -67,15 +61,9 @@ func NewECSDeployer(config *ECSConfig, afy *ArtifactoryConfig, targets []*Deploy
 		return nil, errors.New("required argument is nil: canoeAPI")
 	}
 	return &ecsDeployer{
-		ecs.New(
-			session.New(
-				&aws.Config{
-					Region: aws.String(config.AWSRegion),
-				},
-			),
-		),
+		ecs,
 		afy,
-		config.Timeout,
+		timeout,
 		targets,
 		canoeAPI,
 	}, nil
@@ -111,8 +99,8 @@ func (d *ecsDeployer) ListBuilds(ctx context.Context, t *DeployTarget, branch st
 	return builds, nil
 }
 
-func (d *ecsDeployer) Deploy(ctx context.Context, sender *operator.RequestSender, req *DeployRequest) (*operator.Message, error) {
-	if err := authenticatePhone(d.canoe, req.UserEmail, fmt.Sprintf("Deploy %s", req.Target.Name)); err != nil {
+func (d *ecsDeployer) Deploy(ctx context.Context, messenger Messenger, req *DeployRequest) (*ChatMessage, error) {
+	if err := bread.AuthenticatePhone(d.canoe, req.UserEmail, fmt.Sprintf("Deploy %s", req.Target.Name)); err != nil {
 		return nil, err
 	}
 	svc, err := d.ecs.DescribeServices(
@@ -192,12 +180,10 @@ func (d *ecsDeployer) Deploy(ctx context.Context, sender *operator.RequestSender
 			d.timeout,
 		)
 	}
-	_ = sender.Send(ctx, &operator.Message{
-		Text: *newTask.TaskDefinition.TaskDefinitionArn,
-		HTML: html,
-		Options: &operatorhipchat.MessageOptions{
-			Color: "yellow",
-		},
+	_ = SendRoomMessage(ctx, messenger, &ChatMessage{
+		Text:  *newTask.TaskDefinition.TaskDefinitionArn,
+		HTML:  html,
+		Color: "yellow",
 	})
 	ctx, cancel := context.WithTimeout(ctx, d.timeout)
 	defer cancel()
@@ -234,7 +220,7 @@ func (d *ecsDeployer) Deploy(ctx context.Context, sender *operator.RequestSender
 	case <-ctx.Done():
 		return nil, fmt.Errorf("Deploy of build %s@%s failed. Service did not rollover within %s", req.Target.Name, req.Build.GetID(), d.timeout)
 	case <-okC:
-		return &operator.Message{
+		return &ChatMessage{
 			Text: fmt.Sprintf("Deployed build %s@%s to %s", req.Target.Name, req.Build.GetID(), req.Target.ECSCluster),
 			HTML: fmt.Sprintf(
 				"Deployed build %s to ECS service <code>%s@%s</code>",
@@ -242,9 +228,7 @@ func (d *ecsDeployer) Deploy(ctx context.Context, sender *operator.RequestSender
 				*svc.Services[0].ServiceName,
 				req.Target.ECSCluster,
 			),
-			Options: &operatorhipchat.MessageOptions{
-				Color: "green",
-			},
+			Color: "green",
 		}, nil
 	}
 }

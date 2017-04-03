@@ -1,4 +1,4 @@
-package bread
+package breadapi
 
 import (
 	"encoding/json"
@@ -10,11 +10,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/sr/operator"
-	"github.com/sr/operator/hipchat"
 	"golang.org/x/net/context"
 	"golang.org/x/net/context/ctxhttp"
 
+	"git.dev.pardot.com/Pardot/infrastructure/bread"
 	"git.dev.pardot.com/Pardot/infrastructure/bread/generated/swagger/client/canoe"
 	"git.dev.pardot.com/Pardot/infrastructure/bread/generated/swagger/models"
 )
@@ -22,7 +21,7 @@ import (
 type canoeDeployer struct {
 	http   *http.Client
 	canoe  *CanoeConfig
-	client CanoeClient
+	client bread.CanoeClient
 }
 
 type canoeProject struct {
@@ -43,7 +42,7 @@ type canoeBuild struct {
 }
 
 // NewCanoeDeployer returns a Deployer that deploys to Canoe.
-func NewCanoeDeployer(canoeAPI CanoeClient, config *CanoeConfig) (Deployer, error) {
+func NewCanoeDeployer(canoeAPI bread.CanoeClient, config *CanoeConfig) (Deployer, error) {
 	if canoeAPI == nil {
 		return nil, errors.New("required argument is nil: canoeAPI")
 	}
@@ -91,7 +90,7 @@ func (d *canoeDeployer) ListBuilds(ctx context.Context, t *DeployTarget, branch 
 
 const canoeProductionTarget = "production"
 
-func (d *canoeDeployer) Deploy(ctx context.Context, sender *operator.RequestSender, req *DeployRequest) (*operator.Message, error) {
+func (d *canoeDeployer) Deploy(ctx context.Context, messenger Messenger, req *DeployRequest) (*ChatMessage, error) {
 	if req.UserEmail == "" {
 		return nil, errors.New("unable to deploy without a user")
 	}
@@ -110,7 +109,7 @@ func (d *canoeDeployer) Deploy(ctx context.Context, sender *operator.RequestSend
 		return nil, errors.New(resp.Payload.Message)
 	}
 	deployURL := fmt.Sprintf("%s/projects/%s/deploys/%d?watching=1", d.canoe.URL, req.Target.Name, resp.Payload.DeployID)
-	return &operator.Message{
+	return &ChatMessage{
 		Text: deployURL,
 		HTML: fmt.Sprintf(
 			`Deployment of %s (branch %s) to %s progress. Follow along here: <a href="%s">#%d</a>`,
@@ -120,9 +119,7 @@ func (d *canoeDeployer) Deploy(ctx context.Context, sender *operator.RequestSend
 			deployURL,
 			resp.Payload.DeployID,
 		),
-		Options: &operatorhipchat.MessageOptions{
-			Color: "green",
-		},
+		Color: "green",
 	}, nil
 }
 

@@ -1,4 +1,4 @@
-package bread
+package breadapi
 
 import (
 	"bytes"
@@ -9,8 +9,6 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/sr/operator"
-	"github.com/sr/operator/hipchat"
 	"golang.org/x/net/context"
 
 	"git.dev.pardot.com/Pardot/infrastructure/bread/generated/pb"
@@ -78,7 +76,7 @@ var ECSDeployTargets = []*DeployTarget{
 type Deployer interface {
 	ListTargets(context.Context) ([]*DeployTarget, error)
 	ListBuilds(context.Context, *DeployTarget, string) ([]Build, error)
-	Deploy(context.Context, *operator.RequestSender, *DeployRequest) (*operator.Message, error)
+	Deploy(context.Context, Messenger, *DeployRequest) (*ChatMessage, error)
 }
 
 // A DeployTarget is a running service that can be deployed.
@@ -119,7 +117,7 @@ type CanoeConfig struct {
 }
 
 type deployAPIServer struct {
-	operator.Sender
+	Messenger
 	ecs   Deployer
 	canoe Deployer
 	tz    *time.Location
@@ -128,9 +126,9 @@ type deployAPIServer struct {
 // NewDeployServer returns a gRPC server that implements the bread.Deploy protobuf
 // server interface and supports deploying to both Amazon EC2 Container Service (ECS)
 // and Canoe.
-func NewDeployServer(sender operator.Sender, ecs Deployer, canoe Deployer, tz *time.Location) (breadpb.DeployServer, error) {
-	if sender == nil {
-		return nil, errors.New("required argument is nil: sender")
+func NewDeployServer(messenger Messenger, ecs Deployer, canoe Deployer, tz *time.Location) (breadpb.DeployServer, error) {
+	if messenger == nil {
+		return nil, errors.New("required argument is nil: messenger")
 	}
 	if ecs == nil {
 		return nil, errors.New("required argument is nil: ecs")
@@ -141,23 +139,23 @@ func NewDeployServer(sender operator.Sender, ecs Deployer, canoe Deployer, tz *t
 	if tz == nil {
 		tz = time.UTC
 	}
-	return &deployAPIServer{sender, ecs, canoe, tz}, nil
+	return &deployAPIServer{messenger, ecs, canoe, tz}, nil
 }
 
-func (s *deployAPIServer) ListTargets(ctx context.Context, req *breadpb.ListTargetsRequest) (*operator.Response, error) {
-	targets := s.listTargets(ctx, req)
+func (s *deployAPIServer) ListTargets(ctx context.Context, req *breadpb.ListTargetsRequest) (*breadpb.ListTargetsResponse, error) {
+	targets := s.listTargets(ctx)
 	names := make([]string, len(targets))
 	for i, t := range targets {
 		names[i] = t.Name
 	}
 	sort.Strings(names)
-	return operator.Reply(ctx, s, req, &operator.Message{
+	return &breadpb.ListTargetsResponse{}, SendRoomMessage(ctx, s.Messenger, &ChatMessage{
 		HTML: "Deployment targets: " + strings.Join(names, ", "),
 		Text: strings.Join(names, " "),
 	})
 }
 
-func (s *deployAPIServer) ListBuilds(ctx context.Context, req *breadpb.ListBuildsRequest) (*operator.Response, error) {
+func (s *deployAPIServer) ListBuilds(ctx context.Context, req *breadpb.ListBuildsRequest) (*breadpb.ListBuildsResponse, error) {
 	if req.Target == "" {
 		req.Target = pardot
 	}
@@ -166,7 +164,7 @@ func (s *deployAPIServer) ListBuilds(ctx context.Context, req *breadpb.ListBuild
 		target *DeployTarget
 		builds []Build
 	)
-	targets := s.listTargets(ctx, req)
+	targets := s.listTargets(ctx)
 	for _, t := range targets {
 		if t.Name == req.Target {
 			target = t
@@ -184,10 +182,7 @@ func (s *deployAPIServer) ListBuilds(ctx context.Context, req *breadpb.ListBuild
 		return nil, err
 	}
 	if len(builds) == 0 {
-		return operator.Reply(ctx, s, req, &operator.Message{
-			Text: "",
-			HTML: fmt.Sprintf("No build for %s@%s", req.Target, req.Branch),
-		})
+		return nil, fmt.Errorf("No build for %s@%s", req.Target, req.Branch)
 	}
 	var txt, html bytes.Buffer
 	_, _ = html.WriteString("<table><tr><th>Build</th><th>Commit</th><th>Completed</th><th></th></tr>")
@@ -207,7 +202,8 @@ func (s *deployAPIServer) ListBuilds(ctx context.Context, req *breadpb.ListBuild
 		)
 		i++
 	}
-	return operator.Reply(ctx, s, req, &operator.Message{Text: txt.String(), HTML: html.String()})
+	return &breadpb.ListBuildsResponse{},
+		SendRoomMessage(ctx, s.Messenger, &ChatMessage{Text: txt.String(), HTML: html.String()})
 }
 
 var eggs = map[string]string{
@@ -216,17 +212,13 @@ var eggs = map[string]string{
 	"BIJ":    "http://abload.de/img/gowron1eykyk.gif",
 }
 
-func (s *deployAPIServer) Trigger(ctx context.Context, req *breadpb.TriggerRequest) (*operator.Response, error) {
-	if req.GetRequest() == nil {
-		return nil, errors.New("invalid request")
-	}
+func (s *deployAPIServer) Trigger(ctx context.Context, req *breadpb.TriggerRequest) (*breadpb.TriggerResponse, error) {
 	if v, ok := eggs[req.Target]; ok {
-		return operator.Reply(ctx, s, req, &operator.Message{
-			Text: v,
-			Options: &operatorhipchat.MessageOptions{
+		return &breadpb.TriggerResponse{},
+			SendRoomMessage(ctx, s.Messenger, &ChatMessage{
+				Text:  v,
 				Color: "green",
-			},
-		})
+			})
 	}
 	if req.Build == "" && req.Branch == "" {
 		req.Branch = master
@@ -236,9 +228,9 @@ func (s *deployAPIServer) Trigger(ctx context.Context, req *breadpb.TriggerReque
 	}
 	var (
 		target *DeployTarget
-		msg    *operator.Message
+		msg    *ChatMessage
 	)
-	targets := s.listTargets(ctx, req)
+	targets := s.listTargets(ctx)
 	for _, t := range targets {
 		if t.Name == req.Target {
 			target = t
@@ -277,32 +269,30 @@ func (s *deployAPIServer) Trigger(ctx context.Context, req *breadpb.TriggerReque
 	deploy := &DeployRequest{
 		Target:    target,
 		Build:     build,
-		UserEmail: operator.GetUserEmail(req),
+		UserEmail: emailFromContext(ctx),
 	}
 	if target.Canoe {
-		msg, err = s.canoe.Deploy(ctx, operator.GetSender(s, req), deploy)
+		msg, err = s.canoe.Deploy(ctx, s.Messenger, deploy)
 	} else {
-		msg, err = s.ecs.Deploy(ctx, operator.GetSender(s, req), deploy)
+		msg, err = s.ecs.Deploy(ctx, s.Messenger, deploy)
 	}
 	if err != nil {
 		return nil, err
 	}
-	return operator.Reply(ctx, s, req, msg)
+	return &breadpb.TriggerResponse{Message: msg.Text}, SendRoomMessage(ctx, s.Messenger, msg)
 }
 
 var ecsRunning = aws.String("RUNNING")
 
-func (s *deployAPIServer) listTargets(ctx context.Context, req operator.Requester) (targets []*DeployTarget) {
+func (s *deployAPIServer) listTargets(ctx context.Context) (targets []*DeployTarget) {
 	targets, _ = s.ecs.ListTargets(ctx)
 	if t, err := s.canoe.ListTargets(ctx); err == nil {
 		targets = append(targets, t...)
 	} else {
-		_ = operator.Send(ctx, s, req, &operator.Message{
-			Text: fmt.Sprintf("Could not get list of projects from Canoe: %v", err),
-			HTML: fmt.Sprintf("Could not get list of projects from Canoe: <code>%v</code>", err),
-			Options: &operatorhipchat.MessageOptions{
-				Color: "red",
-			},
+		_ = SendRoomMessage(ctx, s.Messenger, &ChatMessage{
+			Text:  fmt.Sprintf("Could not get list of projects from Canoe: %v", err),
+			HTML:  fmt.Sprintf("Could not get list of projects from Canoe: <code>%v</code>", err),
+			Color: "red",
 		})
 	}
 	return targets
