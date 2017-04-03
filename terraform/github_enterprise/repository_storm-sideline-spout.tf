@@ -8,6 +8,17 @@ resource "github_repository" "storm-sideline-spout" {
   has_wiki      = false
 }
 
+resource "github_branch_protection" "storm-sideline-spout" {
+  repository = "${github_repository.storm-sideline-spout.name}"
+  branch     = "master"
+
+  required_status_checks {
+    include_admins = false
+    strict         = false
+    contexts       = ["compliance"]
+  }
+}
+
 resource "github_team_repository" "storm-sideline-spout_developers" {
   repository = "${github_repository.storm-sideline-spout.name}"
   team_id    = "${github_team.developers.id}"
