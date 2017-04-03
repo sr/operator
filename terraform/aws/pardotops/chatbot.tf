@@ -2,10 +2,6 @@ resource "aws_iam_user" "sa_chatbot" {
   name = "sa_chatbot"
 }
 
-resource "aws_iam_access_key" "chatbot" {
-  user = "${aws_iam_user.sa_chatbot.name}"
-}
-
 resource "aws_iam_user_policy" "chatbot" {
   name = "chatbot"
   user = "${aws_iam_user.sa_chatbot.name}"
