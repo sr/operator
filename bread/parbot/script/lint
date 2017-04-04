@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-cd "$(dirname "${BASH_SOURCE[0]}")/.."
-pwd
-set -exuo pipefail
-find . -name "*.coffee" -print0 | xargs -0 coffeelint -f coffeelint.json

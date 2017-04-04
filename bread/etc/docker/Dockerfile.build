@@ -1,3 +1,0 @@
-FROM docker.dev.pardot.com/base/bread/bread
-ENV PATH "/data/tools/build:$PATH"
-ENV LANG=en_US.UTF-8

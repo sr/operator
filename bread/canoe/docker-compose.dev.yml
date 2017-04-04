@@ -1,7 +1,0 @@
-version: "2"
-services:
-  app:
-    volumes:
-      - .:/app
-    environment:
-      RACK_TIMEOUT_SERVICE_TIMEOUT: 120

@@ -1,4 +1,0 @@
-web: script/server
-worker: LIBRATO_AUTORUN=1 bundle exec sidekiq -q default -q mailers
-stream: LIBRATO_AUTORUN=1 bundle exec rake stream:process
-monitor_testing: bundle exec rake monitor:testing

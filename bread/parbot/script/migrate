@@ -1,8 +1,0 @@
-#!/bin/bash
-set -e
-
-dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.."; pwd)"
-cd "$dir"
-
-echo "==> Setting up the database"
-node_modules/.bin/db-migrate up
