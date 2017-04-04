@@ -1,21 +1,23 @@
-package chatbot
+package breadapi
 
 import (
 	"errors"
 	"strconv"
 
-	operatorhipchat "github.com/sr/operator/hipchat"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc/metadata"
 
 	"git.dev.pardot.com/Pardot/infrastructure/bread"
 )
 
-// A MessageHandler handles chat messages.
-type MessageHandler func(*Message) error
+// A ChatMessageHandler handles chat messages.
+type ChatMessageHandler func(*ChatMessage) error
 
-// A Message is a chat message sent by a User to a Room.
-type Message struct {
+// A Messenger sends messages to a chat room.
+type Messenger func(context.Context, *ChatMessage) error
+
+// A ChatMessage is a chat message sent by a User to a Room.
+type ChatMessage struct {
 	Text  string
 	HTML  string
 	Color string
@@ -39,51 +41,40 @@ type User struct {
 }
 
 // LogHandler is a dummy MessageHandler that logs all messages.
-func LogHandler(logger bread.Logger) MessageHandler {
-	return func(msg *Message) error {
+func LogHandler(logger bread.Logger) ChatMessageHandler {
+	return func(msg *ChatMessage) error {
 		logger.Printf("received message: %s", msg.Text)
 		return nil
 	}
 }
 
-func SendRoomMessage(ctx context.Context, client operatorhipchat.Client, msg *Message) error {
+func SendRoomMessage(ctx context.Context, messenger Messenger, msg *ChatMessage) error {
 	if ctx == nil {
 		return errors.New("required argument is nil: ctx")
 	}
-	if client == nil {
-		return errors.New("required argument is nil: client")
+	if messenger == nil {
+		return errors.New("required argument is nil: messenger")
 	}
 	if msg == nil {
 		return errors.New("required argument is nil: msg")
 	}
-	var roomID int64
+	msg.Room = &Room{}
 	if md, ok := metadata.FromContext(ctx); ok {
-		if val, ok := md[hipchatRoomIDKey]; ok {
+		if val, ok := md[chatRoomIDKey]; ok {
 			if len(val) == 1 {
 				if i, err := strconv.Atoi(val[0]); err == nil {
-					roomID = int64(i)
+					msg.Room.ID = i
 				}
 			}
 		}
 	}
-	if roomID == 0 {
+	if msg.Room.ID == 0 {
 		return errors.New("no chat room ID found in request")
 	}
-	notif := &operatorhipchat.RoomNotification{RoomID: roomID}
-	if msg.Color != "" {
-		notif.MessageOptions = &operatorhipchat.MessageOptions{Color: msg.Color}
-	}
-	if msg.HTML != "" {
-		notif.MessageFormat = "html"
-		notif.Message = msg.HTML
-	} else {
-		notif.MessageFormat = "text"
-		notif.Message = msg.Text
-	}
-	return client.SendRoomNotification(ctx, notif)
+	return messenger(ctx, msg)
 }
 
-func EmailFromContext(ctx context.Context) string {
+func emailFromContext(ctx context.Context) string {
 	if ctx == nil {
 		return ""
 	}

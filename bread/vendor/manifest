@@ -617,14 +617,6 @@
 			"notests": true
 		},
 		{
-			"importpath": "github.com/go-sql-driver/mysql",
-			"repository": "https://github.com/go-sql-driver/mysql",
-			"vcs": "git",
-			"revision": "0b58b37b664c21f3010e836f1b931e1d0b0b0685",
-			"branch": "HEAD",
-			"notests": true
-		},
-		{
 			"importpath": "github.com/go-swagger/go-swagger",
 			"repository": "https://github.com/go-swagger/go-swagger",
 			"vcs": "git",

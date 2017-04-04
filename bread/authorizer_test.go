@@ -10,12 +10,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/go-ldap/ldap"
+	"github.com/golang/protobuf/ptypes/empty"
+	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
-
-	"github.com/go-ldap/ldap"
-	"github.com/sr/operator"
-	"golang.org/x/net/context"
 
 	"git.dev.pardot.com/Pardot/infrastructure/bread"
 	"git.dev.pardot.com/Pardot/infrastructure/bread/generated/pb"
@@ -195,20 +194,10 @@ func (i *fakeAuthorizer) Authorize(ctx context.Context, call *bread.RPC, email s
 }
 
 type pingServer struct {
-	lastRoomID string
 }
 
-func (s *pingServer) Ping(ctx context.Context, req *breadpb.PingRequest) (*operator.Response, error) {
-	if md, ok := metadata.FromContext(ctx); ok {
-		if _, ok := md["hipchat_room_id"]; ok {
-			s.lastRoomID = md["hipchat_room_id"][0]
-		}
-	}
-	return &operator.Response{}, nil
-}
-
-func (s *pingServer) SlowLoris(ctx context.Context, req *breadpb.SlowLorisRequest) (*operator.Response, error) {
-	panic("not implemented")
+func (s *pingServer) Ping(ctx context.Context, req *breadpb.PingRequest) (*empty.Empty, error) {
+	return &empty.Empty{}, nil
 }
 
 func TestGRPCServerInterceptor(t *testing.T) {
@@ -222,7 +211,7 @@ func TestGRPCServerInterceptor(t *testing.T) {
 	server := grpc.NewServer(grpc.UnaryInterceptor(bread.GRPCServerInterceptor(authorizer)))
 	defer server.GracefulStop()
 	ping := &pingServer{}
-	breadpb.RegisterPingServer(server, ping)
+	breadpb.RegisterPingerServer(server, ping)
 	go server.Serve(listener)
 
 	conn, err := grpc.Dial(
@@ -267,7 +256,7 @@ func TestGRPCServerInterceptor(t *testing.T) {
 		},
 	} {
 		authorizer.err = tc.authErr
-		_, err := breadpb.NewPingClient(conn).Ping(tc.ctx, tc.req)
+		_, err := breadpb.NewPingerClient(conn).Ping(tc.ctx, tc.req)
 		if grpc.ErrorDesc(err) != grpc.ErrorDesc(tc.wantErr) {
 			t.Errorf("req %+v %+v want err %+v, got %+v", tc.ctx, tc.req, tc.wantErr, err)
 		}

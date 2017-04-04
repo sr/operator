@@ -11,26 +11,33 @@ service Deploy {
 	option (operator.enabled) = true;
 
 	// List what can be deployed
-	rpc ListTargets(ListTargetsRequest) returns (operator.Response);
+	rpc ListTargets(ListTargetsRequest) returns (ListTargetsResponse);
 	// List the ten most recent builds for a given target
-	rpc ListBuilds(ListBuildsRequest) returns (operator.Response);
+	rpc ListBuilds(ListBuildsRequest) returns (ListBuildsResponse);
 	// Trigger a deploy of a build to given target
-	rpc Trigger(TriggerRequest) returns (operator.Response);
+	rpc Trigger(TriggerRequest) returns (TriggerResponse);
 }
 
 message ListTargetsRequest {
-	operator.Request request = 1;
+}
+
+message ListTargetsResponse {
 }
 
 message ListBuildsRequest {
-	operator.Request request = 1;
-	string target = 2;
-	string branch = 3;
+	string target = 1;
+	string branch = 2;
+}
+
+message ListBuildsResponse {
 }
 
 message TriggerRequest {
-	operator.Request request = 1;
-	string target = 2;
-	string build = 3;
-	string branch = 4;
+	string target = 1;
+	string build = 2;
+	string branch = 3;
+}
+
+message TriggerResponse {
+	string message = 1;
 }

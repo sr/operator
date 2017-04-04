@@ -7,9 +7,10 @@ import (
 	"fmt"
 	"os"
 
-	"git.dev.pardot.com/Pardot/infrastructure/bread"
-	"github.com/sr/operator/hipchat"
 	"golang.org/x/net/context"
+
+	"git.dev.pardot.com/Pardot/infrastructure/bread"
+	"git.dev.pardot.com/Pardot/infrastructure/bread/hipchat"
 )
 
 func main() {
@@ -38,7 +39,7 @@ func run() error {
 	if !ok {
 		return errors.New("required environment variable missing: HIPCHAT_TOKEN")
 	}
-	client, err := bread.NewHipchatClient(&operatorhipchat.ClientConfig{
+	client, err := breadhipchat.NewClient(context.Background(), &breadhipchat.ClientConfig{
 		Hostname: bread.HipchatHost,
 		Token:    token,
 	})
@@ -94,8 +95,8 @@ func run() error {
 	}
 	return client.SendRoomNotification(
 		context.Background(),
-		&operatorhipchat.RoomNotification{
-			MessageOptions: &operatorhipchat.MessageOptions{
+		&breadhipchat.RoomNotification{
+			MessageOptions: &breadhipchat.MessageOptions{
 				Color: color,
 				From:  "breadsignal",
 			},

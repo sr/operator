@@ -5,16 +5,14 @@ import (
 	"errors"
 	"fmt"
 
-	"git.dev.pardot.com/Pardot/infrastructure/bread/chatbot"
-	"git.dev.pardot.com/Pardot/infrastructure/bread/jira"
-	operatorhipchat "github.com/sr/operator/hipchat"
 	"golang.org/x/net/context"
 
 	"git.dev.pardot.com/Pardot/infrastructure/bread/generated/pb"
+	"git.dev.pardot.com/Pardot/infrastructure/bread/jira"
 )
 
 type TicketsServer struct {
-	Hipchat operatorhipchat.Client
+	Messenger
 	Jira    jira.Client
 	Project string
 }
@@ -63,14 +61,14 @@ func (s *TicketsServer) SprintStatus(ctx context.Context, req *breadpb.TicketReq
 			summary,
 		)
 	}
-	return &breadpb.TicketResponse{}, chatbot.SendRoomMessage(ctx, s.Hipchat, &chatbot.Message{
+	return &breadpb.TicketResponse{}, SendRoomMessage(ctx, s.Messenger, &ChatMessage{
 		Text: txt.String(),
 		HTML: html.String(),
 	})
 }
 
 func (s *TicketsServer) Mine(ctx context.Context, req *breadpb.TicketRequest) (*breadpb.TicketResponse, error) {
-	email := chatbot.EmailFromContext(ctx)
+	email := emailFromContext(ctx)
 	if email == "" {
 		return nil, errors.New("unable to retrieve list of assigned tickets without and email address")
 	}
@@ -99,7 +97,7 @@ func (s *TicketsServer) Mine(ctx context.Context, req *breadpb.TicketRequest) (*
 			issue.Fields.Summary,
 		)
 	}
-	return &breadpb.TicketResponse{}, chatbot.SendRoomMessage(ctx, s.Hipchat, &chatbot.Message{
+	return &breadpb.TicketResponse{}, SendRoomMessage(ctx, s.Messenger, &ChatMessage{
 		Text: txt.String(),
 		HTML: html.String(),
 	})

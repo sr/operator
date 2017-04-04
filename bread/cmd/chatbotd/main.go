@@ -15,15 +15,17 @@ import (
 	"sync"
 	"time"
 
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/ecs"
 	heroku "github.com/cyberdelia/heroku-go/v3"
-	operatorhipchat "github.com/sr/operator/hipchat"
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2/clientcredentials"
 	"google.golang.org/grpc"
 
 	"git.dev.pardot.com/Pardot/infrastructure/bread"
 	"git.dev.pardot.com/Pardot/infrastructure/bread/api"
-	"git.dev.pardot.com/Pardot/infrastructure/bread/chatbot"
 	"git.dev.pardot.com/Pardot/infrastructure/bread/generated"
 	"git.dev.pardot.com/Pardot/infrastructure/bread/generated/pb"
 	"git.dev.pardot.com/Pardot/infrastructure/bread/hipchat"
@@ -39,24 +41,40 @@ const (
 )
 
 var (
-	port               = flag.String("port", "", "Listening port of the HTTP server. Defaults to $PORT.")
-	timeout            = flag.Duration("command-timeout", 10*time.Minute, "")
+	port     = flag.String("port", "", "Listening port of the HTTP server. Defaults to $PORT.")
+	timeout  = flag.Duration("command-timeout", 10*time.Minute, "")
+	timezone = flag.String("timezone", "America/New_York", "Display dates and times in this timezone")
+
+	ecsRegion          = flag.String("deploy-ecs-aws-region", "us-east-1", "AWS Region")
+	ecsAccessKeyID     = flag.String("deploy-ecs-aws-access-key-id", "", "")
+	ecsAccessKeySecret = flag.String("deploy-ecs-aws-access-key-secret", "", "")
+	ecsDeployTimeout   = flag.Duration("deploy-ecs-deploy-timeout", 5*time.Minute, "Time to wait for new ECS task definitions to come up")
+
 	hipchatOAuthID     = flag.String("hipchat-oauth-id", "", "")
 	hipchatOAuthSecret = flag.String("hipchat-oauth-secret", "", "")
-	herokuAPIUsername  = flag.String("heroku-api-username", "", "")
-	herokuAPIPassword  = flag.String("heroku-api-password", "", "")
-	canoeAPIURL        = flag.String("canoe-api-url", "https://canoe.dev.pardot.com", "")
-	canoeAPIKey        = flag.String("canoe-api-key", "", "Canoe API key")
-	jiraURL            = flag.String("jira-url", defaultJIRAURL, "URL of the JIRA installation.")
-	jiraProject        = flag.String("jira-project", defaultJIRAProject, "Key of the project to manage")
-	jiraUsername       = flag.String("jira-username", "", "JIRA username")
-	jiraPassword       = flag.String("jira-password", "", "JIRA password")
 
-	hipchatAddonConfig = &breadhipchat.AddonConfig{}
+	herokuAPIUsername = flag.String("heroku-api-username", "", "")
+	herokuAPIPassword = flag.String("heroku-api-password", "", "")
+
+	jiraURL      = flag.String("jira-url", defaultJIRAURL, "URL of the JIRA installation.")
+	jiraProject  = flag.String("jira-project", defaultJIRAProject, "Key of the project to manage")
+	jiraUsername = flag.String("jira-username", "", "JIRA username")
+	jiraPassword = flag.String("jira-password", "", "JIRA password")
+
+	afy                = &breadapi.ArtifactoryConfig{}
+	canoe              = &breadapi.CanoeConfig{}
+	hipchatAddonConfig = &breadapi.HipchatAddonConfig{}
 	ldapConfig         = &bread.LDAPConfig{}
 )
 
 func init() {
+	flag.StringVar(&afy.URL, "deploy-artifactory-url", "https://artifactory.dev.pardot.com/artifactory", "Artifactory URL")
+	flag.StringVar(&afy.User, "deploy-artifactory-user", "", "Artifactory username")
+	flag.StringVar(&afy.APIKey, "deploy-artifactory-api-key", "", "Artifactory API key")
+	flag.StringVar(&afy.Repo, "deploy-artifactory-repo", "pd-docker", "Name of the Artifactory repository where deployable artifacts are stored")
+	flag.StringVar(&canoe.URL, "deploy-canoe-url", "https://canoe.dev.pardot.com", "")
+	flag.StringVar(&canoe.APIKey, "deploy-canoe-api-key", "", "Canoe API key")
+
 	flag.StringVar(&hipchatAddonConfig.Name, "hipchat-addon-name", "", "")
 	flag.StringVar(&hipchatAddonConfig.Key, "hipchat-addon-key", "", "")
 	flag.StringVar(&hipchatAddonConfig.Homepage, "hipchat-addon-homepage", "", "")
@@ -64,6 +82,7 @@ func init() {
 	flag.StringVar(&hipchatAddonConfig.WebhookURL, "hipchat-addon-webhook-url", "", "")
 	flag.StringVar(&hipchatAddonConfig.AvatarURL, "hipchat-addon-avatar-url", "", "")
 	flag.StringVar(&hipchatAddonConfig.HerokuApp, "hipchat-addon-heroku-app", "", "")
+
 	flag.StringVar(&ldapConfig.Addr, "ldap-address", "localhost:389", "Address of the LDAP server used to authenticate and authorize commands")
 	flag.StringVar(&ldapConfig.Base, "ldap-base", bread.LDAPBase, "LDAP Base DN")
 }
@@ -88,28 +107,50 @@ func run() error {
 	if *port == "" {
 		return errors.New("required flag missing: port")
 	}
-	if *canoeAPIURL == "" {
-		return errors.New("required flag missing: canoe-api-url")
+	if canoe.URL == "" {
+		return errors.New("required flag missing: deploy-canoe-api-url")
 	}
-	parsedCanoeAPIURL, err := url.Parse(*canoeAPIURL)
+	parsedCanoeAPIURL, err := url.Parse(canoe.URL)
 	if err != nil {
-		return fmt.Errorf("required flag canoe-url is invalid: %s", err)
+		return fmt.Errorf("required flag deploy-canoe-url is invalid: %s", err)
 	}
-	if *canoeAPIKey == "" {
-		return errors.New("required flag missing: canoe-api-key")
+	if afy.URL == "" {
+		return errors.New("required flag missing: deploy-artifactory-url")
+	}
+	if afy.User == "" {
+		return errors.New("required flag missing: deploy-artifactory-user")
+	}
+	if afy.APIKey == "" {
+		return errors.New("required flag missing: deploy-artifactory-api-key")
+	}
+	if canoe.APIKey == "" {
+		return errors.New("required flag missing: deploy-canoe-api-key")
+	}
+	if *ecsRegion == "" {
+		return errors.New("required flag missing: deploy-ecs-aws-region")
+	}
+	if *ecsAccessKeyID == "" {
+		return errors.New("required flag missing: deploy-ecs-access-key-id")
+	}
+	if *ecsAccessKeySecret == "" {
+		return errors.New("required flag missing: deploy-ecs-access-key-secret")
 	}
 	if v, ok := os.LookupEnv("LDAP_CA_CERT"); ok {
 		ldapConfig.CACert = []byte(v)
 	}
+	tz, err := time.LoadLocation(*timezone)
+	if err != nil {
+		return err
+	}
 
 	logger := log.New(os.Stderr, "chatbotd: ", 0)
 
-	client, err := operatorhipchat.NewClient(
+	hipchat, err := breadhipchat.NewClient(
 		context.TODO(),
-		&operatorhipchat.ClientConfig{
+		&breadhipchat.ClientConfig{
 			Hostname: bread.HipchatHost,
 			Scopes:   breadhipchat.DefaultScopes,
-			Credentials: &operatorhipchat.ClientCredentials{
+			Credentials: &breadhipchat.ClientCredentials{
 				ID:     *hipchatOAuthID,
 				Secret: *hipchatOAuthSecret,
 			},
@@ -119,14 +160,20 @@ func run() error {
 		return err
 	}
 
+	messenger, err := breadapi.HipchatMessenger(hipchat)
+	if err != nil {
+		return err
+	}
+
 	authorizer, err := bread.NewLDAPAuthorizer(
 		ldapConfig,
-		bread.NewCanoeClient(parsedCanoeAPIURL, *canoeAPIKey),
+		bread.NewCanoeClient(parsedCanoeAPIURL, canoe.APIKey),
 		bread.ACL,
 	)
 	if err != nil {
 		return err
 	}
+
 	errC := make(chan error, 1)
 	// Start the gRPC server and establish a client connection to it.
 	grpcListener, err := net.Listen("tcp", grpcAddress)
@@ -135,13 +182,45 @@ func run() error {
 	}
 
 	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(bread.GRPCServerInterceptor(authorizer)))
-	breadpb.RegisterPingerServer(grpcServer, &breadapi.PingerServer{Hipchat: client})
+	breadpb.RegisterPingerServer(grpcServer, &breadapi.PingerServer{Messenger: messenger})
 
 	breadpb.RegisterTicketsServer(grpcServer, &breadapi.TicketsServer{
-		Hipchat: client,
-		Jira:    jira.NewClient(*jiraURL, *jiraUsername, *jiraPassword),
-		Project: *jiraProject,
+		Messenger: messenger,
+		Jira:      jira.NewClient(*jiraURL, *jiraUsername, *jiraPassword),
+		Project:   *jiraProject,
 	})
+
+	canoeAPI := bread.NewCanoeClient(parsedCanoeAPIURL, canoe.APIKey)
+	ecsDeployer, err := breadapi.NewECSDeployer(
+		ecs.New(
+			session.New(
+				&aws.Config{
+					Region: ecsRegion,
+					Credentials: credentials.NewStaticCredentials(
+						*ecsAccessKeyID,
+						*ecsAccessKeySecret,
+						"",
+					),
+				},
+			),
+		),
+		afy,
+		breadapi.ECSDeployTargets,
+		canoeAPI,
+		*ecsDeployTimeout,
+	)
+	if err != nil {
+		return err
+	}
+	canoeDeployer, err := breadapi.NewCanoeDeployer(canoeAPI, canoe)
+	if err != nil {
+		return err
+	}
+	deployServer, err := breadapi.NewDeployServer(messenger, ecsDeployer, canoeDeployer, tz)
+	if err != nil {
+		return err
+	}
+	breadpb.RegisterDeployServer(grpcServer, deployServer)
 
 	go func() {
 		errC <- grpcServer.Serve(grpcListener)
@@ -158,12 +237,12 @@ func run() error {
 	}
 
 	// Channel used to by the event HTTP server to send chat commands to the workers.
-	chatCommands := make(chan *chatbot.Command, 100)
+	chatCommands := make(chan *breadapi.ChatCommand, 100)
 
 	// All chat messages are processed through these functions
-	messageHandlers := []chatbot.MessageHandler{
-		chatbot.LogHandler(logger),
-		chatbot.GRPCMessageHandler(defaultProtoPackage, chatCommands),
+	messageHandlers := []breadapi.ChatMessageHandler{
+		breadapi.LogHandler(logger),
+		breadapi.GRPCMessageHandler(defaultProtoPackage, chatCommands),
 	}
 
 	mux := http.NewServeMux()
@@ -179,7 +258,7 @@ func run() error {
 			return fmt.Errorf("required flag missing: heroku-api-password")
 		}
 
-		handler, err := breadhipchat.AddonHandler(
+		handler, err := breadapi.HipchatAddonHandler(
 			heroku.NewService(&http.Client{
 				Transport: &heroku.Transport{
 					Username: *herokuAPIUsername,
@@ -198,15 +277,15 @@ func run() error {
 			return err
 		}
 
-		handler, err := breadhipchat.EventHandler(
-			client,
+		handler, err := breadapi.HipchatEventHandler(
+			hipchat,
 			&clientcredentials.Config{
 				ClientID:     *hipchatOAuthID,
 				ClientSecret: *hipchatOAuthSecret,
 				TokenURL:     fmt.Sprintf("%s/v2/oauth/token", bread.HipchatHost),
 				Scopes:       breadhipchat.DefaultScopes,
 			},
-			func(msg *chatbot.Message) error {
+			func(msg *breadapi.ChatMessage) error {
 				var fail bool
 				for _, handler := range messageHandlers {
 					if err := handler(msg); err != nil {
@@ -232,7 +311,7 @@ func run() error {
 		wg.Add(1)
 		go func() {
 			for cmd := range chatCommands {
-				if err := chatbot.HandleCommand(client, breadgen.ChatCommandGRPCInvoker, *timeout, conn, cmd); err != nil {
+				if err := breadapi.HandleChatCommand(messenger, breadgen.ChatCommandGRPCInvoker, *timeout, conn, cmd); err != nil {
 					logger.Printf("command handler error: %s", err)
 				}
 			}

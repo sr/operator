@@ -37,7 +37,7 @@ namespace :canoe do
       project.bamboo_project = "BREAD"
       project.bamboo_plan = "BREAD"
       project.bamboo_job = "EX"
-      project.repository = "Pardot/bread"
+      project.repository = "Pardot/infrastructure"
       project.save!
     }.tap(&:save!)
     explorer.deploy_notifications.find_or_initialize_by(hipchat_room_id: BREAD_HIPCHAT_ROOM_ID).tap(&:save!)
