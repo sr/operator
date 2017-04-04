@@ -321,13 +321,6 @@ resource "bamboo_build_plan" "PDT-DC" {
   automatic_merging_enabled = false
 }
 
-resource "bamboo_build_plan" "PDT-DA" {
-  key                       = "PDT-DA"
-  name                      = "Discovery-Agent"
-  default_repository_id     = "${bamboo_repository.Discovery-Agent.id}"
-  automatic_merging_enabled = false
-}
-
 resource "bamboo_build_plan" "PDT-JSNIP" {
   key                       = "PDT-JSNIP"
   name                      = "java-snippets"

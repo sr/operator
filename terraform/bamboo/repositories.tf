@@ -268,14 +268,6 @@ resource "bamboo_repository" "Discovery-Client" {
   shallow_clones = true
 }
 
-resource "bamboo_repository" "Discovery-Agent" {
-  name           = "Discovery-Agent"
-  username       = "${var.bamboo_git_username}"
-  password       = "${var.bamboo_git_password}"
-  repository     = "Pardot/Discovery-Agent"
-  shallow_clones = true
-}
-
 resource "bamboo_repository" "java-snippets" {
   name           = "java-snippets"
   username       = "${var.bamboo_git_username}"
