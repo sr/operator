@@ -1,9 +1,0 @@
-#!/usr/bin/env bash
-#/ Usage: tarball-build <file...>
-#/ Builds a tarball from a set of files and writes the pathname of the tarball
-#/ to standard output.
-set -euo pipefail
-
-archive="$(mktemp -t "breadXXXXX").tar"
-tar -cf - "$@" > "$archive"
-echo "$archive"

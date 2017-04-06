@@ -1,7 +1,0 @@
-node_modules
-.DS_Store*
-.hubot_history
-*.sqlite3
-.idea
-.idea/*
-script/secrets.sh

@@ -1,8 +1,0 @@
-#!/bin/bash
-set -e
-
-dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.."; pwd)"
-cd "$dir"
-
-echo "==> Installing node.js dependencies"
-npm install

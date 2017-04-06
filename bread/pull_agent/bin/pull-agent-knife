@@ -1,7 +1,0 @@
-#!/usr/bin/env ruby
-require "pull_agent"
-
-proxy_selector = PullAgent::ProxySelector.new
-proxy_selector.configure_random_proxy
-
-PullAgent::CLI.knife(ARGV)

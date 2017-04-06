@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-cd "$(dirname "$0")/.."
-set -euo pipefail
-# TODO(sr) Implement linting here instead of in the makefile; run this script on CI.
-make -f etc/mk/golang.mk fmt lint vet errcheck interfacer unused

@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-: "${LDAP_LDIF:="/data/ldap.ldif"}"
-ulimit -n 65535
-slapadd -l "$LDAP_LDIF"
-exec  /usr/sbin/slapd -d16640

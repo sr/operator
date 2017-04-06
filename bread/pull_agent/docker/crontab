@@ -1,5 +1,0 @@
-GEM_HOME=/usr/local/bundle
-BUNDLE_APP_CONFIG=/usr/local/bundle
-
-#* * * * * root . /tmp/.pullhostname.env; cd /pull-agent && /usr/local/bin/bundle exec bin/pull-agent dev chef >>/var/log/cron.log 2>&1
-* * * * * root . /tmp/.pullhostname.env; cd /pull-agent && /usr/local/bin/bundle exec bin/pull-agent dev pardot >>/var/log/cron.log 2>&1

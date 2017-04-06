@@ -1,4 +1,0 @@
-#!/usr/bin/env bash
-set -euo pipefail
-echo "UPDATE repositories SET compliance_enabled = true WHERE owner = 'Pardot' AND name = '$1'" |
-heroku pg:psql -a pardot-changeling-production
