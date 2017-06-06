@@ -96,55 +96,32 @@ func describe(request *plugin.CodeGeneratorRequest) (*Descriptor, error) {
 				services[j].Config = make([]Setting, 0)
 			}
 			for k, method := range service.Method {
-				inputName := strings.Split(method.GetInputType(), ".")[2]
-				outputName := strings.Split(method.GetOutputType(), ".")[2]
-				input, ok := messagesByName[inputName]
-				if !ok {
-					return nil, fmt.Errorf("No definition for input message %s", inputName)
-				}
-				if err := validateMessageHasField(input, sourceField); err != nil {
-					return nil, err
-				}
-				if method.GetOutputType() != ".operator.Response" {
-					output, ok := messagesByName[outputName]
-					if !ok {
-						return nil, fmt.Errorf("No definition for output message %s", outputName)
-					}
-					if len(output.Field) == 0 {
-						return nil, fmt.Errorf("Output message '%s' has no field", output.GetName())
-					}
-					var field *descriptor.FieldDescriptorProto
-					ok = false
-					for _, f := range output.Field {
-						if f.GetNumber() == 1 {
-							ok = true
-							field = f
-						}
-					}
-					if !ok {
-						return nil, fmt.Errorf("Output message '%s' has no field with ID = %d", output.GetName(), 1)
-					}
-					if field.GetType() != descriptor.FieldDescriptorProto_TYPE_STRING {
-						return nil, fmt.Errorf("field %s.message must be a string", output.GetName())
-					}
-				}
 				services[j].Methods[k] = &Method{
 					Name:        method.GetName(),
 					Description: undocumentedPlaceholder,
-					Input:       inputName,
-					Output:      outputName,
-					Arguments:   make([]*Argument, len(input.Field)-1),
 				}
-				for l, field := range input.Field {
-					if field.GetName() == sourceField {
-						continue
-					}
-					services[j].Methods[k].Arguments[l-1] = &Argument{
-						Name:        field.GetName(),
-						Type:        field.GetType(),
-						Description: undocumentedPlaceholder,
-						fieldNum:    *field.Number,
-						messageIdx:  messagesIdxByName[input.GetName()],
+				if !services[j].Enabled {
+					continue
+				}
+				inputName := strings.Split(method.GetInputType(), ".")[2]
+				outputName := strings.Split(method.GetOutputType(), ".")[2]
+				services[j].Methods[k].Input = inputName
+				services[j].Methods[k].Output = outputName
+				input, ok := messagesByName[inputName]
+				if ok {
+					services[j].Methods[k].Arguments = make([]*Argument, len(input.Field))
+				} else {
+					services[j].Methods[k].Arguments = make([]*Argument, 0)
+				}
+				if input != nil {
+					for l, field := range input.Field {
+						services[j].Methods[k].Arguments[l] = &Argument{
+							Name:        field.GetName(),
+							Type:        field.GetType(),
+							Description: undocumentedPlaceholder,
+							fieldNum:    *field.Number,
+							messageIdx:  messagesIdxByName[input.GetName()],
+						}
 					}
 				}
 			}
